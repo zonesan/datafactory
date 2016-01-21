@@ -1,6 +1,3 @@
-
-language: go
-
 go:
   - 1.4
   - 1.5.1
@@ -10,16 +7,23 @@ install:
   - make install-travis
 
 deploy:
-  provider: releases
-  api_key:
-    secure: YXnRO3hJxpVizfzXb5RWu8zYtRyW8q6WEmjuvR6xOwaboTq8mNOEPptfryE0yhaO9Lv68Xf5VB26HLuiTaPivIIomB2QCOo+rQT9GNho5CFPomKW9gk+yhxKAlCZzorfqRyJErr6zyVWaajfdVeLbB6B7MKY+5/bAc5QHYyDW2fLZnQq1wrXkeuFEmmpPbdxincTwjhlRtbbJSCRLaI9SuE9S7JWS5OhLtgEGVu6DY+BQi1PXcwwpAzvLbrr3yt9t+LvyKzvKNXe02bAvp2/Q4cOhKb/7eg8LxjaBwmpk5nLrqx9b3UrMS5Rk9P2J/U75GsQRM4ebGzK7N+FvLWj+8uxT9tDHY3+5g1a2sUzMfdLaSAx6qeleqOqxlvbujzQVlaBhdjxDN5pRLbqQilmM6ezF7/vJ2Y8HXNSfvg1ZsYQ2y1ZP0V42hfsPCs9g8Ro3/buxhqoaIll+rfvJSOipvfS0TjEEfs6/36WsDCpZj94me48ZY4e1FblgaDU0Xa0tseE2froN7X0zLjfLTOFbjbEY96bLwNmnehEBbBiQ80nwjoTj1L+WARTiUtffTrVFYysBCct7fsk/jn9sh2bd4sMXLMvpRbujlXyjP8vvqIxplEwXaKHwRj2IWkbk8Kr6Lf5JSCQspr8z/kT2JVQCwLEoqPsbQOD26stsgGqW6I=
-  file: 
-    - "_output/local/bin/linux/amd64/oc"
-    - "_output/local/bin/linux/amd64/openshift"
-  skip_cleanup: true
-  on:
-    tags: true
-    all_branches: true
+  - provider: s3
+    access_key_id: AKIAPF6C7BXAKXXBFTEQ
+    secret_access_key:
+      secure: cjtlXK/T/3ukQPQvum8u2pPKPk1xG6wypD9kzdrZg1N3f5qddJgZUX98ky6rMG4IT+IFhHd5wyHBHX91mRyFhlJXKbHnaltREdUsjV9/X2IcdS2S28BqPRV2ozzQoe0Dal2bBuDTJ/COws59o8ZmmWaz4zD9nVMhRtObxyQPeR3Lh9VKhoBxh++sJlChAa04QzZva8dOHZT5KlhYxVQJv420FsPM23v/ClJgWXkLJf756J9BTldkCd80RflrTCdhuZIv0CLLbcU/sK6I0qCP8SEbu7aseSyKVFCo+RS9a+s0SDekO7k8whR3zUMFrzO1aJGHyJJmT11qxxE54MHEdcCATJrT4c3CMtV//RN9LRaBmRX3eMg6SHi4y4NUQGxx487GjVNz2JLWBvVv6W0ZpmipHKmXxQop//wAxegJhBKnx2Hzp7xCqbJolVCMLRnZRadr9XKqX3MVQE9qZJhXhu4GYNNdr17uF+LOH7bYtspbyw/Gvisy0jsD7WXErE+RArFzQumBtnHPF7nwpQ7J9M3kq3qAcswx947cfqMFjiU6cz88EgpmG1SOJW9Dv/AiBNYFluBW0LWK5gOOeYaiQZcEbdS32aMB+fYipO4kyBCC4EzRkd58FVhi074w3ZWUY15b82/KbVYVT4d1PXbHq4A2/ko8XJITakXjYEpYM7c=
+    bucket: asiainfo-dataexchange
+    local-dir: _output/local/bin/linux/amd64/
+    region: cn-north-1
+    acl: ''
+  - provider: releases
+    api_key:
+      secure: YXnRO3hJxpVizfzXb5RWu8zYtRyW8q6WEmjuvR6xOwaboTq8mNOEPptfryE0yhaO9Lv68Xf5VB26HLuiTaPivIIomB2QCOo+rQT9GNho5CFPomKW9gk+yhxKAlCZzorfqRyJErr6zyVWaajfdVeLbB6B7MKY+5/bAc5QHYyDW2fLZnQq1wrXkeuFEmmpPbdxincTwjhlRtbbJSCRLaI9SuE9S7JWS5OhLtgEGVu6DY+BQi1PXcwwpAzvLbrr3yt9t+LvyKzvKNXe02bAvp2/Q4cOhKb/7eg8LxjaBwmpk5nLrqx9b3UrMS5Rk9P2J/U75GsQRM4ebGzK7N+FvLWj+8uxT9tDHY3+5g1a2sUzMfdLaSAx6qeleqOqxlvbujzQVlaBhdjxDN5pRLbqQilmM6ezF7/vJ2Y8HXNSfvg1ZsYQ2y1ZP0V42hfsPCs9g8Ro3/buxhqoaIll+rfvJSOipvfS0TjEEfs6/36WsDCpZj94me48ZY4e1FblgaDU0Xa0tseE2froN7X0zLjfLTOFbjbEY96bLwNmnehEBbBiQ80nwjoTj1L+WARTiUtffTrVFYysBCct7fsk/jn9sh2bd4sMXLMvpRbujlXyjP8vvqIxplEwXaKHwRj2IWkbk8Kr6Lf5JSCQspr8z/kT2JVQCwLEoqPsbQOD26stsgGqW6I=
+    file: 
+      - "_output/local/bin/linux/amd64/oc"
+      - "_output/local/bin/linux/amd64/openshift"
+    skip_cleanup: true
+    on:
+      tags: true
+      all_branches: true
     
-sudo: false
-
+  sudo: false
