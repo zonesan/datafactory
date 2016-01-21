@@ -9,6 +9,432 @@
   },
   "apis": [
    {
+    "path": "/oapi/v1/backingservices",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.BackingServiceList",
+      "method": "GET",
+      "summary": "list or watch objects of kind BackingService",
+      "nickname": "listNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceList"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingService",
+      "method": "POST",
+      "summary": "create a BackingService",
+      "nickname": "createNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.BackingService",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingService"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/backingservices",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch individual changes to a list of BackingService",
+      "nickname": "watchNamespacedBackingServiceList",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/backingservices/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.BackingService",
+      "method": "GET",
+      "summary": "read the specified BackingService",
+      "nickname": "readNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingService",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingService"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingService",
+      "method": "PUT",
+      "summary": "replace the specified BackingService",
+      "nickname": "replaceNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.BackingService",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingService",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingService"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingService",
+      "method": "PATCH",
+      "summary": "partially update the specified BackingService",
+      "nickname": "patchNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "unversioned.Patch",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingService",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingService"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "application/json-patch+json",
+       "application/merge-patch+json",
+       "application/strategic-merge-patch+json"
+      ]
+     },
+     {
+      "type": "unversioned.Status",
+      "method": "DELETE",
+      "summary": "delete a BackingService",
+      "nickname": "deleteNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.DeleteOptions",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingService",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "unversioned.Status"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/backingservices/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch changes to an object of kind BackingService",
+      "nickname": "watchNamespacedBackingService",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingService",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
     "path": "/oapi/v1/namespaces/{namespace}/buildconfigs",
     "description": "OpenShift REST API, version v1",
     "operations": [
@@ -14432,8 +14858,8 @@
    }
   ],
   "models": {
-   "v1.BuildConfigList": {
-    "id": "v1.BuildConfigList",
+   "v1.BackingServiceList": {
+    "id": "v1.BackingServiceList",
     "required": [
      "items"
     ],
@@ -14452,9 +14878,9 @@
      "items": {
       "type": "array",
       "items": {
-       "$ref": "v1.BuildConfig"
+       "$ref": "v1.BackingService"
       },
-      "description": "list of build configs"
+      "description": "list of servicebrokers"
      }
     }
    },
@@ -14472,12 +14898,8 @@
      }
     }
    },
-   "v1.BuildConfig": {
-    "id": "v1.BuildConfig",
-    "required": [
-     "spec",
-     "status"
-    ],
+   "v1.BackingService": {
+    "id": "v1.BackingService",
     "properties": {
      "kind": {
       "type": "string",
@@ -14491,12 +14913,12 @@
       "$ref": "v1.ObjectMeta"
      },
      "spec": {
-      "$ref": "v1.BuildConfigSpec",
-      "description": "holds all the input necessary to produce a new build, and the conditions when to trigger them"
+      "$ref": "v1.BackingServiceSpec",
+      "description": "spec defines the behavior of the ServiceBroker"
      },
      "status": {
-      "$ref": "v1.BuildConfigStatus",
-      "description": "holds any relevant information about a build config derived by the system"
+      "$ref": "v1.BackingServiceStatus",
+      "description": "status describes the current status of a Project; read-only"
      }
     }
    },
@@ -14553,6 +14975,213 @@
      "annotations": {
       "type": "any",
       "description": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://releases.k8s.io/HEAD/docs/user-guide/annotations.md"
+     }
+    }
+   },
+   "v1.BackingServiceSpec": {
+    "id": "v1.BackingServiceSpec",
+    "required": [
+     "url",
+     "brokername"
+    ],
+    "properties": {
+     "url": {
+      "type": "string"
+     },
+     "brokername": {
+      "type": "string"
+     },
+     "username": {
+      "type": "string"
+     },
+     "password": {
+      "type": "string"
+     }
+    }
+   },
+   "v1.BackingServiceStatus": {
+    "id": "v1.BackingServiceStatus",
+    "properties": {
+     "phase": {
+      "type": "string",
+      "description": "phase is the current lifecycle phase of the servicebroker"
+     }
+    }
+   },
+   "json.WatchEvent": {
+    "id": "json.WatchEvent",
+    "properties": {
+     "type": {
+      "type": "string",
+      "description": "the type of watch event; may be ADDED, MODIFIED, DELETED, or ERROR"
+     },
+     "object": {
+      "type": "string",
+      "description": "the object being watched; will match the type of the resource endpoint or be a Status object if the type is ERROR"
+     }
+    }
+   },
+   "unversioned.Patch": {
+    "id": "unversioned.Patch",
+    "description": "Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.",
+    "properties": {}
+   },
+   "unversioned.Status": {
+    "id": "unversioned.Status",
+    "description": "Status is a return value for calls that don't return other objects.",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "unversioned.ListMeta",
+      "description": "Standard list metadata. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "status": {
+      "type": "string",
+      "description": "Status of the operation. One of: \"Success\" or \"Failure\". More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#spec-and-status"
+     },
+     "message": {
+      "type": "string",
+      "description": "A human-readable description of the status of this operation."
+     },
+     "reason": {
+      "type": "string",
+      "description": "A machine-readable description of why this operation is in the \"Failure\" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it."
+     },
+     "details": {
+      "$ref": "unversioned.StatusDetails",
+      "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type."
+     },
+     "code": {
+      "type": "integer",
+      "format": "int32",
+      "description": "Suggested HTTP return code for this status, 0 if not set."
+     }
+    }
+   },
+   "unversioned.StatusDetails": {
+    "id": "unversioned.StatusDetails",
+    "description": "StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.",
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described)."
+     },
+     "kind": {
+      "type": "string",
+      "description": "The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "causes": {
+      "type": "array",
+      "items": {
+       "$ref": "unversioned.StatusCause"
+      },
+      "description": "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes."
+     },
+     "retryAfterSeconds": {
+      "type": "integer",
+      "format": "int32",
+      "description": "If specified, the time in seconds before the operation should be retried."
+     }
+    }
+   },
+   "unversioned.StatusCause": {
+    "id": "unversioned.StatusCause",
+    "description": "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
+    "properties": {
+     "reason": {
+      "type": "string",
+      "description": "A machine-readable description of the cause of the error. If this value is empty there is no information available."
+     },
+     "message": {
+      "type": "string",
+      "description": "A human-readable description of the cause of the error.  This field may be presented as-is to a reader."
+     },
+     "field": {
+      "type": "string",
+      "description": "The field of the resource that has caused this error, as named by its JSON serialization. May include dot and postfix notation for nested attributes. Arrays are zero-indexed.  Fields may appear more than once in an array of causes due to fields having multiple errors. Optional.\n\nExamples:\n  \"name\" - the field \"name\" on the current resource\n  \"items[0].name\" - the field \"name\" on the first array entry in \"items\""
+     }
+    }
+   },
+   "v1.DeleteOptions": {
+    "id": "v1.DeleteOptions",
+    "description": "DeleteOptions may be provided when deleting an API object",
+    "required": [
+     "gracePeriodSeconds"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "gracePeriodSeconds": {
+      "type": "integer",
+      "format": "int64",
+      "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately."
+     }
+    }
+   },
+   "v1.BuildConfigList": {
+    "id": "v1.BuildConfigList",
+    "required": [
+     "items"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "unversioned.ListMeta"
+     },
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.BuildConfig"
+      },
+      "description": "list of build configs"
+     }
+    }
+   },
+   "v1.BuildConfig": {
+    "id": "v1.BuildConfig",
+    "required": [
+     "spec",
+     "status"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "v1.ObjectMeta"
+     },
+     "spec": {
+      "$ref": "v1.BuildConfigSpec",
+      "description": "holds all the input necessary to produce a new build, and the conditions when to trigger them"
+     },
+     "status": {
+      "$ref": "v1.BuildConfigStatus",
+      "description": "holds any relevant information about a build config derived by the system"
      }
     }
    },
@@ -15085,129 +15714,6 @@
       "type": "integer",
       "format": "int32",
       "description": "used to inform about number of last triggered build"
-     }
-    }
-   },
-   "json.WatchEvent": {
-    "id": "json.WatchEvent",
-    "properties": {
-     "type": {
-      "type": "string",
-      "description": "the type of watch event; may be ADDED, MODIFIED, DELETED, or ERROR"
-     },
-     "object": {
-      "type": "string",
-      "description": "the object being watched; will match the type of the resource endpoint or be a Status object if the type is ERROR"
-     }
-    }
-   },
-   "unversioned.Patch": {
-    "id": "unversioned.Patch",
-    "description": "Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.",
-    "properties": {}
-   },
-   "unversioned.Status": {
-    "id": "unversioned.Status",
-    "description": "Status is a return value for calls that don't return other objects.",
-    "properties": {
-     "kind": {
-      "type": "string",
-      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
-     },
-     "apiVersion": {
-      "type": "string",
-      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
-     },
-     "metadata": {
-      "$ref": "unversioned.ListMeta",
-      "description": "Standard list metadata. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
-     },
-     "status": {
-      "type": "string",
-      "description": "Status of the operation. One of: \"Success\" or \"Failure\". More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#spec-and-status"
-     },
-     "message": {
-      "type": "string",
-      "description": "A human-readable description of the status of this operation."
-     },
-     "reason": {
-      "type": "string",
-      "description": "A machine-readable description of why this operation is in the \"Failure\" status. If this value is empty there is no information available. A Reason clarifies an HTTP status code but does not override it."
-     },
-     "details": {
-      "$ref": "unversioned.StatusDetails",
-      "description": "Extended data associated with the reason.  Each reason may define its own extended details. This field is optional and the data returned is not guaranteed to conform to any schema except that defined by the reason type."
-     },
-     "code": {
-      "type": "integer",
-      "format": "int32",
-      "description": "Suggested HTTP return code for this status, 0 if not set."
-     }
-    }
-   },
-   "unversioned.StatusDetails": {
-    "id": "unversioned.StatusDetails",
-    "description": "StatusDetails is a set of additional properties that MAY be set by the server to provide additional information about a response. The Reason field of a Status object defines what attributes will be set. Clients must ignore fields that do not match the defined type of each attribute, and should assume that any attribute may be empty, invalid, or under defined.",
-    "properties": {
-     "name": {
-      "type": "string",
-      "description": "The name attribute of the resource associated with the status StatusReason (when there is a single name which can be described)."
-     },
-     "kind": {
-      "type": "string",
-      "description": "The kind attribute of the resource associated with the status StatusReason. On some operations may differ from the requested resource Kind. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
-     },
-     "causes": {
-      "type": "array",
-      "items": {
-       "$ref": "unversioned.StatusCause"
-      },
-      "description": "The Causes array includes more details associated with the StatusReason failure. Not all StatusReasons may provide detailed causes."
-     },
-     "retryAfterSeconds": {
-      "type": "integer",
-      "format": "int32",
-      "description": "If specified, the time in seconds before the operation should be retried."
-     }
-    }
-   },
-   "unversioned.StatusCause": {
-    "id": "unversioned.StatusCause",
-    "description": "StatusCause provides more information about an api.Status failure, including cases when multiple errors are encountered.",
-    "properties": {
-     "reason": {
-      "type": "string",
-      "description": "A machine-readable description of the cause of the error. If this value is empty there is no information available."
-     },
-     "message": {
-      "type": "string",
-      "description": "A human-readable description of the cause of the error.  This field may be presented as-is to a reader."
-     },
-     "field": {
-      "type": "string",
-      "description": "The field of the resource that has caused this error, as named by its JSON serialization. May include dot and postfix notation for nested attributes. Arrays are zero-indexed.  Fields may appear more than once in an array of causes due to fields having multiple errors. Optional.\n\nExamples:\n  \"name\" - the field \"name\" on the current resource\n  \"items[0].name\" - the field \"name\" on the first array entry in \"items\""
-     }
-    }
-   },
-   "v1.DeleteOptions": {
-    "id": "v1.DeleteOptions",
-    "description": "DeleteOptions may be provided when deleting an API object",
-    "required": [
-     "gracePeriodSeconds"
-    ],
-    "properties": {
-     "kind": {
-      "type": "string",
-      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
-     },
-     "apiVersion": {
-      "type": "string",
-      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
-     },
-     "gracePeriodSeconds": {
-      "type": "integer",
-      "format": "int64",
-      "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately."
      }
     }
    },

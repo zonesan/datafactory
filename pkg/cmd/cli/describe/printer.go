@@ -15,6 +15,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/sets"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -27,6 +28,7 @@ import (
 )
 
 var (
+	backingServiceColumns   = []string{"NAME", "STATUS"}
 	buildColumns            = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns      = []string{"NAME", "TYPE", "FROM", "LATEST"}
 	imageColumns            = []string{"NAME", "DOCKER REF"}
@@ -65,6 +67,8 @@ var (
 func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, columnLabels []string) *kctl.HumanReadablePrinter {
 	// TODO: support cross namespace listing
 	p := kctl.NewHumanReadablePrinter(noHeaders, withNamespace, wide, showAll, columnLabels)
+	p.Handler(backingServiceColumns, printBackingService)
+	p.Handler(backingServiceColumns, printBackingServiceList)
 	p.Handler(buildColumns, printBuild)
 	p.Handler(buildColumns, printBuildList)
 	p.Handler(buildConfigColumns, printBuildConfig)
@@ -133,6 +137,21 @@ func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, 
 }
 
 const templateDescriptionLen = 80
+
+func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\n", bs.Name, bs.Status.Phase)
+	return err
+}
+
+func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+
+	for _, bs := range bsList.Items {
+		if err := printBackingService(&bs, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // PrintTemplateParameters the Template parameters with their default values
 func PrintTemplateParameters(params []templateapi.Parameter, output io.Writer) error {

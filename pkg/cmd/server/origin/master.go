@@ -25,6 +25,7 @@ import (
 	"github.com/openshift/origin/pkg/api/latest"
 	"github.com/openshift/origin/pkg/api/v1"
 	"github.com/openshift/origin/pkg/api/v1beta3"
+	backingservice "github.com/openshift/origin/pkg/backingservice/registry/backingservice/etcd"
 	buildclient "github.com/openshift/origin/pkg/build/client"
 	buildgenerator "github.com/openshift/origin/pkg/build/generator"
 	buildregistry "github.com/openshift/origin/pkg/build/registry/build"
@@ -331,6 +332,8 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 		glog.Fatalf("Unable to configure Kubelet client: %v", err)
 	}
 
+	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
+
 	buildStorage, buildDetailsStorage := buildetcd.NewStorage(c.EtcdHelper)
 	buildRegistry := buildregistry.NewRegistry(buildStorage)
 
@@ -435,6 +438,7 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	)
 
 	storage := map[string]rest.Storage{
+		"backingServices":     backingServiceStorage,
 		"images":              imageStorage,
 		"imageStreams":        imageStreamStorage,
 		"imageStreams/status": imageStreamStatusStorage,

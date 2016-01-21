@@ -3,7 +3,8 @@ package v1
 // AUTO-GENERATED FUNCTIONS START HERE
 import (
 	v1 "github.com/openshift/origin/pkg/authorization/api/v1"
-	apiv1 "github.com/openshift/origin/pkg/build/api/v1"
+	apiv1 "github.com/openshift/origin/pkg/backingservice/api/v1"
+	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 	deployapiv1 "github.com/openshift/origin/pkg/deploy/api/v1"
 	imageapiv1 "github.com/openshift/origin/pkg/image/api/v1"
 	oauthapiv1 "github.com/openshift/origin/pkg/oauth/api/v1"
@@ -687,7 +688,64 @@ func deepCopy_v1_SubjectAccessReviewResponse(in v1.SubjectAccessReviewResponse, 
 	return nil
 }
 
-func deepCopy_v1_BinaryBuildRequestOptions(in apiv1.BinaryBuildRequestOptions, out *apiv1.BinaryBuildRequestOptions, c *conversion.Cloner) error {
+func deepCopy_v1_BackingService(in apiv1.BackingService, out *apiv1.BackingService, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapiv1.ObjectMeta)
+	}
+	if err := deepCopy_v1_BackingServiceSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_v1_BackingServiceStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_v1_BackingServiceList(in apiv1.BackingServiceList, out *apiv1.BackingServiceList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]apiv1.BackingService, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_v1_BackingService(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_v1_BackingServiceSpec(in apiv1.BackingServiceSpec, out *apiv1.BackingServiceSpec, c *conversion.Cloner) error {
+	out.Url = in.Url
+	out.Name = in.Name
+	out.UserName = in.UserName
+	out.Password = in.Password
+	return nil
+}
+
+func deepCopy_v1_BackingServiceStatus(in apiv1.BackingServiceStatus, out *apiv1.BackingServiceStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_v1_BinaryBuildRequestOptions(in buildapiv1.BinaryBuildRequestOptions, out *buildapiv1.BinaryBuildRequestOptions, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -708,12 +766,12 @@ func deepCopy_v1_BinaryBuildRequestOptions(in apiv1.BinaryBuildRequestOptions, o
 	return nil
 }
 
-func deepCopy_v1_BinaryBuildSource(in apiv1.BinaryBuildSource, out *apiv1.BinaryBuildSource, c *conversion.Cloner) error {
+func deepCopy_v1_BinaryBuildSource(in buildapiv1.BinaryBuildSource, out *buildapiv1.BinaryBuildSource, c *conversion.Cloner) error {
 	out.AsFile = in.AsFile
 	return nil
 }
 
-func deepCopy_v1_Build(in apiv1.Build, out *apiv1.Build, c *conversion.Cloner) error {
+func deepCopy_v1_Build(in buildapiv1.Build, out *buildapiv1.Build, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -733,7 +791,7 @@ func deepCopy_v1_Build(in apiv1.Build, out *apiv1.Build, c *conversion.Cloner) e
 	return nil
 }
 
-func deepCopy_v1_BuildConfig(in apiv1.BuildConfig, out *apiv1.BuildConfig, c *conversion.Cloner) error {
+func deepCopy_v1_BuildConfig(in buildapiv1.BuildConfig, out *buildapiv1.BuildConfig, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -753,7 +811,7 @@ func deepCopy_v1_BuildConfig(in apiv1.BuildConfig, out *apiv1.BuildConfig, c *co
 	return nil
 }
 
-func deepCopy_v1_BuildConfigList(in apiv1.BuildConfigList, out *apiv1.BuildConfigList, c *conversion.Cloner) error {
+func deepCopy_v1_BuildConfigList(in buildapiv1.BuildConfigList, out *buildapiv1.BuildConfigList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -765,7 +823,7 @@ func deepCopy_v1_BuildConfigList(in apiv1.BuildConfigList, out *apiv1.BuildConfi
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]apiv1.BuildConfig, len(in.Items))
+		out.Items = make([]buildapiv1.BuildConfig, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_v1_BuildConfig(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -777,9 +835,9 @@ func deepCopy_v1_BuildConfigList(in apiv1.BuildConfigList, out *apiv1.BuildConfi
 	return nil
 }
 
-func deepCopy_v1_BuildConfigSpec(in apiv1.BuildConfigSpec, out *apiv1.BuildConfigSpec, c *conversion.Cloner) error {
+func deepCopy_v1_BuildConfigSpec(in buildapiv1.BuildConfigSpec, out *buildapiv1.BuildConfigSpec, c *conversion.Cloner) error {
 	if in.Triggers != nil {
-		out.Triggers = make([]apiv1.BuildTriggerPolicy, len(in.Triggers))
+		out.Triggers = make([]buildapiv1.BuildTriggerPolicy, len(in.Triggers))
 		for i := range in.Triggers {
 			if err := deepCopy_v1_BuildTriggerPolicy(in.Triggers[i], &out.Triggers[i], c); err != nil {
 				return err
@@ -794,12 +852,12 @@ func deepCopy_v1_BuildConfigSpec(in apiv1.BuildConfigSpec, out *apiv1.BuildConfi
 	return nil
 }
 
-func deepCopy_v1_BuildConfigStatus(in apiv1.BuildConfigStatus, out *apiv1.BuildConfigStatus, c *conversion.Cloner) error {
+func deepCopy_v1_BuildConfigStatus(in buildapiv1.BuildConfigStatus, out *buildapiv1.BuildConfigStatus, c *conversion.Cloner) error {
 	out.LastVersion = in.LastVersion
 	return nil
 }
 
-func deepCopy_v1_BuildList(in apiv1.BuildList, out *apiv1.BuildList, c *conversion.Cloner) error {
+func deepCopy_v1_BuildList(in buildapiv1.BuildList, out *buildapiv1.BuildList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -811,7 +869,7 @@ func deepCopy_v1_BuildList(in apiv1.BuildList, out *apiv1.BuildList, c *conversi
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]apiv1.Build, len(in.Items))
+		out.Items = make([]buildapiv1.Build, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_v1_Build(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -823,7 +881,7 @@ func deepCopy_v1_BuildList(in apiv1.BuildList, out *apiv1.BuildList, c *conversi
 	return nil
 }
 
-func deepCopy_v1_BuildLog(in apiv1.BuildLog, out *apiv1.BuildLog, c *conversion.Cloner) error {
+func deepCopy_v1_BuildLog(in buildapiv1.BuildLog, out *buildapiv1.BuildLog, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -832,7 +890,7 @@ func deepCopy_v1_BuildLog(in apiv1.BuildLog, out *apiv1.BuildLog, c *conversion.
 	return nil
 }
 
-func deepCopy_v1_BuildLogOptions(in apiv1.BuildLogOptions, out *apiv1.BuildLogOptions, c *conversion.Cloner) error {
+func deepCopy_v1_BuildLogOptions(in buildapiv1.BuildLogOptions, out *buildapiv1.BuildLogOptions, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -879,7 +937,7 @@ func deepCopy_v1_BuildLogOptions(in apiv1.BuildLogOptions, out *apiv1.BuildLogOp
 	return nil
 }
 
-func deepCopy_v1_BuildOutput(in apiv1.BuildOutput, out *apiv1.BuildOutput, c *conversion.Cloner) error {
+func deepCopy_v1_BuildOutput(in buildapiv1.BuildOutput, out *buildapiv1.BuildOutput, c *conversion.Cloner) error {
 	if in.To != nil {
 		if newVal, err := c.DeepCopy(in.To); err != nil {
 			return err
@@ -901,7 +959,7 @@ func deepCopy_v1_BuildOutput(in apiv1.BuildOutput, out *apiv1.BuildOutput, c *co
 	return nil
 }
 
-func deepCopy_v1_BuildRequest(in apiv1.BuildRequest, out *apiv1.BuildRequest, c *conversion.Cloner) error {
+func deepCopy_v1_BuildRequest(in buildapiv1.BuildRequest, out *buildapiv1.BuildRequest, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -913,7 +971,7 @@ func deepCopy_v1_BuildRequest(in apiv1.BuildRequest, out *apiv1.BuildRequest, c 
 		out.ObjectMeta = newVal.(pkgapiv1.ObjectMeta)
 	}
 	if in.Revision != nil {
-		out.Revision = new(apiv1.SourceRevision)
+		out.Revision = new(buildapiv1.SourceRevision)
 		if err := deepCopy_v1_SourceRevision(*in.Revision, out.Revision, c); err != nil {
 			return err
 		}
@@ -939,7 +997,7 @@ func deepCopy_v1_BuildRequest(in apiv1.BuildRequest, out *apiv1.BuildRequest, c 
 		out.From = nil
 	}
 	if in.Binary != nil {
-		out.Binary = new(apiv1.BinaryBuildSource)
+		out.Binary = new(buildapiv1.BinaryBuildSource)
 		if err := deepCopy_v1_BinaryBuildSource(*in.Binary, out.Binary, c); err != nil {
 			return err
 		}
@@ -967,10 +1025,10 @@ func deepCopy_v1_BuildRequest(in apiv1.BuildRequest, out *apiv1.BuildRequest, c 
 	return nil
 }
 
-func deepCopy_v1_BuildSource(in apiv1.BuildSource, out *apiv1.BuildSource, c *conversion.Cloner) error {
+func deepCopy_v1_BuildSource(in buildapiv1.BuildSource, out *buildapiv1.BuildSource, c *conversion.Cloner) error {
 	out.Type = in.Type
 	if in.Binary != nil {
-		out.Binary = new(apiv1.BinaryBuildSource)
+		out.Binary = new(buildapiv1.BinaryBuildSource)
 		if err := deepCopy_v1_BinaryBuildSource(*in.Binary, out.Binary, c); err != nil {
 			return err
 		}
@@ -984,7 +1042,7 @@ func deepCopy_v1_BuildSource(in apiv1.BuildSource, out *apiv1.BuildSource, c *co
 		out.Dockerfile = nil
 	}
 	if in.Git != nil {
-		out.Git = new(apiv1.GitBuildSource)
+		out.Git = new(buildapiv1.GitBuildSource)
 		if err := deepCopy_v1_GitBuildSource(*in.Git, out.Git, c); err != nil {
 			return err
 		}
@@ -992,7 +1050,7 @@ func deepCopy_v1_BuildSource(in apiv1.BuildSource, out *apiv1.BuildSource, c *co
 		out.Git = nil
 	}
 	if in.Image != nil {
-		out.Image = new(apiv1.ImageSource)
+		out.Image = new(buildapiv1.ImageSource)
 		if err := deepCopy_v1_ImageSource(*in.Image, out.Image, c); err != nil {
 			return err
 		}
@@ -1012,13 +1070,13 @@ func deepCopy_v1_BuildSource(in apiv1.BuildSource, out *apiv1.BuildSource, c *co
 	return nil
 }
 
-func deepCopy_v1_BuildSpec(in apiv1.BuildSpec, out *apiv1.BuildSpec, c *conversion.Cloner) error {
+func deepCopy_v1_BuildSpec(in buildapiv1.BuildSpec, out *buildapiv1.BuildSpec, c *conversion.Cloner) error {
 	out.ServiceAccount = in.ServiceAccount
 	if err := deepCopy_v1_BuildSource(in.Source, &out.Source, c); err != nil {
 		return err
 	}
 	if in.Revision != nil {
-		out.Revision = new(apiv1.SourceRevision)
+		out.Revision = new(buildapiv1.SourceRevision)
 		if err := deepCopy_v1_SourceRevision(*in.Revision, out.Revision, c); err != nil {
 			return err
 		}
@@ -1045,7 +1103,7 @@ func deepCopy_v1_BuildSpec(in apiv1.BuildSpec, out *apiv1.BuildSpec, c *conversi
 	return nil
 }
 
-func deepCopy_v1_BuildStatus(in apiv1.BuildStatus, out *apiv1.BuildStatus, c *conversion.Cloner) error {
+func deepCopy_v1_BuildStatus(in buildapiv1.BuildStatus, out *buildapiv1.BuildStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
 	out.Cancelled = in.Cancelled
 	out.Reason = in.Reason
@@ -1082,10 +1140,10 @@ func deepCopy_v1_BuildStatus(in apiv1.BuildStatus, out *apiv1.BuildStatus, c *co
 	return nil
 }
 
-func deepCopy_v1_BuildStrategy(in apiv1.BuildStrategy, out *apiv1.BuildStrategy, c *conversion.Cloner) error {
+func deepCopy_v1_BuildStrategy(in buildapiv1.BuildStrategy, out *buildapiv1.BuildStrategy, c *conversion.Cloner) error {
 	out.Type = in.Type
 	if in.DockerStrategy != nil {
-		out.DockerStrategy = new(apiv1.DockerBuildStrategy)
+		out.DockerStrategy = new(buildapiv1.DockerBuildStrategy)
 		if err := deepCopy_v1_DockerBuildStrategy(*in.DockerStrategy, out.DockerStrategy, c); err != nil {
 			return err
 		}
@@ -1093,7 +1151,7 @@ func deepCopy_v1_BuildStrategy(in apiv1.BuildStrategy, out *apiv1.BuildStrategy,
 		out.DockerStrategy = nil
 	}
 	if in.SourceStrategy != nil {
-		out.SourceStrategy = new(apiv1.SourceBuildStrategy)
+		out.SourceStrategy = new(buildapiv1.SourceBuildStrategy)
 		if err := deepCopy_v1_SourceBuildStrategy(*in.SourceStrategy, out.SourceStrategy, c); err != nil {
 			return err
 		}
@@ -1101,7 +1159,7 @@ func deepCopy_v1_BuildStrategy(in apiv1.BuildStrategy, out *apiv1.BuildStrategy,
 		out.SourceStrategy = nil
 	}
 	if in.CustomStrategy != nil {
-		out.CustomStrategy = new(apiv1.CustomBuildStrategy)
+		out.CustomStrategy = new(buildapiv1.CustomBuildStrategy)
 		if err := deepCopy_v1_CustomBuildStrategy(*in.CustomStrategy, out.CustomStrategy, c); err != nil {
 			return err
 		}
@@ -1111,10 +1169,10 @@ func deepCopy_v1_BuildStrategy(in apiv1.BuildStrategy, out *apiv1.BuildStrategy,
 	return nil
 }
 
-func deepCopy_v1_BuildTriggerPolicy(in apiv1.BuildTriggerPolicy, out *apiv1.BuildTriggerPolicy, c *conversion.Cloner) error {
+func deepCopy_v1_BuildTriggerPolicy(in buildapiv1.BuildTriggerPolicy, out *buildapiv1.BuildTriggerPolicy, c *conversion.Cloner) error {
 	out.Type = in.Type
 	if in.GitHubWebHook != nil {
-		out.GitHubWebHook = new(apiv1.WebHookTrigger)
+		out.GitHubWebHook = new(buildapiv1.WebHookTrigger)
 		if err := deepCopy_v1_WebHookTrigger(*in.GitHubWebHook, out.GitHubWebHook, c); err != nil {
 			return err
 		}
@@ -1122,7 +1180,7 @@ func deepCopy_v1_BuildTriggerPolicy(in apiv1.BuildTriggerPolicy, out *apiv1.Buil
 		out.GitHubWebHook = nil
 	}
 	if in.GenericWebHook != nil {
-		out.GenericWebHook = new(apiv1.WebHookTrigger)
+		out.GenericWebHook = new(buildapiv1.WebHookTrigger)
 		if err := deepCopy_v1_WebHookTrigger(*in.GenericWebHook, out.GenericWebHook, c); err != nil {
 			return err
 		}
@@ -1130,7 +1188,7 @@ func deepCopy_v1_BuildTriggerPolicy(in apiv1.BuildTriggerPolicy, out *apiv1.Buil
 		out.GenericWebHook = nil
 	}
 	if in.ImageChange != nil {
-		out.ImageChange = new(apiv1.ImageChangeTrigger)
+		out.ImageChange = new(buildapiv1.ImageChangeTrigger)
 		if err := deepCopy_v1_ImageChangeTrigger(*in.ImageChange, out.ImageChange, c); err != nil {
 			return err
 		}
@@ -1140,7 +1198,7 @@ func deepCopy_v1_BuildTriggerPolicy(in apiv1.BuildTriggerPolicy, out *apiv1.Buil
 	return nil
 }
 
-func deepCopy_v1_CustomBuildStrategy(in apiv1.CustomBuildStrategy, out *apiv1.CustomBuildStrategy, c *conversion.Cloner) error {
+func deepCopy_v1_CustomBuildStrategy(in buildapiv1.CustomBuildStrategy, out *buildapiv1.CustomBuildStrategy, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.From); err != nil {
 		return err
 	} else {
@@ -1170,7 +1228,7 @@ func deepCopy_v1_CustomBuildStrategy(in apiv1.CustomBuildStrategy, out *apiv1.Cu
 	out.ExposeDockerSocket = in.ExposeDockerSocket
 	out.ForcePull = in.ForcePull
 	if in.Secrets != nil {
-		out.Secrets = make([]apiv1.SecretSpec, len(in.Secrets))
+		out.Secrets = make([]buildapiv1.SecretSpec, len(in.Secrets))
 		for i := range in.Secrets {
 			if err := deepCopy_v1_SecretSpec(in.Secrets[i], &out.Secrets[i], c); err != nil {
 				return err
@@ -1182,7 +1240,7 @@ func deepCopy_v1_CustomBuildStrategy(in apiv1.CustomBuildStrategy, out *apiv1.Cu
 	return nil
 }
 
-func deepCopy_v1_DockerBuildStrategy(in apiv1.DockerBuildStrategy, out *apiv1.DockerBuildStrategy, c *conversion.Cloner) error {
+func deepCopy_v1_DockerBuildStrategy(in buildapiv1.DockerBuildStrategy, out *buildapiv1.DockerBuildStrategy, c *conversion.Cloner) error {
 	if in.From != nil {
 		if newVal, err := c.DeepCopy(in.From); err != nil {
 			return err
@@ -1219,7 +1277,7 @@ func deepCopy_v1_DockerBuildStrategy(in apiv1.DockerBuildStrategy, out *apiv1.Do
 	return nil
 }
 
-func deepCopy_v1_GitBuildSource(in apiv1.GitBuildSource, out *apiv1.GitBuildSource, c *conversion.Cloner) error {
+func deepCopy_v1_GitBuildSource(in buildapiv1.GitBuildSource, out *buildapiv1.GitBuildSource, c *conversion.Cloner) error {
 	out.URI = in.URI
 	out.Ref = in.Ref
 	out.HTTPProxy = in.HTTPProxy
@@ -1227,7 +1285,7 @@ func deepCopy_v1_GitBuildSource(in apiv1.GitBuildSource, out *apiv1.GitBuildSour
 	return nil
 }
 
-func deepCopy_v1_GitSourceRevision(in apiv1.GitSourceRevision, out *apiv1.GitSourceRevision, c *conversion.Cloner) error {
+func deepCopy_v1_GitSourceRevision(in buildapiv1.GitSourceRevision, out *buildapiv1.GitSourceRevision, c *conversion.Cloner) error {
 	out.Commit = in.Commit
 	if err := deepCopy_v1_SourceControlUser(in.Author, &out.Author, c); err != nil {
 		return err
@@ -1239,7 +1297,7 @@ func deepCopy_v1_GitSourceRevision(in apiv1.GitSourceRevision, out *apiv1.GitSou
 	return nil
 }
 
-func deepCopy_v1_ImageChangeTrigger(in apiv1.ImageChangeTrigger, out *apiv1.ImageChangeTrigger, c *conversion.Cloner) error {
+func deepCopy_v1_ImageChangeTrigger(in buildapiv1.ImageChangeTrigger, out *buildapiv1.ImageChangeTrigger, c *conversion.Cloner) error {
 	out.LastTriggeredImageID = in.LastTriggeredImageID
 	if in.From != nil {
 		if newVal, err := c.DeepCopy(in.From); err != nil {
@@ -1253,14 +1311,14 @@ func deepCopy_v1_ImageChangeTrigger(in apiv1.ImageChangeTrigger, out *apiv1.Imag
 	return nil
 }
 
-func deepCopy_v1_ImageSource(in apiv1.ImageSource, out *apiv1.ImageSource, c *conversion.Cloner) error {
+func deepCopy_v1_ImageSource(in buildapiv1.ImageSource, out *buildapiv1.ImageSource, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.From); err != nil {
 		return err
 	} else {
 		out.From = newVal.(pkgapiv1.ObjectReference)
 	}
 	if in.Paths != nil {
-		out.Paths = make([]apiv1.ImageSourcePath, len(in.Paths))
+		out.Paths = make([]buildapiv1.ImageSourcePath, len(in.Paths))
 		for i := range in.Paths {
 			if err := deepCopy_v1_ImageSourcePath(in.Paths[i], &out.Paths[i], c); err != nil {
 				return err
@@ -1281,13 +1339,13 @@ func deepCopy_v1_ImageSource(in apiv1.ImageSource, out *apiv1.ImageSource, c *co
 	return nil
 }
 
-func deepCopy_v1_ImageSourcePath(in apiv1.ImageSourcePath, out *apiv1.ImageSourcePath, c *conversion.Cloner) error {
+func deepCopy_v1_ImageSourcePath(in buildapiv1.ImageSourcePath, out *buildapiv1.ImageSourcePath, c *conversion.Cloner) error {
 	out.SourcePath = in.SourcePath
 	out.DestinationDir = in.DestinationDir
 	return nil
 }
 
-func deepCopy_v1_SecretSpec(in apiv1.SecretSpec, out *apiv1.SecretSpec, c *conversion.Cloner) error {
+func deepCopy_v1_SecretSpec(in buildapiv1.SecretSpec, out *buildapiv1.SecretSpec, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.SecretSource); err != nil {
 		return err
 	} else {
@@ -1297,7 +1355,7 @@ func deepCopy_v1_SecretSpec(in apiv1.SecretSpec, out *apiv1.SecretSpec, c *conve
 	return nil
 }
 
-func deepCopy_v1_SourceBuildStrategy(in apiv1.SourceBuildStrategy, out *apiv1.SourceBuildStrategy, c *conversion.Cloner) error {
+func deepCopy_v1_SourceBuildStrategy(in buildapiv1.SourceBuildStrategy, out *buildapiv1.SourceBuildStrategy, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.From); err != nil {
 		return err
 	} else {
@@ -1330,16 +1388,16 @@ func deepCopy_v1_SourceBuildStrategy(in apiv1.SourceBuildStrategy, out *apiv1.So
 	return nil
 }
 
-func deepCopy_v1_SourceControlUser(in apiv1.SourceControlUser, out *apiv1.SourceControlUser, c *conversion.Cloner) error {
+func deepCopy_v1_SourceControlUser(in buildapiv1.SourceControlUser, out *buildapiv1.SourceControlUser, c *conversion.Cloner) error {
 	out.Name = in.Name
 	out.Email = in.Email
 	return nil
 }
 
-func deepCopy_v1_SourceRevision(in apiv1.SourceRevision, out *apiv1.SourceRevision, c *conversion.Cloner) error {
+func deepCopy_v1_SourceRevision(in buildapiv1.SourceRevision, out *buildapiv1.SourceRevision, c *conversion.Cloner) error {
 	out.Type = in.Type
 	if in.Git != nil {
-		out.Git = new(apiv1.GitSourceRevision)
+		out.Git = new(buildapiv1.GitSourceRevision)
 		if err := deepCopy_v1_GitSourceRevision(*in.Git, out.Git, c); err != nil {
 			return err
 		}
@@ -1349,7 +1407,7 @@ func deepCopy_v1_SourceRevision(in apiv1.SourceRevision, out *apiv1.SourceRevisi
 	return nil
 }
 
-func deepCopy_v1_WebHookTrigger(in apiv1.WebHookTrigger, out *apiv1.WebHookTrigger, c *conversion.Cloner) error {
+func deepCopy_v1_WebHookTrigger(in buildapiv1.WebHookTrigger, out *buildapiv1.WebHookTrigger, c *conversion.Cloner) error {
 	out.Secret = in.Secret
 	return nil
 }
@@ -2831,6 +2889,10 @@ func init() {
 		deepCopy_v1_RoleList,
 		deepCopy_v1_SubjectAccessReview,
 		deepCopy_v1_SubjectAccessReviewResponse,
+		deepCopy_v1_BackingService,
+		deepCopy_v1_BackingServiceList,
+		deepCopy_v1_BackingServiceSpec,
+		deepCopy_v1_BackingServiceStatus,
 		deepCopy_v1_BinaryBuildRequestOptions,
 		deepCopy_v1_BinaryBuildSource,
 		deepCopy_v1_Build,

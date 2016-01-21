@@ -25,6 +25,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/sets"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildutil "github.com/openshift/origin/pkg/build/util"
 	"github.com/openshift/origin/pkg/client"
@@ -35,6 +36,7 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
+		"BackingService":       &BackingServiceDescriber{c},
 		"Build":                &BuildDescriber{c, kclient},
 		"BuildConfig":          &BuildConfigDescriber{c, host},
 		"DeploymentConfig":     NewDeploymentConfigDescriber(c, kclient),
@@ -80,6 +82,30 @@ func DescriberFor(kind string, c *client.Client, kclient kclient.Interface, host
 		return f, true
 	}
 	return nil, false
+}
+
+// BackingServiceDescriber generates information about a Image
+type BackingServiceDescriber struct {
+	client.Interface
+}
+
+// Describe returns the description of an image
+func (d *BackingServiceDescriber) Describe(namespace, name string) (string, error) {
+	c := d.BackingServices()
+	bs, err := c.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	return describeBackingService(bs, "")
+}
+
+func describeBackingService(bs *backingserviceapi.BackingService, imageName string) (string, error) {
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, bs.ObjectMeta)
+		formatString(out, "Status", bs.Status.Phase)
+		return nil
+	})
 }
 
 // BuildDescriber generates information about a build

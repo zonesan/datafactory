@@ -3,6 +3,7 @@ package api
 // AUTO-GENERATED FUNCTIONS START HERE
 import (
 	api "github.com/openshift/origin/pkg/authorization/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -660,6 +661,63 @@ func deepCopy_api_SubjectAccessReviewResponse(in api.SubjectAccessReviewResponse
 	out.Namespace = in.Namespace
 	out.Allowed = in.Allowed
 	out.Reason = in.Reason
+	return nil
+}
+
+func deepCopy_api_BackingService(in backingserviceapi.BackingService, out *backingserviceapi.BackingService, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
+	}
+	if err := deepCopy_api_BackingServiceSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_api_BackingServiceStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_api_BackingServiceList(in backingserviceapi.BackingServiceList, out *backingserviceapi.BackingServiceList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]backingserviceapi.BackingService, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_api_BackingService(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_api_BackingServiceSpec(in backingserviceapi.BackingServiceSpec, out *backingserviceapi.BackingServiceSpec, c *conversion.Cloner) error {
+	out.Url = in.Url
+	out.Name = in.Name
+	out.UserName = in.UserName
+	out.Password = in.Password
+	return nil
+}
+
+func deepCopy_api_BackingServiceStatus(in backingserviceapi.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
 	return nil
 }
 
@@ -2937,6 +2995,10 @@ func init() {
 		deepCopy_api_RoleList,
 		deepCopy_api_SubjectAccessReview,
 		deepCopy_api_SubjectAccessReviewResponse,
+		deepCopy_api_BackingService,
+		deepCopy_api_BackingServiceList,
+		deepCopy_api_BackingServiceSpec,
+		deepCopy_api_BackingServiceStatus,
 		deepCopy_api_BinaryBuildRequestOptions,
 		deepCopy_api_BinaryBuildSource,
 		deepCopy_api_Build,
