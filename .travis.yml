@@ -13,8 +13,8 @@ deploy:
   api_key:
     secure: YXnRO3hJxpVizfzXb5RWu8zYtRyW8q6WEmjuvR6xOwaboTq8mNOEPptfryE0yhaO9Lv68Xf5VB26HLuiTaPivIIomB2QCOo+rQT9GNho5CFPomKW9gk+yhxKAlCZzorfqRyJErr6zyVWaajfdVeLbB6B7MKY+5/bAc5QHYyDW2fLZnQq1wrXkeuFEmmpPbdxincTwjhlRtbbJSCRLaI9SuE9S7JWS5OhLtgEGVu6DY+BQi1PXcwwpAzvLbrr3yt9t+LvyKzvKNXe02bAvp2/Q4cOhKb/7eg8LxjaBwmpk5nLrqx9b3UrMS5Rk9P2J/U75GsQRM4ebGzK7N+FvLWj+8uxT9tDHY3+5g1a2sUzMfdLaSAx6qeleqOqxlvbujzQVlaBhdjxDN5pRLbqQilmM6ezF7/vJ2Y8HXNSfvg1ZsYQ2y1ZP0V42hfsPCs9g8Ro3/buxhqoaIll+rfvJSOipvfS0TjEEfs6/36WsDCpZj94me48ZY4e1FblgaDU0Xa0tseE2froN7X0zLjfLTOFbjbEY96bLwNmnehEBbBiQ80nwjoTj1L+WARTiUtffTrVFYysBCct7fsk/jn9sh2bd4sMXLMvpRbujlXyjP8vvqIxplEwXaKHwRj2IWkbk8Kr6Lf5JSCQspr8z/kT2JVQCwLEoqPsbQOD26stsgGqW6I=
   file: 
-    - "_output/local/bin/linux/amd64/oc"
-    - "_output/local/bin/linux/amd64/openshift"
+    - "~/workspace/openshift/build/bin/linux/amd64/oc"
+    - "~/workspace/openshift/build/bin/linux/amd64/openshift"
   skip_cleanup: true
   on:
     tags: true
