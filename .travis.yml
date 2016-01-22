@@ -16,7 +16,6 @@ deploy:
     bucket: asiainfo-dataexchange
     local-dir: _output/local/bin/linux/amd64/
     region: cn-north-1
-    acl: ''
     skip_cleanup: true
     on:
       tags: true
