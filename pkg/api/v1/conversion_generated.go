@@ -20,6 +20,8 @@ import (
 	routeapiv1 "github.com/openshift/origin/pkg/route/api/v1"
 	sdnapi "github.com/openshift/origin/pkg/sdn/api"
 	sdnapiv1 "github.com/openshift/origin/pkg/sdn/api/v1"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
+	servicebrokerapiv1 "github.com/openshift/origin/pkg/servicebroker/api/v1"
 	templateapi "github.com/openshift/origin/pkg/template/api"
 	templateapiv1 "github.com/openshift/origin/pkg/template/api/v1"
 	userapi "github.com/openshift/origin/pkg/user/api"
@@ -5395,6 +5397,176 @@ func convert_v1_NetNamespaceList_To_api_NetNamespaceList(in *sdnapiv1.NetNamespa
 	return autoconvert_v1_NetNamespaceList_To_api_NetNamespaceList(in, out, s)
 }
 
+func autoconvert_api_ServiceBroker_To_v1_ServiceBroker(in *servicebrokerapi.ServiceBroker, out *servicebrokerapiv1.ServiceBroker, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapi.ServiceBroker))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_api_ObjectMeta_To_v1_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	if err := convert_api_ServiceBrokerSpec_To_v1_ServiceBrokerSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := convert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+func convert_api_ServiceBroker_To_v1_ServiceBroker(in *servicebrokerapi.ServiceBroker, out *servicebrokerapiv1.ServiceBroker, s conversion.Scope) error {
+	return autoconvert_api_ServiceBroker_To_v1_ServiceBroker(in, out, s)
+}
+
+func autoconvert_api_ServiceBrokerList_To_v1_ServiceBrokerList(in *servicebrokerapi.ServiceBrokerList, out *servicebrokerapiv1.ServiceBrokerList, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapi.ServiceBrokerList))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := s.Convert(&in.ListMeta, &out.ListMeta, 0); err != nil {
+		return err
+	}
+	if in.Items != nil {
+		out.Items = make([]servicebrokerapiv1.ServiceBroker, len(in.Items))
+		for i := range in.Items {
+			if err := convert_api_ServiceBroker_To_v1_ServiceBroker(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func convert_api_ServiceBrokerList_To_v1_ServiceBrokerList(in *servicebrokerapi.ServiceBrokerList, out *servicebrokerapiv1.ServiceBrokerList, s conversion.Scope) error {
+	return autoconvert_api_ServiceBrokerList_To_v1_ServiceBrokerList(in, out, s)
+}
+
+func autoconvert_api_ServiceBrokerSpec_To_v1_ServiceBrokerSpec(in *servicebrokerapi.ServiceBrokerSpec, out *servicebrokerapiv1.ServiceBrokerSpec, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapi.ServiceBrokerSpec))(in)
+	}
+	out.Url = in.Url
+	out.Name = in.Name
+	out.UserName = in.UserName
+	out.Password = in.Password
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapiv1.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = pkgapiv1.FinalizerName(in.Finalizers[i])
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func convert_api_ServiceBrokerSpec_To_v1_ServiceBrokerSpec(in *servicebrokerapi.ServiceBrokerSpec, out *servicebrokerapiv1.ServiceBrokerSpec, s conversion.Scope) error {
+	return autoconvert_api_ServiceBrokerSpec_To_v1_ServiceBrokerSpec(in, out, s)
+}
+
+func autoconvert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus(in *servicebrokerapi.ServiceBrokerStatus, out *servicebrokerapiv1.ServiceBrokerStatus, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapi.ServiceBrokerStatus))(in)
+	}
+	out.Phase = pkgapiv1.NamespacePhase(in.Phase)
+	return nil
+}
+
+func convert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus(in *servicebrokerapi.ServiceBrokerStatus, out *servicebrokerapiv1.ServiceBrokerStatus, s conversion.Scope) error {
+	return autoconvert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus(in, out, s)
+}
+
+func autoconvert_v1_ServiceBroker_To_api_ServiceBroker(in *servicebrokerapiv1.ServiceBroker, out *servicebrokerapi.ServiceBroker, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapiv1.ServiceBroker))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_v1_ObjectMeta_To_api_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	if err := convert_v1_ServiceBrokerSpec_To_api_ServiceBrokerSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := convert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+func convert_v1_ServiceBroker_To_api_ServiceBroker(in *servicebrokerapiv1.ServiceBroker, out *servicebrokerapi.ServiceBroker, s conversion.Scope) error {
+	return autoconvert_v1_ServiceBroker_To_api_ServiceBroker(in, out, s)
+}
+
+func autoconvert_v1_ServiceBrokerList_To_api_ServiceBrokerList(in *servicebrokerapiv1.ServiceBrokerList, out *servicebrokerapi.ServiceBrokerList, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapiv1.ServiceBrokerList))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := s.Convert(&in.ListMeta, &out.ListMeta, 0); err != nil {
+		return err
+	}
+	if in.Items != nil {
+		out.Items = make([]servicebrokerapi.ServiceBroker, len(in.Items))
+		for i := range in.Items {
+			if err := convert_v1_ServiceBroker_To_api_ServiceBroker(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func convert_v1_ServiceBrokerList_To_api_ServiceBrokerList(in *servicebrokerapiv1.ServiceBrokerList, out *servicebrokerapi.ServiceBrokerList, s conversion.Scope) error {
+	return autoconvert_v1_ServiceBrokerList_To_api_ServiceBrokerList(in, out, s)
+}
+
+func autoconvert_v1_ServiceBrokerSpec_To_api_ServiceBrokerSpec(in *servicebrokerapiv1.ServiceBrokerSpec, out *servicebrokerapi.ServiceBrokerSpec, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapiv1.ServiceBrokerSpec))(in)
+	}
+	out.Url = in.Url
+	out.Name = in.Name
+	out.UserName = in.UserName
+	out.Password = in.Password
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapi.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = pkgapi.FinalizerName(in.Finalizers[i])
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func convert_v1_ServiceBrokerSpec_To_api_ServiceBrokerSpec(in *servicebrokerapiv1.ServiceBrokerSpec, out *servicebrokerapi.ServiceBrokerSpec, s conversion.Scope) error {
+	return autoconvert_v1_ServiceBrokerSpec_To_api_ServiceBrokerSpec(in, out, s)
+}
+
+func autoconvert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus(in *servicebrokerapiv1.ServiceBrokerStatus, out *servicebrokerapi.ServiceBrokerStatus, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*servicebrokerapiv1.ServiceBrokerStatus))(in)
+	}
+	out.Phase = pkgapi.NamespacePhase(in.Phase)
+	return nil
+}
+
+func convert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus(in *servicebrokerapiv1.ServiceBrokerStatus, out *servicebrokerapi.ServiceBrokerStatus, s conversion.Scope) error {
+	return autoconvert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus(in, out, s)
+}
+
 func autoconvert_api_Parameter_To_v1_Parameter(in *templateapi.Parameter, out *templateapiv1.Parameter, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*templateapi.Parameter))(in)
@@ -8157,6 +8329,10 @@ func init() {
 		autoconvert_api_SecretSpec_To_v1_SecretSpec,
 		autoconvert_api_SecretVolumeSource_To_v1_SecretVolumeSource,
 		autoconvert_api_SecurityContext_To_v1_SecurityContext,
+		autoconvert_api_ServiceBrokerList_To_v1_ServiceBrokerList,
+		autoconvert_api_ServiceBrokerSpec_To_v1_ServiceBrokerSpec,
+		autoconvert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus,
+		autoconvert_api_ServiceBroker_To_v1_ServiceBroker,
 		autoconvert_api_SourceBuildStrategy_To_v1_SourceBuildStrategy,
 		autoconvert_api_SourceControlUser_To_v1_SourceControlUser,
 		autoconvert_api_SourceRevision_To_v1_SourceRevision,
@@ -8318,6 +8494,10 @@ func init() {
 		autoconvert_v1_SecretSpec_To_api_SecretSpec,
 		autoconvert_v1_SecretVolumeSource_To_api_SecretVolumeSource,
 		autoconvert_v1_SecurityContext_To_api_SecurityContext,
+		autoconvert_v1_ServiceBrokerList_To_api_ServiceBrokerList,
+		autoconvert_v1_ServiceBrokerSpec_To_api_ServiceBrokerSpec,
+		autoconvert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus,
+		autoconvert_v1_ServiceBroker_To_api_ServiceBroker,
 		autoconvert_v1_SourceBuildStrategy_To_api_SourceBuildStrategy,
 		autoconvert_v1_SourceControlUser_To_api_SourceControlUser,
 		autoconvert_v1_SourceRevision_To_api_SourceRevision,

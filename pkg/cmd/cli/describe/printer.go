@@ -15,6 +15,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/sets"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
@@ -28,6 +29,7 @@ import (
 )
 
 var (
+	serviceBrokerColumns 	= []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns   = []string{"NAME", "STATUS"}
 	buildColumns            = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns      = []string{"NAME", "TYPE", "FROM", "LATEST"}
@@ -67,6 +69,8 @@ var (
 func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, columnLabels []string) *kctl.HumanReadablePrinter {
 	// TODO: support cross namespace listing
 	p := kctl.NewHumanReadablePrinter(noHeaders, withNamespace, wide, showAll, columnLabels)
+	p.Handler(serviceBrokerColumns, printServiceBroker)
+	p.Handler(serviceBrokerColumns, printServiceBrokerList)
 	p.Handler(backingServiceColumns, printBackingService)
 	p.Handler(backingServiceColumns, printBackingServiceList)
 	p.Handler(buildColumns, printBuild)
@@ -438,6 +442,35 @@ func printProjectList(projects *projectapi.ProjectList, w io.Writer, withNamespa
 	sort.Sort(SortableProjects(projects.Items))
 	for _, project := range projects.Items {
 		if err := printProject(&project, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printServiceBroker(serviceBroker *servicebrokerapi.ServiceBroker, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", serviceBroker.Name, labels.Set(serviceBroker.Labels), formatRelativeTime(serviceBroker.CreationTimestamp.Time), serviceBroker.Spec.Url, serviceBroker.Status.Phase)
+	return err
+}
+
+type SortableServiceBrokers []servicebrokerapi.ServiceBroker
+
+func (list SortableServiceBrokers) Len() int {
+	return len(list)
+}
+
+func (list SortableServiceBrokers) Swap(i, j int) {
+	list[i], list[j] = list[j], list[i]
+}
+
+func (list SortableServiceBrokers) Less(i, j int) bool {
+	return list[i].ObjectMeta.Name < list[j].ObjectMeta.Name
+}
+
+func printServiceBrokerList(serviceBrokers *servicebrokerapi.ServiceBrokerList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	sort.Sort(SortableServiceBrokers(serviceBrokers.Items))
+	for _, serviceBroker := range serviceBrokers.Items {
+		if err := printServiceBroker(&serviceBroker, w, withNamespace, wide, showAll, columnLabels); err != nil {
 			return err
 		}
 	}

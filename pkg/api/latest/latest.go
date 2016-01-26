@@ -115,6 +115,7 @@ func init() {
 	// the list of kinds that are scoped at the root of the api hierarchy
 	// if a kind is not enumerated here, it is assumed to have a namespace scope
 	kindToRootScope := map[string]bool{
+		"ServiceBroker":  true,
 		"BackingService": true,
 		"Status":         true,
 

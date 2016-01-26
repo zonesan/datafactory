@@ -25,6 +25,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/sets"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildutil "github.com/openshift/origin/pkg/build/util"
@@ -36,6 +37,7 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
+		"ServiceBroker":		&ServiceBrokerDescriber{c},
 		"BackingService":       &BackingServiceDescriber{c},
 		"Build":                &BuildDescriber{c, kclient},
 		"BuildConfig":          &BuildConfigDescriber{c, host},
@@ -85,6 +87,30 @@ func DescriberFor(kind string, c *client.Client, kclient kclient.Interface, host
 }
 
 // BackingServiceDescriber generates information about a Image
+type ServiceBrokerDescriber struct {
+	client.Interface
+}
+
+// Describe returns the description of an image
+func (d *ServiceBrokerDescriber) Describe(namespace, name string) (string, error) {
+	c := d.ServiceBrokers()
+	bs, err := c.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	return describeServiceBroker(bs)
+}
+
+func describeServiceBroker(sb *servicebrokerapi.ServiceBroker) (string, error) {
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, sb.ObjectMeta)
+		formatString(out, "Status", sb.Status.Phase)
+		return nil
+	})
+}
+
+// BackingServiceDescriber generates information about a Image
 type BackingServiceDescriber struct {
 	client.Interface
 }
@@ -97,10 +123,10 @@ func (d *BackingServiceDescriber) Describe(namespace, name string) (string, erro
 		return "", err
 	}
 
-	return describeBackingService(bs, "")
+	return describeBackingService(bs)
 }
 
-func describeBackingService(bs *backingserviceapi.BackingService, imageName string) (string, error) {
+func describeBackingService(bs *backingserviceapi.BackingService) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bs.ObjectMeta)
 		formatString(out, "Status", bs.Status.Phase)
