@@ -10,13 +10,13 @@ install:
 
 deploy:
   - provider: s3
-    access_key_id: AKIAPF6C7BXAKXXBFTEQ
+    access_key_id: AKIAO27MPEIWV3GJ56EQ
     secret_access_key:
-      secure: cjtlXK/T/3ukQPQvum8u2pPKPk1xG6wypD9kzdrZg1N3f5qddJgZUX98ky6rMG4IT+IFhHd5wyHBHX91mRyFhlJXKbHnaltREdUsjV9/X2IcdS2S28BqPRV2ozzQoe0Dal2bBuDTJ/COws59o8ZmmWaz4zD9nVMhRtObxyQPeR3Lh9VKhoBxh++sJlChAa04QzZva8dOHZT5KlhYxVQJv420FsPM23v/ClJgWXkLJf756J9BTldkCd80RflrTCdhuZIv0CLLbcU/sK6I0qCP8SEbu7aseSyKVFCo+RS9a+s0SDekO7k8whR3zUMFrzO1aJGHyJJmT11qxxE54MHEdcCATJrT4c3CMtV//RN9LRaBmRX3eMg6SHi4y4NUQGxx487GjVNz2JLWBvVv6W0ZpmipHKmXxQop//wAxegJhBKnx2Hzp7xCqbJolVCMLRnZRadr9XKqX3MVQE9qZJhXhu4GYNNdr17uF+LOH7bYtspbyw/Gvisy0jsD7WXErE+RArFzQumBtnHPF7nwpQ7J9M3kq3qAcswx947cfqMFjiU6cz88EgpmG1SOJW9Dv/AiBNYFluBW0LWK5gOOeYaiQZcEbdS32aMB+fYipO4kyBCC4EzRkd58FVhi074w3ZWUY15b82/KbVYVT4d1PXbHq4A2/ko8XJITakXjYEpYM7c=
-    bucket: asiainfo-dataexchange
+      secure: Q9Dxc3YHZH2IhZ4aeUYna1ZeLK8kSRTwoPFtPHAf/oL6sGRjpcmLCgjHBDhTioW+WimAVtwNfvvz5ApNVRi539c9x5zEUmj6+hOQqP5ieiJ2ByVAO2oAkmf327x2O4kZwXkirKBWq82NgY4o8RbGnNhdgYLRZX41Twyzc1892WiC/ADUEqQV72LGgtxBG8zh4dHc+gurrBhbHq3hO5E+vlfUTOuLfmg7jRr0T9fN31AbHUPkTTlDc+K2fJ7XDqxE8MctpPDlWQ85EiavySTGOY0+HDnQ+zePBxxe1DJAVYi/CFceUX5Dox9Bt8aQKkXHNsFuDDDFEBYPk1FDlVmrkYiy4DBYbM9PgfH6Z9vk0t0kRpwr5mY2fzcY2cMkj6icx/lgiZm7OO3fb1scr4SIlYRAp69k5TlnjQIHAeN6/sSttJkfZW4SBUTsDsSJhxBh3rCIY2QhLhsL7Xwp/VSWwCZHndNkdp5HwAS7+u3JmTOpMOXGT2ExgxdLD87+H34MOGrbiNCw3iJFk+jFk7KAyyGPTVgWx5ZypQQy4kHsyfk1qfBThMJKJnYxCdv99Kw8NNKQdMOjq3Eh3PWxHjE+bjzRjxSTDdP2HqGd0Mau9UofZiYgwKQF7/0pVf4n6bVnrvKnQmX7G/3OGZYhEtHoMMiApRfo5pR8tmH0/rTXvPI=
+    bucket: asiainfo-datafactory-bin
+    upload-dir: dev-san
     local-dir: _output/local/bin/linux/amd64/
     region: cn-north-1
-    skip_cleanup: true
     on:
       tags: true
       all_branches: true
