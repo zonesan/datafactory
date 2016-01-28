@@ -9,15 +9,16 @@ install:
   - make install-travis
 
 deploy:
-  provider: releases
-  api_key:
-    secure: YXnRO3hJxpVizfzXb5RWu8zYtRyW8q6WEmjuvR6xOwaboTq8mNOEPptfryE0yhaO9Lv68Xf5VB26HLuiTaPivIIomB2QCOo+rQT9GNho5CFPomKW9gk+yhxKAlCZzorfqRyJErr6zyVWaajfdVeLbB6B7MKY+5/bAc5QHYyDW2fLZnQq1wrXkeuFEmmpPbdxincTwjhlRtbbJSCRLaI9SuE9S7JWS5OhLtgEGVu6DY+BQi1PXcwwpAzvLbrr3yt9t+LvyKzvKNXe02bAvp2/Q4cOhKb/7eg8LxjaBwmpk5nLrqx9b3UrMS5Rk9P2J/U75GsQRM4ebGzK7N+FvLWj+8uxT9tDHY3+5g1a2sUzMfdLaSAx6qeleqOqxlvbujzQVlaBhdjxDN5pRLbqQilmM6ezF7/vJ2Y8HXNSfvg1ZsYQ2y1ZP0V42hfsPCs9g8Ro3/buxhqoaIll+rfvJSOipvfS0TjEEfs6/36WsDCpZj94me48ZY4e1FblgaDU0Xa0tseE2froN7X0zLjfLTOFbjbEY96bLwNmnehEBbBiQ80nwjoTj1L+WARTiUtffTrVFYysBCct7fsk/jn9sh2bd4sMXLMvpRbujlXyjP8vvqIxplEwXaKHwRj2IWkbk8Kr6Lf5JSCQspr8z/kT2JVQCwLEoqPsbQOD26stsgGqW6I=
-  file: 
-    - "_output/local/bin/linux/amd64/oc"
-    - "_output/local/bin/linux/amd64/openshift"
+  provider: s3
+  access_key_id: AKIAO27MPEIWV3GJ56EQ
+  secret_access_key:
+    secure: pD4aZMTF9t327Ov3e0Y+RVj1qDGr4kOzR5LHuR2vRR5NxPIX9cv0ub9zxQcDWRgBB/dHto5iqGxY92XLISwKf/tcGTJNJ+/uHxH5A0QzqUJzTwPIoM4QrMpRFqG4+QcmfRnMVF60N4qhw0rNCoJvYYNBbmlM3IFOoocpahsSSGZGaqH38hjPme9J1BlkjBLO7jC2vNRNA13+Y32TQ4hfTxH0U2asfNEJ80pG0Gh/hjwXc7R8PYkjEucQdRuVZYWxHB5pPxMdvb3NH6CxWqv/y5O0Cm7fgPEpHF2XnDYaDMoXy6W9hv/Za9X+eDr/APzIdRaksoYyI5UAdu+lFCrvTkKw+UMRrew4Q6GndjeEJPGWwfYnRDW281Heo3p5mf7SF9qC23yUplQxP7cR0rilq0GapMFUpFUlTWgoSTMagaj3+9RMCdV1m7kPhEEk6GW8mDbqyNzfIQF8J8njcOFK+DEV15QKZiygpwaFupbEbYSkm4jz67XqB1znJcD3p4LVIL4qFxJZdhjVNgc8/IIk/NhvUDpoAI7G5+wVIbR+GeLztm94+7h9IauW689ehamnCjYmpbw62avLheX9YeOug3VU6O5nw1hVePY/FHNFx+K8wsXloPZnsWD32A+v87BXkaXPKQ9X/6tkJXzO2MRwmvKW4TXSY5A7AE9R0g2Z800=
+  bucket: asiainfo-datafactory-bin
+  upload-dir: dev-san
+  local-dir: "_output/local/bin/linux/amd64"
+  region: cn-north-1
   skip_cleanup: true
   on:
     tags: true
     all_branches: true
-    
 sudo: false
