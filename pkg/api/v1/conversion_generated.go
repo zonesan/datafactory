@@ -1125,10 +1125,53 @@ func autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserv
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.BackingServiceSpec))(in)
 	}
-	out.Url = in.Url
 	out.Name = in.Name
-	out.UserName = in.UserName
-	out.Password = in.Password
+	out.Id = in.Id
+	out.Description = in.Description
+	out.Bindable = in.Bindable
+	out.PlanUpdateable = in.PlanUpdateable
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
+	if in.Requires != nil {
+		out.Requires = make([]string, len(in.Requires))
+		for i := range in.Requires {
+			out.Requires[i] = in.Requires[i]
+		}
+	} else {
+		out.Requires = nil
+	}
+	if in.Metadata != nil {
+		out.Metadata = make(map[string]string)
+		for key, val := range in.Metadata {
+			out.Metadata[key] = val
+		}
+	} else {
+		out.Metadata = nil
+	}
+	if in.Plans != nil {
+		out.Plans = make([]apiv1.ServicePlan, len(in.Plans))
+		for i := range in.Plans {
+			if err := convert_api_ServicePlan_To_v1_ServicePlan(&in.Plans[i], &out.Plans[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Plans = nil
+	}
+	if in.DashboardClient != nil {
+		out.DashboardClient = make(map[string]string)
+		for key, val := range in.DashboardClient {
+			out.DashboardClient[key] = val
+		}
+	} else {
+		out.DashboardClient = nil
+	}
 	return nil
 }
 
@@ -1146,6 +1189,74 @@ func autoconvert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backing
 
 func convert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backingserviceapi.BackingServiceStatus, out *apiv1.BackingServiceStatus, s conversion.Scope) error {
 	return autoconvert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in, out, s)
+}
+
+func autoconvert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *apiv1.ServicePlan, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceapi.ServicePlan))(in)
+	}
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	if err := convert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(&in.Metadata, &out.Metadata, s); err != nil {
+		return err
+	}
+	out.Free = in.Free
+	return nil
+}
+
+func convert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *apiv1.ServicePlan, s conversion.Scope) error {
+	return autoconvert_api_ServicePlan_To_v1_ServicePlan(in, out, s)
+}
+
+func autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *apiv1.ServicePlanCost, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceapi.ServicePlanCost))(in)
+	}
+	if in.Amount != nil {
+		out.Amount = make(map[string]float64)
+		for key, val := range in.Amount {
+			out.Amount[key] = val
+		}
+	} else {
+		out.Amount = nil
+	}
+	out.Unit = in.Unit
+	return nil
+}
+
+func convert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *apiv1.ServicePlanCost, s conversion.Scope) error {
+	return autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in, out, s)
+}
+
+func autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceapi.ServicePlanMetadata))(in)
+	}
+	if in.Bullets != nil {
+		out.Bullets = make([]string, len(in.Bullets))
+		for i := range in.Bullets {
+			out.Bullets[i] = in.Bullets[i]
+		}
+	} else {
+		out.Bullets = nil
+	}
+	if in.Costs != nil {
+		out.Costs = make([]apiv1.ServicePlanCost, len(in.Costs))
+		for i := range in.Costs {
+			if err := convert_api_ServicePlanCost_To_v1_ServicePlanCost(&in.Costs[i], &out.Costs[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Costs = nil
+	}
+	out.DisplayName = in.DisplayName
+	return nil
+}
+
+func convert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, s conversion.Scope) error {
+	return autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in, out, s)
 }
 
 func autoconvert_v1_BackingService_To_api_BackingService(in *apiv1.BackingService, out *backingserviceapi.BackingService, s conversion.Scope) error {
@@ -1202,10 +1313,53 @@ func autoconvert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *apiv1.Backi
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*apiv1.BackingServiceSpec))(in)
 	}
-	out.Url = in.Url
 	out.Name = in.Name
-	out.UserName = in.UserName
-	out.Password = in.Password
+	out.Id = in.Id
+	out.Description = in.Description
+	out.Bindable = in.Bindable
+	out.PlanUpdateable = in.PlanUpdateable
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
+	if in.Requires != nil {
+		out.Requires = make([]string, len(in.Requires))
+		for i := range in.Requires {
+			out.Requires[i] = in.Requires[i]
+		}
+	} else {
+		out.Requires = nil
+	}
+	if in.Metadata != nil {
+		out.Metadata = make(map[string]string)
+		for key, val := range in.Metadata {
+			out.Metadata[key] = val
+		}
+	} else {
+		out.Metadata = nil
+	}
+	if in.Plans != nil {
+		out.Plans = make([]backingserviceapi.ServicePlan, len(in.Plans))
+		for i := range in.Plans {
+			if err := convert_v1_ServicePlan_To_api_ServicePlan(&in.Plans[i], &out.Plans[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Plans = nil
+	}
+	if in.DashboardClient != nil {
+		out.DashboardClient = make(map[string]string)
+		for key, val := range in.DashboardClient {
+			out.DashboardClient[key] = val
+		}
+	} else {
+		out.DashboardClient = nil
+	}
 	return nil
 }
 
@@ -1223,6 +1377,74 @@ func autoconvert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *apiv1.B
 
 func convert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *apiv1.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in, out, s)
+}
+
+func autoconvert_v1_ServicePlan_To_api_ServicePlan(in *apiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*apiv1.ServicePlan))(in)
+	}
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	if err := convert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(&in.Metadata, &out.Metadata, s); err != nil {
+		return err
+	}
+	out.Free = in.Free
+	return nil
+}
+
+func convert_v1_ServicePlan_To_api_ServicePlan(in *apiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
+	return autoconvert_v1_ServicePlan_To_api_ServicePlan(in, out, s)
+}
+
+func autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in *apiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*apiv1.ServicePlanCost))(in)
+	}
+	if in.Amount != nil {
+		out.Amount = make(map[string]float64)
+		for key, val := range in.Amount {
+			out.Amount[key] = val
+		}
+	} else {
+		out.Amount = nil
+	}
+	out.Unit = in.Unit
+	return nil
+}
+
+func convert_v1_ServicePlanCost_To_api_ServicePlanCost(in *apiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
+	return autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in, out, s)
+}
+
+func autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *apiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*apiv1.ServicePlanMetadata))(in)
+	}
+	if in.Bullets != nil {
+		out.Bullets = make([]string, len(in.Bullets))
+		for i := range in.Bullets {
+			out.Bullets[i] = in.Bullets[i]
+		}
+	} else {
+		out.Bullets = nil
+	}
+	if in.Costs != nil {
+		out.Costs = make([]backingserviceapi.ServicePlanCost, len(in.Costs))
+		for i := range in.Costs {
+			if err := convert_v1_ServicePlanCost_To_api_ServicePlanCost(&in.Costs[i], &out.Costs[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Costs = nil
+	}
+	out.DisplayName = in.DisplayName
+	return nil
+}
+
+func convert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *apiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
+	return autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in, out, s)
 }
 
 func autoconvert_api_BinaryBuildRequestOptions_To_v1_BinaryBuildRequestOptions(in *buildapi.BinaryBuildRequestOptions, out *buildapiv1.BinaryBuildRequestOptions, s conversion.Scope) error {
@@ -8157,6 +8379,9 @@ func init() {
 		autoconvert_api_SecretSpec_To_v1_SecretSpec,
 		autoconvert_api_SecretVolumeSource_To_v1_SecretVolumeSource,
 		autoconvert_api_SecurityContext_To_v1_SecurityContext,
+		autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost,
+		autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata,
+		autoconvert_api_ServicePlan_To_v1_ServicePlan,
 		autoconvert_api_SourceBuildStrategy_To_v1_SourceBuildStrategy,
 		autoconvert_api_SourceControlUser_To_v1_SourceControlUser,
 		autoconvert_api_SourceRevision_To_v1_SourceRevision,
@@ -8318,6 +8543,9 @@ func init() {
 		autoconvert_v1_SecretSpec_To_api_SecretSpec,
 		autoconvert_v1_SecretVolumeSource_To_api_SecretVolumeSource,
 		autoconvert_v1_SecurityContext_To_api_SecurityContext,
+		autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost,
+		autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata,
+		autoconvert_v1_ServicePlan_To_api_ServicePlan,
 		autoconvert_v1_SourceBuildStrategy_To_api_SourceBuildStrategy,
 		autoconvert_v1_SourceControlUser_To_api_SourceControlUser,
 		autoconvert_v1_SourceRevision_To_api_SourceRevision,

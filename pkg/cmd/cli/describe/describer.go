@@ -89,7 +89,7 @@ type BackingServiceDescriber struct {
 	client.Interface
 }
 
-// Describe returns the description of an image
+// Describe returns the description of an backingService
 func (d *BackingServiceDescriber) Describe(namespace, name string) (string, error) {
 	c := d.BackingServices()
 	bs, err := c.Get(name)
@@ -103,7 +103,39 @@ func (d *BackingServiceDescriber) Describe(namespace, name string) (string, erro
 func describeBackingService(bs *backingserviceapi.BackingService, imageName string) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bs.ObjectMeta)
+		formatString(out, "Description", bs.Spec.Description)
 		formatString(out, "Status", bs.Status.Phase)
+		formatString(out, "Bindable", bs.Spec.Bindable)
+		formatString(out, "Updateable", bs.Spec.PlanUpdateable)
+		for k, v := range bs.Spec.Metadata {
+			formatString(out, k, v)
+		}
+		for k, v := range bs.Spec.DashboardClient {
+			formatString(out, "Service"+k, v)
+		}
+		for _, plan := range bs.Spec.Plans {
+			fmt.Fprintln(out, "────────────────────")
+			formatString(out, "Plan", plan.Name)
+
+			formatString(out, "PlanID", plan.Id)
+			formatString(out, "PlanDesc", plan.Description)
+			formatString(out, "PlanFree", plan.Free)
+			formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
+			fmt.Fprintf(out, "Bullets:\n")
+			for _, bullet := range plan.Metadata.Bullets {
+				fmt.Fprintf(out, "  %s\n", bullet)
+			}
+			//formatString(out,"PlanBullets",strings.Join(plan.Metadata.Bullets,","))
+			fmt.Fprintf(out, "PlanCosts:\n")
+			for _, cost := range plan.Metadata.Costs {
+				fmt.Fprintf(out, "  CostUnit:\t%s\n", cost.Unit)
+				fmt.Fprintf(out, "  Amount:\n")
+				for k, v := range cost.Amount {
+					fmt.Fprintf(out, "    %v: %v\n", k, v)
+				}
+			}
+
+		}
 		return nil
 	})
 }

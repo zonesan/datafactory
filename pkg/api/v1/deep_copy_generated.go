@@ -733,15 +733,105 @@ func deepCopy_v1_BackingServiceList(in apiv1.BackingServiceList, out *apiv1.Back
 }
 
 func deepCopy_v1_BackingServiceSpec(in apiv1.BackingServiceSpec, out *apiv1.BackingServiceSpec, c *conversion.Cloner) error {
-	out.Url = in.Url
 	out.Name = in.Name
-	out.UserName = in.UserName
-	out.Password = in.Password
+	out.Id = in.Id
+	out.Description = in.Description
+	out.Bindable = in.Bindable
+	out.PlanUpdateable = in.PlanUpdateable
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
+	if in.Requires != nil {
+		out.Requires = make([]string, len(in.Requires))
+		for i := range in.Requires {
+			out.Requires[i] = in.Requires[i]
+		}
+	} else {
+		out.Requires = nil
+	}
+	if in.Metadata != nil {
+		out.Metadata = make(map[string]string)
+		for key, val := range in.Metadata {
+			out.Metadata[key] = val
+		}
+	} else {
+		out.Metadata = nil
+	}
+	if in.Plans != nil {
+		out.Plans = make([]apiv1.ServicePlan, len(in.Plans))
+		for i := range in.Plans {
+			if err := deepCopy_v1_ServicePlan(in.Plans[i], &out.Plans[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Plans = nil
+	}
+	if in.DashboardClient != nil {
+		out.DashboardClient = make(map[string]string)
+		for key, val := range in.DashboardClient {
+			out.DashboardClient[key] = val
+		}
+	} else {
+		out.DashboardClient = nil
+	}
 	return nil
 }
 
 func deepCopy_v1_BackingServiceStatus(in apiv1.BackingServiceStatus, out *apiv1.BackingServiceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_v1_ServicePlan(in apiv1.ServicePlan, out *apiv1.ServicePlan, c *conversion.Cloner) error {
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	if err := deepCopy_v1_ServicePlanMetadata(in.Metadata, &out.Metadata, c); err != nil {
+		return err
+	}
+	out.Free = in.Free
+	return nil
+}
+
+func deepCopy_v1_ServicePlanCost(in apiv1.ServicePlanCost, out *apiv1.ServicePlanCost, c *conversion.Cloner) error {
+	if in.Amount != nil {
+		out.Amount = make(map[string]float64)
+		for key, val := range in.Amount {
+			out.Amount[key] = val
+		}
+	} else {
+		out.Amount = nil
+	}
+	out.Unit = in.Unit
+	return nil
+}
+
+func deepCopy_v1_ServicePlanMetadata(in apiv1.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, c *conversion.Cloner) error {
+	if in.Bullets != nil {
+		out.Bullets = make([]string, len(in.Bullets))
+		for i := range in.Bullets {
+			out.Bullets[i] = in.Bullets[i]
+		}
+	} else {
+		out.Bullets = nil
+	}
+	if in.Costs != nil {
+		out.Costs = make([]apiv1.ServicePlanCost, len(in.Costs))
+		for i := range in.Costs {
+			if err := deepCopy_v1_ServicePlanCost(in.Costs[i], &out.Costs[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Costs = nil
+	}
+	out.DisplayName = in.DisplayName
 	return nil
 }
 
@@ -2893,6 +2983,9 @@ func init() {
 		deepCopy_v1_BackingServiceList,
 		deepCopy_v1_BackingServiceSpec,
 		deepCopy_v1_BackingServiceStatus,
+		deepCopy_v1_ServicePlan,
+		deepCopy_v1_ServicePlanCost,
+		deepCopy_v1_ServicePlanMetadata,
 		deepCopy_v1_BinaryBuildRequestOptions,
 		deepCopy_v1_BinaryBuildSource,
 		deepCopy_v1_Build,
