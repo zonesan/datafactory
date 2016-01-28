@@ -18,5 +18,7 @@ deploy:
   local-dir: "_output/local/bin/linux/amd64"
   region: cn-north-1
   skip_cleanup: true
-  
+  on:
+    tags: true
+    all_branches: true
 sudo: false
