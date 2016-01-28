@@ -81,3 +81,8 @@ type BackingServiceStatus struct {
 }
 
 type BackingServicePhase string
+
+const (
+	BackingServicePhaseActive   BackingServicePhase = "Active"
+	BackingServicePhaseInactive BackingServicePhase = "Inactive"
+)
