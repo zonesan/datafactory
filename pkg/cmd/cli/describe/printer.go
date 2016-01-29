@@ -16,6 +16,7 @@ import (
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -28,22 +29,23 @@ import (
 )
 
 var (
-	backingServiceColumns   = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
-	buildColumns            = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
-	buildConfigColumns      = []string{"NAME", "TYPE", "FROM", "LATEST"}
-	imageColumns            = []string{"NAME", "DOCKER REF"}
-	imageStreamTagColumns   = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
-	imageStreamImageColumns = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
-	imageStreamColumns      = []string{"NAME", "DOCKER REPO", "TAGS", "UPDATED"}
-	projectColumns          = []string{"NAME", "DISPLAY NAME", "STATUS"}
-	routeColumns            = []string{"NAME", "HOST/PORT", "PATH", "SERVICE", "LABELS", "INSECURE POLICY", "TLS TERMINATION"}
-	deploymentColumns       = []string{"NAME", "STATUS", "CAUSE"}
-	deploymentConfigColumns = []string{"NAME", "TRIGGERS", "LATEST"}
-	templateColumns         = []string{"NAME", "DESCRIPTION", "PARAMETERS", "OBJECTS"}
-	policyColumns           = []string{"NAME", "ROLES", "LAST MODIFIED"}
-	policyBindingColumns    = []string{"NAME", "ROLE BINDINGS", "LAST MODIFIED"}
-	roleBindingColumns      = []string{"NAME", "ROLE", "USERS", "GROUPS", "SERVICE ACCOUNTS", "SUBJECTS"}
-	roleColumns             = []string{"NAME"}
+	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
+	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
+	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
+	imageColumns                  = []string{"NAME", "DOCKER REF"}
+	imageStreamTagColumns         = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
+	imageStreamImageColumns       = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
+	imageStreamColumns            = []string{"NAME", "DOCKER REPO", "TAGS", "UPDATED"}
+	projectColumns                = []string{"NAME", "DISPLAY NAME", "STATUS"}
+	routeColumns                  = []string{"NAME", "HOST/PORT", "PATH", "SERVICE", "LABELS", "INSECURE POLICY", "TLS TERMINATION"}
+	deploymentColumns             = []string{"NAME", "STATUS", "CAUSE"}
+	deploymentConfigColumns       = []string{"NAME", "TRIGGERS", "LATEST"}
+	templateColumns               = []string{"NAME", "DESCRIPTION", "PARAMETERS", "OBJECTS"}
+	policyColumns                 = []string{"NAME", "ROLES", "LAST MODIFIED"}
+	policyBindingColumns          = []string{"NAME", "ROLE BINDINGS", "LAST MODIFIED"}
+	roleBindingColumns            = []string{"NAME", "ROLE", "USERS", "GROUPS", "SERVICE ACCOUNTS", "SUBJECTS"}
+	roleColumns                   = []string{"NAME"}
 
 	oauthClientColumns              = []string{"NAME", "SECRET", "WWW-CHALLENGE", "REDIRECT URIS"}
 	oauthClientAuthorizationColumns = []string{"NAME", "USER NAME", "CLIENT NAME", "SCOPES"}
@@ -69,6 +71,8 @@ func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, 
 	p := kctl.NewHumanReadablePrinter(noHeaders, withNamespace, wide, showAll, columnLabels)
 	p.Handler(backingServiceColumns, printBackingService)
 	p.Handler(backingServiceColumns, printBackingServiceList)
+	p.Handler(backingServiceInstanceColumns, printBackingServiceInstance)
+	p.Handler(backingServiceInstanceColumns, printBackingServiceInstanceList)
 	p.Handler(buildColumns, printBuild)
 	p.Handler(buildColumns, printBuildList)
 	p.Handler(buildConfigColumns, printBuildConfig)
@@ -140,11 +144,11 @@ const templateDescriptionLen = 80
 
 func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
 	/*
-	var labels []string
-	for k, v := range bs.Labels {
-		label := fmt.Sprintf("%s=%s", k, v)
-		labels = append(labels, label)
-	}
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
 	*/
 
 	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
@@ -155,6 +159,29 @@ func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.
 
 	for _, bs := range bsList.Items {
 		if err := printBackingService(&bs, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	/*
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
+	*/
+
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
+	return err
+}
+
+func printBackingServiceInstanceList(bsiList *backingserviceinstanceapi.BackingServiceInstanceList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+
+	for _, bsi := range bsiList.Items {
+		if err := printBackingServiceInstance(&bsi, w, withNamespace, wide, showAll, columnLabels); err != nil {
 			return err
 		}
 	}

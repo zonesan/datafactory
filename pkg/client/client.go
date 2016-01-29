@@ -16,6 +16,7 @@ import (
 // Interface exposes methods on OpenShift resources.
 type Interface interface {
 	BackingServicesInterface
+	BackingServiceInstancesInterface
 	BuildsNamespacer
 	BuildConfigsNamespacer
 	BuildLogsNamespacer
@@ -58,6 +59,11 @@ type Interface interface {
 // BackingService provides a REST client for backingservice
 func (c *Client) BackingServices() BackingServiceInterface {
 	return newBackingServices(c)
+}
+
+// BackingServiceInstance provides a REST client for backingserviceinstance
+func (c *Client) BackingServiceInstances() BackingServiceInstanceInterface {
+	return newBackingServiceInstances(c)
 }
 
 // Builds provides a REST client for Builds

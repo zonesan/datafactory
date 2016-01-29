@@ -26,6 +26,7 @@ import (
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	buildutil "github.com/openshift/origin/pkg/build/util"
 	"github.com/openshift/origin/pkg/client"
@@ -36,29 +37,30 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
-		"BackingService":       &BackingServiceDescriber{c},
-		"Build":                &BuildDescriber{c, kclient},
-		"BuildConfig":          &BuildConfigDescriber{c, host},
-		"DeploymentConfig":     NewDeploymentConfigDescriber(c, kclient),
-		"Identity":             &IdentityDescriber{c},
-		"Image":                &ImageDescriber{c},
-		"ImageStream":          &ImageStreamDescriber{c},
-		"ImageStreamTag":       &ImageStreamTagDescriber{c},
-		"ImageStreamImage":     &ImageStreamImageDescriber{c},
-		"Route":                &RouteDescriber{c},
-		"Project":              &ProjectDescriber{c, kclient},
-		"Template":             &TemplateDescriber{c, meta.NewAccessor(), kapi.Scheme, nil},
-		"Policy":               &PolicyDescriber{c},
-		"PolicyBinding":        &PolicyBindingDescriber{c},
-		"RoleBinding":          &RoleBindingDescriber{c},
-		"Role":                 &RoleDescriber{c},
-		"ClusterPolicy":        &ClusterPolicyDescriber{c},
-		"ClusterPolicyBinding": &ClusterPolicyBindingDescriber{c},
-		"ClusterRoleBinding":   &ClusterRoleBindingDescriber{c},
-		"ClusterRole":          &ClusterRoleDescriber{c},
-		"User":                 &UserDescriber{c},
-		"Group":                &GroupDescriber{c.Groups()},
-		"UserIdentityMapping":  &UserIdentityMappingDescriber{c},
+		"BackingService":         &BackingServiceDescriber{c},
+		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
+		"Build":                  &BuildDescriber{c, kclient},
+		"BuildConfig":            &BuildConfigDescriber{c, host},
+		"DeploymentConfig":       NewDeploymentConfigDescriber(c, kclient),
+		"Identity":               &IdentityDescriber{c},
+		"Image":                  &ImageDescriber{c},
+		"ImageStream":            &ImageStreamDescriber{c},
+		"ImageStreamTag":         &ImageStreamTagDescriber{c},
+		"ImageStreamImage":       &ImageStreamImageDescriber{c},
+		"Route":                  &RouteDescriber{c},
+		"Project":                &ProjectDescriber{c, kclient},
+		"Template":               &TemplateDescriber{c, meta.NewAccessor(), kapi.Scheme, nil},
+		"Policy":                 &PolicyDescriber{c},
+		"PolicyBinding":          &PolicyBindingDescriber{c},
+		"RoleBinding":            &RoleBindingDescriber{c},
+		"Role":                   &RoleDescriber{c},
+		"ClusterPolicy":          &ClusterPolicyDescriber{c},
+		"ClusterPolicyBinding":   &ClusterPolicyBindingDescriber{c},
+		"ClusterRoleBinding":     &ClusterRoleBindingDescriber{c},
+		"ClusterRole":            &ClusterRoleDescriber{c},
+		"User":                   &UserDescriber{c},
+		"Group":                  &GroupDescriber{c.Groups()},
+		"UserIdentityMapping":    &UserIdentityMappingDescriber{c},
 	}
 	return m
 }
@@ -136,6 +138,64 @@ func describeBackingService(bs *backingserviceapi.BackingService, imageName stri
 			}
 
 		}
+		return nil
+	})
+}
+
+// BackingServiceInstanceDescriber generates information about a Image
+type BackingServiceInstanceDescriber struct {
+	client.Interface
+}
+
+// Describe returns the description of an backingServiceinstance
+func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (string, error) {
+	c := d.BackingServiceInstances()
+	bsi, err := c.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	return describeBackingServiceInstance(bsi, "")
+}
+
+func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, imageName string) (string, error) {
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, bsi.ObjectMeta)
+		formatString(out, "Description", bsi.Spec.Description)
+		formatString(out, "Status", bsi.Status.Phase)
+		formatString(out, "Bindable", bsi.Spec.Bindable)
+		formatString(out, "Updateable", bsi.Spec.PlanUpdateable)
+		for k, v := range bsi.Spec.Metadata {
+			formatString(out, k, v)
+		}
+		for k, v := range bsi.Spec.DashboardClient {
+			formatString(out, "Service"+k, v)
+		}
+		plan := bsi.Spec.Plan
+		{
+			fmt.Fprintln(out, "────────────────────")
+			formatString(out, "Plan", plan.Name)
+
+			formatString(out, "PlanID", plan.Id)
+			formatString(out, "PlanDesc", plan.Description)
+			formatString(out, "PlanFree", plan.Free)
+			formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
+			fmt.Fprintf(out, "Bullets:\n")
+			for _, bullet := range plan.Metadata.Bullets {
+				fmt.Fprintf(out, "  %s\n", bullet)
+			}
+			//formatString(out,"PlanBullets",strings.Join(plan.Metadata.Bullets,","))
+			fmt.Fprintf(out, "PlanCosts:\n")
+			for _, cost := range plan.Metadata.Costs {
+				fmt.Fprintf(out, "  CostUnit:\t%s\n", cost.Unit)
+				fmt.Fprintf(out, "  Amount:\n")
+				for k, v := range cost.Amount {
+					fmt.Fprintf(out, "    %v: %v\n", k, v)
+				}
+			}
+
+		}
+		formatString(out, "Used", bsi.Spec.Used)
 		return nil
 	})
 }

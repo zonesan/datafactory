@@ -4,6 +4,7 @@ package api
 import (
 	api "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -801,6 +802,147 @@ func deepCopy_api_ServicePlanMetadata(in backingserviceapi.ServicePlanMetadata, 
 		out.Costs = make([]backingserviceapi.ServicePlanCost, len(in.Costs))
 		for i := range in.Costs {
 			if err := deepCopy_api_ServicePlanCost(in.Costs[i], &out.Costs[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Costs = nil
+	}
+	out.DisplayName = in.DisplayName
+	return nil
+}
+
+func deepCopy_api_BackingServiceInstance(in backingserviceinstanceapi.BackingServiceInstance, out *backingserviceinstanceapi.BackingServiceInstance, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
+	}
+	if err := deepCopy_api_BackingServiceInstanceSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_api_BackingServiceInstanceStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_api_BackingServiceInstanceList(in backingserviceinstanceapi.BackingServiceInstanceList, out *backingserviceinstanceapi.BackingServiceInstanceList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]backingserviceinstanceapi.BackingServiceInstance, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_api_BackingServiceInstance(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.BackingServiceInstanceSpec, out *backingserviceinstanceapi.BackingServiceInstanceSpec, c *conversion.Cloner) error {
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	out.Bindable = in.Bindable
+	out.PlanUpdateable = in.PlanUpdateable
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
+	if in.Requires != nil {
+		out.Requires = make([]string, len(in.Requires))
+		for i := range in.Requires {
+			out.Requires[i] = in.Requires[i]
+		}
+	} else {
+		out.Requires = nil
+	}
+	if in.Metadata != nil {
+		out.Metadata = make(map[string]string)
+		for key, val := range in.Metadata {
+			out.Metadata[key] = val
+		}
+	} else {
+		out.Metadata = nil
+	}
+	if err := deepCopy_api_ServiceInstancePlan(in.Plan, &out.Plan, c); err != nil {
+		return err
+	}
+	out.Used = in.Used
+	if in.DashboardClient != nil {
+		out.DashboardClient = make(map[string]string)
+		for key, val := range in.DashboardClient {
+			out.DashboardClient[key] = val
+		}
+	} else {
+		out.DashboardClient = nil
+	}
+	return nil
+}
+
+func deepCopy_api_BackingServiceInstanceStatus(in backingserviceinstanceapi.BackingServiceInstanceStatus, out *backingserviceinstanceapi.BackingServiceInstanceStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_api_ServiceInstancePlan(in backingserviceinstanceapi.ServiceInstancePlan, out *backingserviceinstanceapi.ServiceInstancePlan, c *conversion.Cloner) error {
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	if err := deepCopy_api_ServiceInstancePlanMetadata(in.Metadata, &out.Metadata, c); err != nil {
+		return err
+	}
+	out.Free = in.Free
+	return nil
+}
+
+func deepCopy_api_ServiceInstancePlanCost(in backingserviceinstanceapi.ServiceInstancePlanCost, out *backingserviceinstanceapi.ServiceInstancePlanCost, c *conversion.Cloner) error {
+	if in.Amount != nil {
+		out.Amount = make(map[string]float64)
+		for key, val := range in.Amount {
+			out.Amount[key] = val
+		}
+	} else {
+		out.Amount = nil
+	}
+	out.Unit = in.Unit
+	return nil
+}
+
+func deepCopy_api_ServiceInstancePlanMetadata(in backingserviceinstanceapi.ServiceInstancePlanMetadata, out *backingserviceinstanceapi.ServiceInstancePlanMetadata, c *conversion.Cloner) error {
+	if in.Bullets != nil {
+		out.Bullets = make([]string, len(in.Bullets))
+		for i := range in.Bullets {
+			out.Bullets[i] = in.Bullets[i]
+		}
+	} else {
+		out.Bullets = nil
+	}
+	if in.Costs != nil {
+		out.Costs = make([]backingserviceinstanceapi.ServiceInstancePlanCost, len(in.Costs))
+		for i := range in.Costs {
+			if err := deepCopy_api_ServiceInstancePlanCost(in.Costs[i], &out.Costs[i], c); err != nil {
 				return err
 			}
 		}
@@ -3092,6 +3234,13 @@ func init() {
 		deepCopy_api_ServicePlan,
 		deepCopy_api_ServicePlanCost,
 		deepCopy_api_ServicePlanMetadata,
+		deepCopy_api_BackingServiceInstance,
+		deepCopy_api_BackingServiceInstanceList,
+		deepCopy_api_BackingServiceInstanceSpec,
+		deepCopy_api_BackingServiceInstanceStatus,
+		deepCopy_api_ServiceInstancePlan,
+		deepCopy_api_ServiceInstancePlanCost,
+		deepCopy_api_ServiceInstancePlanMetadata,
 		deepCopy_api_BinaryBuildRequestOptions,
 		deepCopy_api_BinaryBuildSource,
 		deepCopy_api_Build,

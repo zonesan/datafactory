@@ -1,9 +1,9 @@
 package controller
 
 import (
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination

@@ -9,6 +9,7 @@ import (
 	"github.com/golang/glog"
 
 	backingservicecontroller "github.com/openshift/origin/pkg/backingservice/controller"
+	backingserviceinstancecontroller "github.com/openshift/origin/pkg/backingserviceinstance/controller"
 	"k8s.io/kubernetes/pkg/admission"
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/controller/serviceaccount"
@@ -47,6 +48,17 @@ import (
 func (c *MasterConfig) RunBackingServiceController() {
 	osclient, kclient := c.OriginNamespaceControllerClients()
 	factory := backingservicecontroller.BackingServiceControllerFactory{
+		Client:     osclient,
+		KubeClient: kclient,
+	}
+	controller := factory.Create()
+	controller.Run()
+}
+
+// RunBackingServiceController starts the project authorization cache
+func (c *MasterConfig) RunBackingServiceInstanceController() {
+	osclient, kclient := c.OriginNamespaceControllerClients()
+	factory := backingserviceinstancecontroller.BackingServiceInstanceControllerFactory{
 		Client:     osclient,
 		KubeClient: kclient,
 	}

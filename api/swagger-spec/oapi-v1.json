@@ -14981,122 +14981,20 @@
    "v1.BackingServiceSpec": {
     "id": "v1.BackingServiceSpec",
     "required": [
-     "name",
-     "id",
-     "description",
-     "bindable",
-     "plan_updateable",
-     "tags",
-     "requires",
-     "metadata",
-     "plans",
-     "dashboard_client"
+     "url",
+     "brokername"
     ],
     "properties": {
-     "name": {
+     "url": {
       "type": "string"
      },
-     "id": {
+     "brokername": {
       "type": "string"
      },
-     "description": {
+     "username": {
       "type": "string"
      },
-     "bindable": {
-      "type": "boolean"
-     },
-     "plan_updateable": {
-      "type": "boolean"
-     },
-     "tags": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "requires": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "metadata": {
-      "type": "any"
-     },
-     "plans": {
-      "type": "array",
-      "items": {
-       "$ref": "v1.ServicePlan"
-      }
-     },
-     "dashboard_client": {
-      "type": "any"
-     }
-    }
-   },
-   "v1.ServicePlan": {
-    "id": "v1.ServicePlan",
-    "required": [
-     "name",
-     "id",
-     "description",
-     "metadata",
-     "free"
-    ],
-    "properties": {
-     "name": {
-      "type": "string"
-     },
-     "id": {
-      "type": "string"
-     },
-     "description": {
-      "type": "string"
-     },
-     "metadata": {
-      "$ref": "v1.ServicePlanMetadata"
-     },
-     "free": {
-      "type": "boolean"
-     }
-    }
-   },
-   "v1.ServicePlanMetadata": {
-    "id": "v1.ServicePlanMetadata",
-    "required": [
-     "bullets",
-     "costs",
-     "displayName"
-    ],
-    "properties": {
-     "bullets": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "costs": {
-      "type": "array",
-      "items": {
-       "$ref": "v1.ServicePlanCost"
-      }
-     },
-     "displayName": {
-      "type": "string"
-     }
-    }
-   },
-   "v1.ServicePlanCost": {
-    "id": "v1.ServicePlanCost",
-    "required": [
-     "amount",
-     "unit"
-    ],
-    "properties": {
-     "amount": {
-      "type": "any"
-     },
-     "unit": {
+     "password": {
       "type": "string"
      }
     }
