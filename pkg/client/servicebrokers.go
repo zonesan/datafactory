@@ -4,6 +4,7 @@ import (
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
+	"k8s.io/kubernetes/pkg/watch"
 )
 
 // ServiceBrokersInterface has methods to work with ServiceBroker resources in a namespace
@@ -15,8 +16,10 @@ type ServiceBrokersInterface interface {
 type ServiceBrokerInterface interface {
 	Create(p *servicebrokerapi.ServiceBroker) (*servicebrokerapi.ServiceBroker, error)
 	Delete(name string) error
+	Update(p *servicebrokerapi.ServiceBroker) (*servicebrokerapi.ServiceBroker, error)
 	Get(name string) (*servicebrokerapi.ServiceBroker, error)
 	List(label labels.Selector, field fields.Selector) (*servicebrokerapi.ServiceBrokerList, error)
+	Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error)
 }
 
 type serviceBrokers struct {
@@ -67,4 +70,14 @@ func (c *serviceBrokers) Update(p *servicebrokerapi.ServiceBroker) (result *serv
 func (c *serviceBrokers) Delete(name string) (err error) {
 	err = c.r.Delete().Resource("serviceBrokers").Name(name).Do().Error()
 	return
+}
+// Watch returns a watch.Interface that watches the requested serviceBrokers
+func (c *serviceBrokers) Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
+	return c.r.Get().
+	Prefix("watch").
+	Resource("serviceBrokers").
+	Param("resourceVersion", resourceVersion).
+	LabelsSelectorParam(label).
+	FieldsSelectorParam(field).
+	Watch()
 }
