@@ -1503,46 +1503,42 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapi.BackingServiceInstanceSpec))(in)
 	}
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	out.Bindable = in.Bindable
-	out.PlanUpdateable = in.PlanUpdateable
-	if in.Tags != nil {
-		out.Tags = make([]string, len(in.Tags))
-		for i := range in.Tags {
-			out.Tags[i] = in.Tags[i]
+	if in.Config != nil {
+		out.Config = make(map[string]string)
+		for key, val := range in.Config {
+			out.Config[key] = val
 		}
 	} else {
-		out.Tags = nil
+		out.Config = nil
 	}
-	if in.Requires != nil {
-		out.Requires = make([]string, len(in.Requires))
-		for i := range in.Requires {
-			out.Requires[i] = in.Requires[i]
+	out.DashboardUrl = in.DashboardUrl
+	out.BackingServiceGuid = in.BackingServiceGuid
+	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	if in.Parameters != nil {
+		out.Parameters = make(map[string]string)
+		for key, val := range in.Parameters {
+			out.Parameters[key] = val
 		}
 	} else {
-		out.Requires = nil
+		out.Parameters = nil
 	}
-	if in.Metadata != nil {
-		out.Metadata = make(map[string]string)
-		for key, val := range in.Metadata {
-			out.Metadata[key] = val
+	out.Binding = in.Binding
+	out.BindUuid = in.BindUuid
+	if in.BindDeploymentConfig != nil {
+		out.BindDeploymentConfig = make(map[string]string)
+		for key, val := range in.BindDeploymentConfig {
+			out.BindDeploymentConfig[key] = val
 		}
 	} else {
-		out.Metadata = nil
+		out.BindDeploymentConfig = nil
 	}
-	if err := convert_api_ServiceInstancePlan_To_v1_ServiceInstancePlan(&in.Plan, &out.Plan, s); err != nil {
-		return err
-	}
-	out.Used = in.Used
-	if in.DashboardClient != nil {
-		out.DashboardClient = make(map[string]string)
-		for key, val := range in.DashboardClient {
-			out.DashboardClient[key] = val
+	if in.Credential != nil {
+		out.Credential = make(map[string]string)
+		for key, val := range in.Credential {
+			out.Credential[key] = val
 		}
 	} else {
-		out.DashboardClient = nil
+		out.Credential = nil
 	}
 	return nil
 }
@@ -1561,74 +1557,6 @@ func autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceSt
 
 func convert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus(in *backingserviceinstanceapi.BackingServiceInstanceStatus, out *backingserviceinstanceapiv1.BackingServiceInstanceStatus, s conversion.Scope) error {
 	return autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus(in, out, s)
-}
-
-func autoconvert_api_ServiceInstancePlan_To_v1_ServiceInstancePlan(in *backingserviceinstanceapi.ServiceInstancePlan, out *backingserviceinstanceapiv1.ServiceInstancePlan, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapi.ServiceInstancePlan))(in)
-	}
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	if err := convert_api_ServiceInstancePlanMetadata_To_v1_ServiceInstancePlanMetadata(&in.Metadata, &out.Metadata, s); err != nil {
-		return err
-	}
-	out.Free = in.Free
-	return nil
-}
-
-func convert_api_ServiceInstancePlan_To_v1_ServiceInstancePlan(in *backingserviceinstanceapi.ServiceInstancePlan, out *backingserviceinstanceapiv1.ServiceInstancePlan, s conversion.Scope) error {
-	return autoconvert_api_ServiceInstancePlan_To_v1_ServiceInstancePlan(in, out, s)
-}
-
-func autoconvert_api_ServiceInstancePlanCost_To_v1_ServiceInstancePlanCost(in *backingserviceinstanceapi.ServiceInstancePlanCost, out *backingserviceinstanceapiv1.ServiceInstancePlanCost, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapi.ServiceInstancePlanCost))(in)
-	}
-	if in.Amount != nil {
-		out.Amount = make(map[string]float64)
-		for key, val := range in.Amount {
-			out.Amount[key] = val
-		}
-	} else {
-		out.Amount = nil
-	}
-	out.Unit = in.Unit
-	return nil
-}
-
-func convert_api_ServiceInstancePlanCost_To_v1_ServiceInstancePlanCost(in *backingserviceinstanceapi.ServiceInstancePlanCost, out *backingserviceinstanceapiv1.ServiceInstancePlanCost, s conversion.Scope) error {
-	return autoconvert_api_ServiceInstancePlanCost_To_v1_ServiceInstancePlanCost(in, out, s)
-}
-
-func autoconvert_api_ServiceInstancePlanMetadata_To_v1_ServiceInstancePlanMetadata(in *backingserviceinstanceapi.ServiceInstancePlanMetadata, out *backingserviceinstanceapiv1.ServiceInstancePlanMetadata, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapi.ServiceInstancePlanMetadata))(in)
-	}
-	if in.Bullets != nil {
-		out.Bullets = make([]string, len(in.Bullets))
-		for i := range in.Bullets {
-			out.Bullets[i] = in.Bullets[i]
-		}
-	} else {
-		out.Bullets = nil
-	}
-	if in.Costs != nil {
-		out.Costs = make([]backingserviceinstanceapiv1.ServiceInstancePlanCost, len(in.Costs))
-		for i := range in.Costs {
-			if err := convert_api_ServiceInstancePlanCost_To_v1_ServiceInstancePlanCost(&in.Costs[i], &out.Costs[i], s); err != nil {
-				return err
-			}
-		}
-	} else {
-		out.Costs = nil
-	}
-	out.DisplayName = in.DisplayName
-	return nil
-}
-
-func convert_api_ServiceInstancePlanMetadata_To_v1_ServiceInstancePlanMetadata(in *backingserviceinstanceapi.ServiceInstancePlanMetadata, out *backingserviceinstanceapiv1.ServiceInstancePlanMetadata, s conversion.Scope) error {
-	return autoconvert_api_ServiceInstancePlanMetadata_To_v1_ServiceInstancePlanMetadata(in, out, s)
 }
 
 func autoconvert_v1_BackingServiceInstance_To_api_BackingServiceInstance(in *backingserviceinstanceapiv1.BackingServiceInstance, out *backingserviceinstanceapi.BackingServiceInstance, s conversion.Scope) error {
@@ -1685,46 +1613,42 @@ func autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapiv1.BackingServiceInstanceSpec))(in)
 	}
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	out.Bindable = in.Bindable
-	out.PlanUpdateable = in.PlanUpdateable
-	if in.Tags != nil {
-		out.Tags = make([]string, len(in.Tags))
-		for i := range in.Tags {
-			out.Tags[i] = in.Tags[i]
+	if in.Config != nil {
+		out.Config = make(map[string]string)
+		for key, val := range in.Config {
+			out.Config[key] = val
 		}
 	} else {
-		out.Tags = nil
+		out.Config = nil
 	}
-	if in.Requires != nil {
-		out.Requires = make([]string, len(in.Requires))
-		for i := range in.Requires {
-			out.Requires[i] = in.Requires[i]
+	out.DashboardUrl = in.DashboardUrl
+	out.BackingServiceGuid = in.BackingServiceGuid
+	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	if in.Parameters != nil {
+		out.Parameters = make(map[string]string)
+		for key, val := range in.Parameters {
+			out.Parameters[key] = val
 		}
 	} else {
-		out.Requires = nil
+		out.Parameters = nil
 	}
-	if in.Metadata != nil {
-		out.Metadata = make(map[string]string)
-		for key, val := range in.Metadata {
-			out.Metadata[key] = val
+	out.Binding = in.Binding
+	out.BindUuid = in.BindUuid
+	if in.BindDeploymentConfig != nil {
+		out.BindDeploymentConfig = make(map[string]string)
+		for key, val := range in.BindDeploymentConfig {
+			out.BindDeploymentConfig[key] = val
 		}
 	} else {
-		out.Metadata = nil
+		out.BindDeploymentConfig = nil
 	}
-	if err := convert_v1_ServiceInstancePlan_To_api_ServiceInstancePlan(&in.Plan, &out.Plan, s); err != nil {
-		return err
-	}
-	out.Used = in.Used
-	if in.DashboardClient != nil {
-		out.DashboardClient = make(map[string]string)
-		for key, val := range in.DashboardClient {
-			out.DashboardClient[key] = val
+	if in.Credential != nil {
+		out.Credential = make(map[string]string)
+		for key, val := range in.Credential {
+			out.Credential[key] = val
 		}
 	} else {
-		out.DashboardClient = nil
+		out.Credential = nil
 	}
 	return nil
 }
@@ -1743,74 +1667,6 @@ func autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceSt
 
 func convert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus(in *backingserviceinstanceapiv1.BackingServiceInstanceStatus, out *backingserviceinstanceapi.BackingServiceInstanceStatus, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus(in, out, s)
-}
-
-func autoconvert_v1_ServiceInstancePlan_To_api_ServiceInstancePlan(in *backingserviceinstanceapiv1.ServiceInstancePlan, out *backingserviceinstanceapi.ServiceInstancePlan, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapiv1.ServiceInstancePlan))(in)
-	}
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	if err := convert_v1_ServiceInstancePlanMetadata_To_api_ServiceInstancePlanMetadata(&in.Metadata, &out.Metadata, s); err != nil {
-		return err
-	}
-	out.Free = in.Free
-	return nil
-}
-
-func convert_v1_ServiceInstancePlan_To_api_ServiceInstancePlan(in *backingserviceinstanceapiv1.ServiceInstancePlan, out *backingserviceinstanceapi.ServiceInstancePlan, s conversion.Scope) error {
-	return autoconvert_v1_ServiceInstancePlan_To_api_ServiceInstancePlan(in, out, s)
-}
-
-func autoconvert_v1_ServiceInstancePlanCost_To_api_ServiceInstancePlanCost(in *backingserviceinstanceapiv1.ServiceInstancePlanCost, out *backingserviceinstanceapi.ServiceInstancePlanCost, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapiv1.ServiceInstancePlanCost))(in)
-	}
-	if in.Amount != nil {
-		out.Amount = make(map[string]float64)
-		for key, val := range in.Amount {
-			out.Amount[key] = val
-		}
-	} else {
-		out.Amount = nil
-	}
-	out.Unit = in.Unit
-	return nil
-}
-
-func convert_v1_ServiceInstancePlanCost_To_api_ServiceInstancePlanCost(in *backingserviceinstanceapiv1.ServiceInstancePlanCost, out *backingserviceinstanceapi.ServiceInstancePlanCost, s conversion.Scope) error {
-	return autoconvert_v1_ServiceInstancePlanCost_To_api_ServiceInstancePlanCost(in, out, s)
-}
-
-func autoconvert_v1_ServiceInstancePlanMetadata_To_api_ServiceInstancePlanMetadata(in *backingserviceinstanceapiv1.ServiceInstancePlanMetadata, out *backingserviceinstanceapi.ServiceInstancePlanMetadata, s conversion.Scope) error {
-	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*backingserviceinstanceapiv1.ServiceInstancePlanMetadata))(in)
-	}
-	if in.Bullets != nil {
-		out.Bullets = make([]string, len(in.Bullets))
-		for i := range in.Bullets {
-			out.Bullets[i] = in.Bullets[i]
-		}
-	} else {
-		out.Bullets = nil
-	}
-	if in.Costs != nil {
-		out.Costs = make([]backingserviceinstanceapi.ServiceInstancePlanCost, len(in.Costs))
-		for i := range in.Costs {
-			if err := convert_v1_ServiceInstancePlanCost_To_api_ServiceInstancePlanCost(&in.Costs[i], &out.Costs[i], s); err != nil {
-				return err
-			}
-		}
-	} else {
-		out.Costs = nil
-	}
-	out.DisplayName = in.DisplayName
-	return nil
-}
-
-func convert_v1_ServiceInstancePlanMetadata_To_api_ServiceInstancePlanMetadata(in *backingserviceinstanceapiv1.ServiceInstancePlanMetadata, out *backingserviceinstanceapi.ServiceInstancePlanMetadata, s conversion.Scope) error {
-	return autoconvert_v1_ServiceInstancePlanMetadata_To_api_ServiceInstancePlanMetadata(in, out, s)
 }
 
 func autoconvert_api_BinaryBuildRequestOptions_To_v1_BinaryBuildRequestOptions(in *buildapi.BinaryBuildRequestOptions, out *buildapiv1.BinaryBuildRequestOptions, s conversion.Scope) error {
@@ -8749,9 +8605,6 @@ func init() {
 		autoconvert_api_SecretSpec_To_v1_SecretSpec,
 		autoconvert_api_SecretVolumeSource_To_v1_SecretVolumeSource,
 		autoconvert_api_SecurityContext_To_v1_SecurityContext,
-		autoconvert_api_ServiceInstancePlanCost_To_v1_ServiceInstancePlanCost,
-		autoconvert_api_ServiceInstancePlanMetadata_To_v1_ServiceInstancePlanMetadata,
-		autoconvert_api_ServiceInstancePlan_To_v1_ServiceInstancePlan,
 		autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost,
 		autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata,
 		autoconvert_api_ServicePlan_To_v1_ServicePlan,
@@ -8920,9 +8773,6 @@ func init() {
 		autoconvert_v1_SecretSpec_To_api_SecretSpec,
 		autoconvert_v1_SecretVolumeSource_To_api_SecretVolumeSource,
 		autoconvert_v1_SecurityContext_To_api_SecurityContext,
-		autoconvert_v1_ServiceInstancePlanCost_To_api_ServiceInstancePlanCost,
-		autoconvert_v1_ServiceInstancePlanMetadata_To_api_ServiceInstancePlanMetadata,
-		autoconvert_v1_ServiceInstancePlan_To_api_ServiceInstancePlan,
 		autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost,
 		autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata,
 		autoconvert_v1_ServicePlan_To_api_ServicePlan,

@@ -25,21 +25,15 @@ type BackingServiceInstanceList struct {
 }
 
 type BackingServiceInstanceSpec struct {
-	Name           string   `json:"name"`
-	Id             string   `json:"id"`
-	Description    string   `json:"description"`
-	Bindable       bool     `json:"bindable"`
-	PlanUpdateable bool     `json:"plan_updateable, omitempty"`
-	Tags           []string `json:"tags, omitempty"`
-	Requires       []string `json:"requires, omitempty"`
-
-	//Metadata        ServiceMetadata        `json:"metadata, omitempty"`
-	Metadata        map[string]string `json:"metadata, omitempty"`
-	//Plans           []ServiceInstancePlan     `json:"plans"`
-	Plan            ServiceInstancePlan     `json:"plan"`
-	Used            int64
-	DashboardClient map[string]string `json:"dashboard_client"`
-	//DashboardClient ServiceDashboardClient `json:"dashboard_client"`
+	Config                 map[string]string `json:"config, omitempty"`
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+	Binding                bool              `json:"binding, omitempty"`
+	BindUuid               string            `json:"bind_uuid, omitempty"`
+	BindDeploymentConfig   map[string]string `json:"bind_deploymentconfig, omitempty"`
+	Credential             map[string]string `json:"credential, omitempty"`
 }
 
 //type ServiceMetadata struct {
@@ -57,26 +51,6 @@ type BackingServiceInstanceSpec struct {
 //	RedirectUri string `json:"redirect_uri, omitempty"`
 //}
 
-type ServiceInstancePlan struct {
-	Name        string              `json:"name"`
-	Id          string              `json:"id"`
-	Description string              `json:"description"`
-	Metadata    ServiceInstancePlanMetadata `json:"metadata, omitempty"`
-	Free        bool                `json:"free, omitempty"`
-}
-
-type ServiceInstancePlanMetadata struct {
-	Bullets     []string          `json:"bullets, omitempty"`
-	Costs       []ServiceInstancePlanCost `json:"costs, omitempty"`
-	DisplayName string            `json:"displayName, omitempty"`
-}
-
-//TODO amount should be a array object...
-type ServiceInstancePlanCost struct {
-	Amount map[string]float64 `json:"amount, omitempty"`
-	Unit   string             `json:"unit, omitempty"`
-}
-
 // ProjectStatus is information about the current status of a Project
 type BackingServiceInstanceStatus struct {
 	Phase BackingServiceInstancePhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
@@ -86,5 +60,7 @@ type BackingServiceInstancePhase string
 
 const (
 	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
+	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
 	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
+	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
 )

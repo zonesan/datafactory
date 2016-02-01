@@ -857,99 +857,48 @@ func deepCopy_api_BackingServiceInstanceList(in backingserviceinstanceapi.Backin
 }
 
 func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.BackingServiceInstanceSpec, out *backingserviceinstanceapi.BackingServiceInstanceSpec, c *conversion.Cloner) error {
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	out.Bindable = in.Bindable
-	out.PlanUpdateable = in.PlanUpdateable
-	if in.Tags != nil {
-		out.Tags = make([]string, len(in.Tags))
-		for i := range in.Tags {
-			out.Tags[i] = in.Tags[i]
+	if in.Config != nil {
+		out.Config = make(map[string]string)
+		for key, val := range in.Config {
+			out.Config[key] = val
 		}
 	} else {
-		out.Tags = nil
+		out.Config = nil
 	}
-	if in.Requires != nil {
-		out.Requires = make([]string, len(in.Requires))
-		for i := range in.Requires {
-			out.Requires[i] = in.Requires[i]
+	out.DashboardUrl = in.DashboardUrl
+	out.BackingServiceGuid = in.BackingServiceGuid
+	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	if in.Parameters != nil {
+		out.Parameters = make(map[string]string)
+		for key, val := range in.Parameters {
+			out.Parameters[key] = val
 		}
 	} else {
-		out.Requires = nil
+		out.Parameters = nil
 	}
-	if in.Metadata != nil {
-		out.Metadata = make(map[string]string)
-		for key, val := range in.Metadata {
-			out.Metadata[key] = val
+	out.Binding = in.Binding
+	out.BindUuid = in.BindUuid
+	if in.BindDeploymentConfig != nil {
+		out.BindDeploymentConfig = make(map[string]string)
+		for key, val := range in.BindDeploymentConfig {
+			out.BindDeploymentConfig[key] = val
 		}
 	} else {
-		out.Metadata = nil
+		out.BindDeploymentConfig = nil
 	}
-	if err := deepCopy_api_ServiceInstancePlan(in.Plan, &out.Plan, c); err != nil {
-		return err
-	}
-	out.Used = in.Used
-	if in.DashboardClient != nil {
-		out.DashboardClient = make(map[string]string)
-		for key, val := range in.DashboardClient {
-			out.DashboardClient[key] = val
+	if in.Credential != nil {
+		out.Credential = make(map[string]string)
+		for key, val := range in.Credential {
+			out.Credential[key] = val
 		}
 	} else {
-		out.DashboardClient = nil
+		out.Credential = nil
 	}
 	return nil
 }
 
 func deepCopy_api_BackingServiceInstanceStatus(in backingserviceinstanceapi.BackingServiceInstanceStatus, out *backingserviceinstanceapi.BackingServiceInstanceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
-	return nil
-}
-
-func deepCopy_api_ServiceInstancePlan(in backingserviceinstanceapi.ServiceInstancePlan, out *backingserviceinstanceapi.ServiceInstancePlan, c *conversion.Cloner) error {
-	out.Name = in.Name
-	out.Id = in.Id
-	out.Description = in.Description
-	if err := deepCopy_api_ServiceInstancePlanMetadata(in.Metadata, &out.Metadata, c); err != nil {
-		return err
-	}
-	out.Free = in.Free
-	return nil
-}
-
-func deepCopy_api_ServiceInstancePlanCost(in backingserviceinstanceapi.ServiceInstancePlanCost, out *backingserviceinstanceapi.ServiceInstancePlanCost, c *conversion.Cloner) error {
-	if in.Amount != nil {
-		out.Amount = make(map[string]float64)
-		for key, val := range in.Amount {
-			out.Amount[key] = val
-		}
-	} else {
-		out.Amount = nil
-	}
-	out.Unit = in.Unit
-	return nil
-}
-
-func deepCopy_api_ServiceInstancePlanMetadata(in backingserviceinstanceapi.ServiceInstancePlanMetadata, out *backingserviceinstanceapi.ServiceInstancePlanMetadata, c *conversion.Cloner) error {
-	if in.Bullets != nil {
-		out.Bullets = make([]string, len(in.Bullets))
-		for i := range in.Bullets {
-			out.Bullets[i] = in.Bullets[i]
-		}
-	} else {
-		out.Bullets = nil
-	}
-	if in.Costs != nil {
-		out.Costs = make([]backingserviceinstanceapi.ServiceInstancePlanCost, len(in.Costs))
-		for i := range in.Costs {
-			if err := deepCopy_api_ServiceInstancePlanCost(in.Costs[i], &out.Costs[i], c); err != nil {
-				return err
-			}
-		}
-	} else {
-		out.Costs = nil
-	}
-	out.DisplayName = in.DisplayName
 	return nil
 }
 
@@ -3238,9 +3187,6 @@ func init() {
 		deepCopy_api_BackingServiceInstanceList,
 		deepCopy_api_BackingServiceInstanceSpec,
 		deepCopy_api_BackingServiceInstanceStatus,
-		deepCopy_api_ServiceInstancePlan,
-		deepCopy_api_ServiceInstancePlanCost,
-		deepCopy_api_ServiceInstancePlanMetadata,
 		deepCopy_api_BinaryBuildRequestOptions,
 		deepCopy_api_BinaryBuildSource,
 		deepCopy_api_Build,

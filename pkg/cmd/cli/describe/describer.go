@@ -159,45 +159,48 @@ func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (stri
 }
 
 func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, imageName string) (string, error) {
-	return tabbedString(func(out *tabwriter.Writer) error {
-		formatMeta(out, bsi.ObjectMeta)
-		formatString(out, "Description", bsi.Spec.Description)
-		formatString(out, "Status", bsi.Status.Phase)
-		formatString(out, "Bindable", bsi.Spec.Bindable)
-		formatString(out, "Updateable", bsi.Spec.PlanUpdateable)
-		for k, v := range bsi.Spec.Metadata {
-			formatString(out, k, v)
-		}
-		for k, v := range bsi.Spec.DashboardClient {
-			formatString(out, "Service"+k, v)
-		}
-		plan := bsi.Spec.Plan
-		{
-			fmt.Fprintln(out, "────────────────────")
-			formatString(out, "Plan", plan.Name)
-
-			formatString(out, "PlanID", plan.Id)
-			formatString(out, "PlanDesc", plan.Description)
-			formatString(out, "PlanFree", plan.Free)
-			formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
-			fmt.Fprintf(out, "Bullets:\n")
-			for _, bullet := range plan.Metadata.Bullets {
-				fmt.Fprintf(out, "  %s\n", bullet)
+	return "", nil
+	/*
+		return tabbedString(func(out *tabwriter.Writer) error {
+			formatMeta(out, bsi.ObjectMeta)
+			formatString(out, "Description", bsi.Spec.Description)
+			formatString(out, "Status", bsi.Status.Phase)
+			formatString(out, "Bindable", bsi.Spec.Bindable)
+			formatString(out, "Updateable", bsi.Spec.PlanUpdateable)
+			for k, v := range bsi.Spec.Metadata {
+				formatString(out, k, v)
 			}
-			//formatString(out,"PlanBullets",strings.Join(plan.Metadata.Bullets,","))
-			fmt.Fprintf(out, "PlanCosts:\n")
-			for _, cost := range plan.Metadata.Costs {
-				fmt.Fprintf(out, "  CostUnit:\t%s\n", cost.Unit)
-				fmt.Fprintf(out, "  Amount:\n")
-				for k, v := range cost.Amount {
-					fmt.Fprintf(out, "    %v: %v\n", k, v)
+			for k, v := range bsi.Spec.DashboardClient {
+				formatString(out, "Service"+k, v)
+			}
+			plan := bsi.Spec.Plan
+			{
+				fmt.Fprintln(out, "────────────────────")
+				formatString(out, "Plan", plan.Name)
+
+				formatString(out, "PlanID", plan.Id)
+				formatString(out, "PlanDesc", plan.Description)
+				formatString(out, "PlanFree", plan.Free)
+				formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
+				fmt.Fprintf(out, "Bullets:\n")
+				for _, bullet := range plan.Metadata.Bullets {
+					fmt.Fprintf(out, "  %s\n", bullet)
 				}
-			}
+				//formatString(out,"PlanBullets",strings.Join(plan.Metadata.Bullets,","))
+				fmt.Fprintf(out, "PlanCosts:\n")
+				for _, cost := range plan.Metadata.Costs {
+					fmt.Fprintf(out, "  CostUnit:\t%s\n", cost.Unit)
+					fmt.Fprintf(out, "  Amount:\n")
+					for k, v := range cost.Amount {
+						fmt.Fprintf(out, "    %v: %v\n", k, v)
+					}
+				}
 
-		}
-		formatString(out, "Used", bsi.Spec.Used)
-		return nil
-	})
+			}
+			formatString(out, "Used", bsi.Spec.Used)
+			return nil
+		})
+	*/
 }
 
 // BuildDescriber generates information about a build
