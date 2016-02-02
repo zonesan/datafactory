@@ -11,6 +11,7 @@ import (
 	"time"
 
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
+	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
 )
@@ -43,6 +44,7 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 	servicebrokerController := &ServiceBrokerController{
 		Client:     factory.Client,
 		KubeClient: factory.KubeClient,
+		ServiceBrokerClient: servicebrokerclient.NewServiceBrokerClient(),
 	}
 
 	return &controller.RetryController{
