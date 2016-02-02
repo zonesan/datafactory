@@ -5,7 +5,6 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 
 	_ "github.com/openshift/origin/pkg/authorization/api"
-	_ "github.com/openshift/origin/pkg/servicebroker/api"
 	_ "github.com/openshift/origin/pkg/backingservice/api"
 	_ "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	_ "github.com/openshift/origin/pkg/build/api"
@@ -15,6 +14,7 @@ import (
 	_ "github.com/openshift/origin/pkg/project/api"
 	_ "github.com/openshift/origin/pkg/route/api"
 	_ "github.com/openshift/origin/pkg/sdn/api"
+	_ "github.com/openshift/origin/pkg/servicebroker/api"
 	_ "github.com/openshift/origin/pkg/template/api"
 	_ "github.com/openshift/origin/pkg/user/api"
 )

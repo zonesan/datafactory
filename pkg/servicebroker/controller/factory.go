@@ -10,15 +10,15 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 	"time"
 
-	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
-	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
+	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
 )
 
 type ServiceBrokerControllerFactory struct {
 	// Client is an OpenShift client.
-	Client     osclient.Interface
+	Client osclient.Interface
 	// KubeClient is a Kubernetes client.
 	KubeClient kclient.Interface
 }
@@ -42,8 +42,8 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 	cache.NewReflector(servicebrokerLW, &servicebrokerapi.ServiceBroker{}, queue, 1*time.Minute).Run()
 
 	servicebrokerController := &ServiceBrokerController{
-		Client:     factory.Client,
-		KubeClient: factory.KubeClient,
+		Client:              factory.Client,
+		KubeClient:          factory.KubeClient,
 		ServiceBrokerClient: servicebrokerclient.NewServiceBrokerClient(),
 	}
 

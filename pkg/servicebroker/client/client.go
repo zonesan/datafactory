@@ -2,13 +2,19 @@ package client
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api/v1"
 	"io/ioutil"
 	"net/http"
 )
 
+type ServiceList struct {
+	Services []backingserviceapi.BackingServiceSpec `json:"services"`
+}
+
 type Interface interface {
-	Catalog(Url string) ([]byte, error)
+	Catalog(Url string) (ServiceList, error)
 }
 
 func NewServiceBrokerClient() Interface {
@@ -23,8 +29,19 @@ type httpClient struct {
 	Post func(getUrl string, body []byte, credential ...string) ([]byte, error)
 }
 
-func (c *httpClient) Catalog(Url string) ([]byte, error) {
-	return c.Get(Url)
+func (c *httpClient) Catalog(Url string) (ServiceList, error) {
+	services := new(ServiceList)
+	b, err := c.Get(Url)
+	if err != nil {
+		fmt.Printf("httpclient catalog err %s", err.Error())
+		return *services, err
+	}
+
+	if err := json.Unmarshal(b, services); err != nil {
+		return *services, err
+	}
+
+	return *services, nil
 }
 
 func httpGet(getUrl string, credential ...string) ([]byte, error) {

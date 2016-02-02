@@ -5,14 +5,13 @@ import (
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/registry/generic"
-	"k8s.io/kubernetes/pkg/storage"
 	etcdgeneric "k8s.io/kubernetes/pkg/registry/generic/etcd"
+	"k8s.io/kubernetes/pkg/storage"
+	"k8s.io/kubernetes/pkg/watch"
 
 	"github.com/openshift/origin/pkg/servicebroker/api"
 	servicebroker "github.com/openshift/origin/pkg/servicebroker/registry/servicebroker"
 	"k8s.io/kubernetes/pkg/runtime"
-
-
 )
 
 type REST struct {
@@ -65,7 +64,7 @@ func (r *REST) Get(ctx kapi.Context, name string) (runtime.Object, error) {
 }
 
 func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Selector) (runtime.Object, error) {
-	return r.store.List(ctx, label,field)
+	return r.store.List(ctx, label, field)
 }
 
 // Create creates an image based on a specification.
@@ -81,4 +80,8 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 // Delete deletes an existing image specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
 	return r.store.Delete(ctx, name, options)
+}
+
+func (r *REST) Watch(ctx kapi.Context, label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
+	return r.store.Watch(ctx, label, field, resourceVersion)
 }

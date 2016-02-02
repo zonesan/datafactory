@@ -25,7 +25,6 @@ import (
 	"k8s.io/kubernetes/pkg/util/sets"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
-	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
@@ -33,36 +32,37 @@ import (
 	"github.com/openshift/origin/pkg/client"
 	imageapi "github.com/openshift/origin/pkg/image/api"
 	projectapi "github.com/openshift/origin/pkg/project/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	templateapi "github.com/openshift/origin/pkg/template/api"
 )
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
-		"ServiceBroker":		&ServiceBrokerDescriber{c},
-		"BackingService":       	&BackingServiceDescriber{c},
-		"BackingServiceInstance": 	&BackingServiceInstanceDescriber{c},
-		"Build":                	&BuildDescriber{c, kclient},
-		"BuildConfig":          	&BuildConfigDescriber{c, host},
-		"DeploymentConfig":     	NewDeploymentConfigDescriber(c, kclient),
-		"Identity":             	&IdentityDescriber{c},
-		"Image":                	&ImageDescriber{c},
-		"ImageStream":          	&ImageStreamDescriber{c},
-		"ImageStreamTag":       	&ImageStreamTagDescriber{c},
-		"ImageStreamImage":     	&ImageStreamImageDescriber{c},
-		"Route":                	&RouteDescriber{c},
-		"Project":              	&ProjectDescriber{c, kclient},
-		"Template":             	&TemplateDescriber{c, meta.NewAccessor(), kapi.Scheme, nil},
-		"Policy":               	&PolicyDescriber{c},
-		"PolicyBinding":        	&PolicyBindingDescriber{c},
-		"RoleBinding":          	&RoleBindingDescriber{c},
-		"Role":                 	&RoleDescriber{c},
-		"ClusterPolicy":        	&ClusterPolicyDescriber{c},
-		"ClusterPolicyBinding": 	&ClusterPolicyBindingDescriber{c},
-		"ClusterRoleBinding":   	&ClusterRoleBindingDescriber{c},
-		"ClusterRole":          	&ClusterRoleDescriber{c},
-		"User":                 	&UserDescriber{c},
-		"Group":                	&GroupDescriber{c.Groups()},
-		"UserIdentityMapping":  	&UserIdentityMappingDescriber{c},
+		"ServiceBroker":          &ServiceBrokerDescriber{c},
+		"BackingService":         &BackingServiceDescriber{c},
+		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
+		"Build":                  &BuildDescriber{c, kclient},
+		"BuildConfig":            &BuildConfigDescriber{c, host},
+		"DeploymentConfig":       NewDeploymentConfigDescriber(c, kclient),
+		"Identity":               &IdentityDescriber{c},
+		"Image":                  &ImageDescriber{c},
+		"ImageStream":            &ImageStreamDescriber{c},
+		"ImageStreamTag":         &ImageStreamTagDescriber{c},
+		"ImageStreamImage":       &ImageStreamImageDescriber{c},
+		"Route":                  &RouteDescriber{c},
+		"Project":                &ProjectDescriber{c, kclient},
+		"Template":               &TemplateDescriber{c, meta.NewAccessor(), kapi.Scheme, nil},
+		"Policy":                 &PolicyDescriber{c},
+		"PolicyBinding":          &PolicyBindingDescriber{c},
+		"RoleBinding":            &RoleBindingDescriber{c},
+		"Role":                   &RoleDescriber{c},
+		"ClusterPolicy":          &ClusterPolicyDescriber{c},
+		"ClusterPolicyBinding":   &ClusterPolicyBindingDescriber{c},
+		"ClusterRoleBinding":     &ClusterRoleBindingDescriber{c},
+		"ClusterRole":            &ClusterRoleDescriber{c},
+		"User":                   &UserDescriber{c},
+		"Group":                  &GroupDescriber{c.Groups()},
+		"UserIdentityMapping":    &UserIdentityMappingDescriber{c},
 	}
 	return m
 }

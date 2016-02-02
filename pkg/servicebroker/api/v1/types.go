@@ -30,9 +30,8 @@ type ServiceBrokerList struct {
 }
 
 type ServiceBrokerSpec struct {
-
-	Url string `json:"url"`
-	Name string `json:"brokername"`
+	Url      string `json:"url"`
+	Name     string `json:"brokername"`
 	UserName string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 

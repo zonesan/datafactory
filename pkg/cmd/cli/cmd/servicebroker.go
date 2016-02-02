@@ -1,13 +1,14 @@
 package cmd
+
 import (
-	"github.com/openshift/origin/pkg/client"
-	"io"
-	"github.com/spf13/cobra"
-	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
-	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"fmt"
-	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	"errors"
+	"fmt"
+	"github.com/openshift/origin/pkg/client"
+	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
+	"github.com/spf13/cobra"
+	"io"
+	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
 )
 
 const (
@@ -18,26 +19,26 @@ Create a new servicebroker for administrator
 	newServiceBrokerExample = `# Create a new servicebroker with [name username password url]
   $ %[1]s  mysql_servicebroker  --username="username"  --password="password" --url="url"`
 )
+
 type NewServiceBrokerOptions struct {
-	Url string
-	Name string
+	Url      string
+	Name     string
 	UserName string
 	Password string
 
 	Client client.Interface
 
-	Out            io.Writer
+	Out io.Writer
 }
 
-
-func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *cobra.Command  {
+func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *cobra.Command {
 	options := &NewServiceBrokerOptions{}
 	options.Out = out
 
 	cmd := &cobra.Command{
 		Use:     "new-servicebroker NAME [--username=USERNAME] [--password=PASSWORD] [--url=URL]",
-		Short:	 "create a new servicebroker",
-		Long: 	 newServiceBrokerLong,
+		Short:   "create a new servicebroker",
+		Long:    newServiceBrokerLong,
 		Example: fmt.Sprintf(newServiceBrokerExample, fullName),
 		Run: func(cmd *cobra.Command, args []string) {
 			var err error
@@ -57,7 +58,7 @@ func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *
 	}
 
 	cmd.Flags().StringVar(&options.Url, "url", "", "ServiceBroker Url")
-//	cmd.Flags().StringVar(&options.Name, "name", "", "ServiceBroker Name")
+	//	cmd.Flags().StringVar(&options.Name, "name", "", "ServiceBroker Name")
 	cmd.Flags().StringVar(&options.UserName, "username", "", "ServiceBroker username")
 	cmd.Flags().StringVar(&options.Password, "password", "", "ServiceBroker Password")
 
@@ -66,7 +67,7 @@ func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *
 
 func (o *NewServiceBrokerOptions) complete(cmd *cobra.Command, f *clientcmd.Factory) error {
 	args := cmd.Flags().Args()
-	if len(args) == 0  {
+	if len(args) == 0 {
 		cmd.Help()
 		return errors.New("must have exactly one argument")
 	}
@@ -81,7 +82,7 @@ func (o *NewServiceBrokerOptions) Run() error {
 	serviceBroker.Spec.Name = o.Name
 	serviceBroker.Spec.Url = o.Url
 	serviceBroker.Spec.UserName = o.UserName
-	serviceBroker.Spec.Password 	=o.Password
+	serviceBroker.Spec.Password = o.Password
 	serviceBroker.Annotations = make(map[string]string)
 	serviceBroker.Name = o.Name
 	serviceBroker.GenerateName = o.Name
@@ -93,4 +94,3 @@ func (o *NewServiceBrokerOptions) Run() error {
 
 	return nil
 }
-

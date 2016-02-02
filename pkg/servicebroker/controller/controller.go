@@ -1,13 +1,14 @@
 package controller
 
 import (
+	"fmt"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
-	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"fmt"
+
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -19,7 +20,6 @@ type ServiceBrokerController struct {
 	KubeClient kclient.Interface
 	//ServiceBrokerClient is a ServiceBroker client
 	ServiceBrokerClient servicebrokerclient.Interface
-
 }
 
 type fatalError string
@@ -35,13 +35,26 @@ func (c *ServiceBrokerController) Handle(bs *servicebrokerapi.ServiceBroker) (er
 		return nil
 	}
 
-	b, err := c.ServiceBrokerClient.Catalog(bs.Spec.Url);
+	services, err := c.ServiceBrokerClient.Catalog(bs.Spec.Url)
 	if err != nil {
 		fmt.Printf("servicebroker controller catalog err %s", err.Error())
 		return err
 	}
-	fmt.Printf("[Debug] -------------------> %#v \n", bs)
-	fmt.Printf("[Debug] -------------------> %s \n", string(b))
+
+	for _, v := range services.Services {
+		fmt.Printf("---------------------->[Debug] %#v", v)
+	}
+
+	//backingService := &backingservice.BackingService{}
+	//serviceBroker.Spec.Name = o.Name
+	//serviceBroker.Spec.Url = o.Url
+	//serviceBroker.Spec.UserName = o.UserName
+	//serviceBroker.Spec.Password 	=o.Password
+	//serviceBroker.Annotations = make(map[string]string)
+	//serviceBroker.Name = o.Name
+	//serviceBroker.GenerateName = o.Name
+	//
+	//c.Client.BackingServices().Create()
 
 	//if bs.Status.Phase != "test" {
 	//	bs.Status.Phase = "test"

@@ -30,8 +30,8 @@ type ServiceBrokerList struct {
 }
 
 type ServiceBrokerSpec struct {
-	Url string
-	Name string
+	Url      string
+	Name     string
 	UserName string
 	Password string
 	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage

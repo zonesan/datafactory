@@ -59,7 +59,6 @@ func Matcher(label labels.Selector, field fields.Selector) generic.Matcher {
 	return &generic.SelectionPredicate{Label: label, Field: field, GetAttrs: getAttrs}
 }
 
-
 func getAttrs(obj runtime.Object) (objLabels labels.Set, objFields fields.Set, err error) {
 	sb := obj.(*api.ServiceBroker)
 	return labels.Set(sb.Labels), api.ServiceBrokerToSelectableFields(sb), nil

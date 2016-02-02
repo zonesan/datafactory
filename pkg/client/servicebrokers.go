@@ -44,11 +44,11 @@ func (c *serviceBrokers) Get(name string) (result *servicebrokerapi.ServiceBroke
 func (c *serviceBrokers) List(label labels.Selector, field fields.Selector) (result *servicebrokerapi.ServiceBrokerList, err error) {
 	result = &servicebrokerapi.ServiceBrokerList{}
 	err = c.r.Get().
-	Resource("serviceBrokers").
-	LabelsSelectorParam(label).
-	FieldsSelectorParam(field).
-	Do().
-	Into(result)
+		Resource("serviceBrokers").
+		LabelsSelectorParam(label).
+		FieldsSelectorParam(field).
+		Do().
+		Into(result)
 	return
 }
 
@@ -71,13 +71,14 @@ func (c *serviceBrokers) Delete(name string) (err error) {
 	err = c.r.Delete().Resource("serviceBrokers").Name(name).Do().Error()
 	return
 }
+
 // Watch returns a watch.Interface that watches the requested serviceBrokers
 func (c *serviceBrokers) Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
 	return c.r.Get().
-	Prefix("watch").
-	Resource("serviceBrokers").
-	Param("resourceVersion", resourceVersion).
-	LabelsSelectorParam(label).
-	FieldsSelectorParam(field).
-	Watch()
+		Prefix("watch").
+		Resource("serviceBrokers").
+		Param("resourceVersion", resourceVersion).
+		LabelsSelectorParam(label).
+		FieldsSelectorParam(field).
+		Watch()
 }
