@@ -27,6 +27,7 @@ import (
 	"github.com/openshift/origin/pkg/api/v1beta3"
 	backingservice "github.com/openshift/origin/pkg/backingservice/registry/backingservice/etcd"
 	servicebroker "github.com/openshift/origin/pkg/servicebroker/registry/servicebroker/etcd"
+	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/etcd"
 	buildclient "github.com/openshift/origin/pkg/build/client"
 	buildgenerator "github.com/openshift/origin/pkg/build/generator"
 	buildregistry "github.com/openshift/origin/pkg/build/registry/build"
@@ -335,6 +336,7 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 
 	serviceBrokerStorage := servicebroker.NewREST(c.EtcdHelper)
 	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
+	backingServiceInstanceStorage := backingserviceinstance.NewREST(c.EtcdHelper)
 
 	buildStorage, buildDetailsStorage := buildetcd.NewStorage(c.EtcdHelper)
 	buildRegistry := buildregistry.NewRegistry(buildStorage)
@@ -440,14 +442,15 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	)
 
 	storage := map[string]rest.Storage{
-		"serviceBrokers":      serviceBrokerStorage,
-		"backingServices":     backingServiceStorage,
-		"images":              imageStorage,
-		"imageStreams":        imageStreamStorage,
-		"imageStreams/status": imageStreamStatusStorage,
-		"imageStreamImages":   imageStreamImageStorage,
-		"imageStreamMappings": imageStreamMappingStorage,
-		"imageStreamTags":     imageStreamTagStorage,
+		"serviceBrokers":          serviceBrokerStorage,
+		"backingServices":         backingServiceStorage,
+		"backingServiceInstances": backingServiceInstanceStorage,
+		"images":                  imageStorage,
+		"imageStreams":            imageStreamStorage,
+		"imageStreams/status":     imageStreamStatusStorage,
+		"imageStreamImages":       imageStreamImageStorage,
+		"imageStreamMappings":     imageStreamMappingStorage,
+		"imageStreamTags":         imageStreamTagStorage,
 
 		"deploymentConfigs":         deployConfigStorage.DeploymentConfig,
 		"deploymentConfigs/scale":   deployConfigStorage.Scale,

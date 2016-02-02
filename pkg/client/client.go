@@ -17,6 +17,7 @@ import (
 type Interface interface {
 	ServiceBrokersInterface
 	BackingServicesInterface
+	BackingServiceInstancesInterface
 	BuildsNamespacer
 	BuildConfigsNamespacer
 	BuildLogsNamespacer
@@ -64,6 +65,11 @@ func (c *Client) ServiceBrokers() ServiceBrokerInterface {
 // BackingService provides a REST client for backingservice
 func (c *Client) BackingServices() BackingServiceInterface {
 	return newBackingServices(c)
+}
+
+// BackingServiceInstance provides a REST client for backingserviceinstance
+func (c *Client) BackingServiceInstances() BackingServiceInstanceInterface {
+	return newBackingServiceInstances(c)
 }
 
 // Builds provides a REST client for Builds

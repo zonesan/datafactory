@@ -1,10 +1,9 @@
 package controller
 
 import (
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -25,8 +24,8 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) (err error) {
 
-	if bs.Status.Phase != "test" {
-		bs.Status.Phase = "test"
+	if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
+		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
 
 		c.Client.BackingServices().Update(bs)
 	}

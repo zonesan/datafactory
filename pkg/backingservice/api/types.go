@@ -25,15 +25,64 @@ type BackingServiceList struct {
 }
 
 type BackingServiceSpec struct {
-	Url      string
-	Name     string
-	UserName string
-	Password string
+	Name           string
+	Id             string
+	Description    string
+	Bindable       bool
+	PlanUpdateable bool
+	Tags           []string
+	Requires       []string
+
+	//Metadata        ServiceMetadata
+	Metadata        map[string]string
+	Plans           []ServicePlan
+	DashboardClient map[string]string
+	//DashboardClient ServiceDashboardClient
 }
 
-// BackingServiceStatus is information about the current status of a Project
+type ServiceMetadata struct {
+	DisplayName         string
+	ImageUrl            string
+	LongDescription     string
+	ProviderDisplayName string
+	DocumentationUrl    string
+	SupportUrl          string
+}
+
+type ServiceDashboardClient struct {
+	Id          string
+	Secret      string
+	RedirectUri string
+}
+
+type ServicePlan struct {
+	Name        string
+	Id          string
+	Description string
+	Metadata    ServicePlanMetadata
+	Free        bool
+}
+
+type ServicePlanMetadata struct {
+	Bullets     []string
+	Costs       []ServicePlanCost
+	DisplayName string
+}
+
+//TODO amount should be a array object...
+type ServicePlanCost struct {
+	Amount map[string]float64
+	Unit   string
+}
+
+// ProjectStatus is information about the current status of a Project
 type BackingServiceStatus struct {
 	Phase BackingServicePhase
 }
 
 type BackingServicePhase string
+
+const (
+	BackingServicePhaseActive   BackingServicePhase = "Active"
+	BackingServicePhaseInactive BackingServicePhase = "Inactive"
+)

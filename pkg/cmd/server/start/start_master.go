@@ -572,6 +572,7 @@ func startControllers(oc *origin.MasterConfig, kc *kubernetes.MasterConfig) erro
 
 	oc.RunServiceBrokerController()
 	oc.RunBackingServiceController()
+	oc.RunBackingServiceInstanceController()
 	oc.RunDeploymentController()
 	oc.RunDeployerPodController()
 	oc.RunDeploymentConfigController()

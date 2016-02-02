@@ -4,6 +4,7 @@ package v1
 import (
 	v1 "github.com/openshift/origin/pkg/authorization/api/v1"
 	apiv1 "github.com/openshift/origin/pkg/backingservice/api/v1"
+	backingserviceinstanceapiv1 "github.com/openshift/origin/pkg/backingserviceinstance/api/v1"
 	buildapiv1 "github.com/openshift/origin/pkg/build/api/v1"
 	deployapiv1 "github.com/openshift/origin/pkg/deploy/api/v1"
 	imageapiv1 "github.com/openshift/origin/pkg/image/api/v1"
@@ -734,14 +735,194 @@ func deepCopy_v1_BackingServiceList(in apiv1.BackingServiceList, out *apiv1.Back
 }
 
 func deepCopy_v1_BackingServiceSpec(in apiv1.BackingServiceSpec, out *apiv1.BackingServiceSpec, c *conversion.Cloner) error {
-	out.Url = in.Url
 	out.Name = in.Name
-	out.UserName = in.UserName
-	out.Password = in.Password
+	out.Id = in.Id
+	out.Description = in.Description
+	out.Bindable = in.Bindable
+	out.PlanUpdateable = in.PlanUpdateable
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
+	if in.Requires != nil {
+		out.Requires = make([]string, len(in.Requires))
+		for i := range in.Requires {
+			out.Requires[i] = in.Requires[i]
+		}
+	} else {
+		out.Requires = nil
+	}
+	if in.Metadata != nil {
+		out.Metadata = make(map[string]string)
+		for key, val := range in.Metadata {
+			out.Metadata[key] = val
+		}
+	} else {
+		out.Metadata = nil
+	}
+	if in.Plans != nil {
+		out.Plans = make([]apiv1.ServicePlan, len(in.Plans))
+		for i := range in.Plans {
+			if err := deepCopy_v1_ServicePlan(in.Plans[i], &out.Plans[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Plans = nil
+	}
+	if in.DashboardClient != nil {
+		out.DashboardClient = make(map[string]string)
+		for key, val := range in.DashboardClient {
+			out.DashboardClient[key] = val
+		}
+	} else {
+		out.DashboardClient = nil
+	}
 	return nil
 }
 
 func deepCopy_v1_BackingServiceStatus(in apiv1.BackingServiceStatus, out *apiv1.BackingServiceStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_v1_ServicePlan(in apiv1.ServicePlan, out *apiv1.ServicePlan, c *conversion.Cloner) error {
+	out.Name = in.Name
+	out.Id = in.Id
+	out.Description = in.Description
+	if err := deepCopy_v1_ServicePlanMetadata(in.Metadata, &out.Metadata, c); err != nil {
+		return err
+	}
+	out.Free = in.Free
+	return nil
+}
+
+func deepCopy_v1_ServicePlanCost(in apiv1.ServicePlanCost, out *apiv1.ServicePlanCost, c *conversion.Cloner) error {
+	if in.Amount != nil {
+		out.Amount = make(map[string]float64)
+		for key, val := range in.Amount {
+			out.Amount[key] = val
+		}
+	} else {
+		out.Amount = nil
+	}
+	out.Unit = in.Unit
+	return nil
+}
+
+func deepCopy_v1_ServicePlanMetadata(in apiv1.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, c *conversion.Cloner) error {
+	if in.Bullets != nil {
+		out.Bullets = make([]string, len(in.Bullets))
+		for i := range in.Bullets {
+			out.Bullets[i] = in.Bullets[i]
+		}
+	} else {
+		out.Bullets = nil
+	}
+	if in.Costs != nil {
+		out.Costs = make([]apiv1.ServicePlanCost, len(in.Costs))
+		for i := range in.Costs {
+			if err := deepCopy_v1_ServicePlanCost(in.Costs[i], &out.Costs[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Costs = nil
+	}
+	out.DisplayName = in.DisplayName
+	return nil
+}
+
+func deepCopy_v1_BackingServiceInstance(in backingserviceinstanceapiv1.BackingServiceInstance, out *backingserviceinstanceapiv1.BackingServiceInstance, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapiv1.ObjectMeta)
+	}
+	if err := deepCopy_v1_BackingServiceInstanceSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_v1_BackingServiceInstanceStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_v1_BackingServiceInstanceList(in backingserviceinstanceapiv1.BackingServiceInstanceList, out *backingserviceinstanceapiv1.BackingServiceInstanceList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]backingserviceinstanceapiv1.BackingServiceInstance, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_v1_BackingServiceInstance(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.BackingServiceInstanceSpec, out *backingserviceinstanceapiv1.BackingServiceInstanceSpec, c *conversion.Cloner) error {
+	if in.Config != nil {
+		out.Config = make(map[string]string)
+		for key, val := range in.Config {
+			out.Config[key] = val
+		}
+	} else {
+		out.Config = nil
+	}
+	out.DashboardUrl = in.DashboardUrl
+	out.BackingServiceGuid = in.BackingServiceGuid
+	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	if in.Parameters != nil {
+		out.Parameters = make(map[string]string)
+		for key, val := range in.Parameters {
+			out.Parameters[key] = val
+		}
+	} else {
+		out.Parameters = nil
+	}
+	out.Binding = in.Binding
+	out.BindUuid = in.BindUuid
+	if in.BindDeploymentConfig != nil {
+		out.BindDeploymentConfig = make(map[string]string)
+		for key, val := range in.BindDeploymentConfig {
+			out.BindDeploymentConfig[key] = val
+		}
+	} else {
+		out.BindDeploymentConfig = nil
+	}
+	if in.Credential != nil {
+		out.Credential = make(map[string]string)
+		for key, val := range in.Credential {
+			out.Credential[key] = val
+		}
+	} else {
+		out.Credential = nil
+	}
+	return nil
+}
+
+func deepCopy_v1_BackingServiceInstanceStatus(in backingserviceinstanceapiv1.BackingServiceInstanceStatus, out *backingserviceinstanceapiv1.BackingServiceInstanceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
 	return nil
 }
@@ -2959,6 +3140,13 @@ func init() {
 		deepCopy_v1_BackingServiceList,
 		deepCopy_v1_BackingServiceSpec,
 		deepCopy_v1_BackingServiceStatus,
+		deepCopy_v1_ServicePlan,
+		deepCopy_v1_ServicePlanCost,
+		deepCopy_v1_ServicePlanMetadata,
+		deepCopy_v1_BackingServiceInstance,
+		deepCopy_v1_BackingServiceInstanceList,
+		deepCopy_v1_BackingServiceInstanceSpec,
+		deepCopy_v1_BackingServiceInstanceStatus,
 		deepCopy_v1_BinaryBuildRequestOptions,
 		deepCopy_v1_BinaryBuildSource,
 		deepCopy_v1_Build,
