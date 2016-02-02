@@ -9,6 +9,432 @@
   },
   "apis": [
    {
+    "path": "/oapi/v1/backingserviceinstances",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.BackingServiceInstanceList",
+      "method": "GET",
+      "summary": "list or watch objects of kind BackingServiceInstance",
+      "nickname": "listNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceInstanceList"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingServiceInstance",
+      "method": "POST",
+      "summary": "create a BackingServiceInstance",
+      "nickname": "createNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.BackingServiceInstance",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceInstance"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/backingserviceinstances",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch individual changes to a list of BackingServiceInstance",
+      "nickname": "watchNamespacedBackingServiceInstanceList",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/backingserviceinstances/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.BackingServiceInstance",
+      "method": "GET",
+      "summary": "read the specified BackingServiceInstance",
+      "nickname": "readNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingServiceInstance",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceInstance"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingServiceInstance",
+      "method": "PUT",
+      "summary": "replace the specified BackingServiceInstance",
+      "nickname": "replaceNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.BackingServiceInstance",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingServiceInstance",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceInstance"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.BackingServiceInstance",
+      "method": "PATCH",
+      "summary": "partially update the specified BackingServiceInstance",
+      "nickname": "patchNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "unversioned.Patch",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingServiceInstance",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BackingServiceInstance"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "application/json-patch+json",
+       "application/merge-patch+json",
+       "application/strategic-merge-patch+json"
+      ]
+     },
+     {
+      "type": "unversioned.Status",
+      "method": "DELETE",
+      "summary": "delete a BackingServiceInstance",
+      "nickname": "deleteNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.DeleteOptions",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingServiceInstance",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "unversioned.Status"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/backingserviceinstances/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch changes to an object of kind BackingServiceInstance",
+      "nickname": "watchNamespacedBackingServiceInstance",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BackingServiceInstance",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
     "path": "/oapi/v1/backingservices",
     "description": "OpenShift REST API, version v1",
     "operations": [
@@ -14858,8 +15284,8 @@
    }
   ],
   "models": {
-   "v1.BackingServiceList": {
-    "id": "v1.BackingServiceList",
+   "v1.BackingServiceInstanceList": {
+    "id": "v1.BackingServiceInstanceList",
     "required": [
      "items"
     ],
@@ -14878,7 +15304,7 @@
      "items": {
       "type": "array",
       "items": {
-       "$ref": "v1.BackingService"
+       "$ref": "v1.BackingServiceInstance"
       },
       "description": "list of servicebrokers"
      }
@@ -14898,8 +15324,8 @@
      }
     }
    },
-   "v1.BackingService": {
-    "id": "v1.BackingService",
+   "v1.BackingServiceInstance": {
+    "id": "v1.BackingServiceInstance",
     "properties": {
      "kind": {
       "type": "string",
@@ -14913,11 +15339,11 @@
       "$ref": "v1.ObjectMeta"
      },
      "spec": {
-      "$ref": "v1.BackingServiceSpec",
+      "$ref": "v1.BackingServiceInstanceSpec",
       "description": "spec defines the behavior of the ServiceBroker"
      },
      "status": {
-      "$ref": "v1.BackingServiceStatus",
+      "$ref": "v1.BackingServiceInstanceStatus",
       "description": "status describes the current status of a Project; read-only"
      }
     }
@@ -14978,131 +15404,58 @@
      }
     }
    },
-   "v1.BackingServiceSpec": {
-    "id": "v1.BackingServiceSpec",
+   "v1.BackingServiceInstanceSpec": {
+    "id": "v1.BackingServiceInstanceSpec",
     "required": [
-     "name",
-     "id",
-     "description",
-     "bindable",
-     "plan_updateable",
-     "tags",
-     "requires",
-     "metadata",
-     "plans",
-     "dashboard_client"
+     "config",
+     "dashboard_url",
+     "backingservice_guid",
+     "backingservice_plan_guid",
+     "parameters",
+     "binding",
+     "bind_uuid",
+     "bind_deploymentconfig",
+     "credential",
+     "tags"
     ],
     "properties": {
-     "name": {
+     "config": {
+      "type": "any"
+     },
+     "dashboard_url": {
       "type": "string"
      },
-     "id": {
+     "backingservice_guid": {
       "type": "string"
      },
-     "description": {
+     "backingservice_plan_guid": {
       "type": "string"
      },
-     "bindable": {
+     "parameters": {
+      "type": "any"
+     },
+     "binding": {
       "type": "boolean"
      },
-     "plan_updateable": {
-      "type": "boolean"
+     "bind_uuid": {
+      "type": "string"
+     },
+     "bind_deploymentconfig": {
+      "type": "any"
+     },
+     "credential": {
+      "type": "any"
      },
      "tags": {
       "type": "array",
       "items": {
        "type": "string"
       }
-     },
-     "requires": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "metadata": {
-      "type": "any"
-     },
-     "plans": {
-      "type": "array",
-      "items": {
-       "$ref": "v1.ServicePlan"
-      }
-     },
-     "dashboard_client": {
-      "type": "any"
      }
     }
    },
-   "v1.ServicePlan": {
-    "id": "v1.ServicePlan",
-    "required": [
-     "name",
-     "id",
-     "description",
-     "metadata",
-     "free"
-    ],
-    "properties": {
-     "name": {
-      "type": "string"
-     },
-     "id": {
-      "type": "string"
-     },
-     "description": {
-      "type": "string"
-     },
-     "metadata": {
-      "$ref": "v1.ServicePlanMetadata"
-     },
-     "free": {
-      "type": "boolean"
-     }
-    }
-   },
-   "v1.ServicePlanMetadata": {
-    "id": "v1.ServicePlanMetadata",
-    "required": [
-     "bullets",
-     "costs",
-     "displayName"
-    ],
-    "properties": {
-     "bullets": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     },
-     "costs": {
-      "type": "array",
-      "items": {
-       "$ref": "v1.ServicePlanCost"
-      }
-     },
-     "displayName": {
-      "type": "string"
-     }
-    }
-   },
-   "v1.ServicePlanCost": {
-    "id": "v1.ServicePlanCost",
-    "required": [
-     "amount",
-     "unit"
-    ],
-    "properties": {
-     "amount": {
-      "type": "any"
-     },
-     "unit": {
-      "type": "string"
-     }
-    }
-   },
-   "v1.BackingServiceStatus": {
-    "id": "v1.BackingServiceStatus",
+   "v1.BackingServiceInstanceStatus": {
+    "id": "v1.BackingServiceInstanceStatus",
     "properties": {
      "phase": {
       "type": "string",
@@ -15230,6 +15583,198 @@
       "type": "integer",
       "format": "int64",
       "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately."
+     }
+    }
+   },
+   "v1.BackingServiceList": {
+    "id": "v1.BackingServiceList",
+    "required": [
+     "items"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "unversioned.ListMeta"
+     },
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.BackingService"
+      },
+      "description": "list of backingservice"
+     }
+    }
+   },
+   "v1.BackingService": {
+    "id": "v1.BackingService",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "v1.ObjectMeta"
+     },
+     "spec": {
+      "$ref": "v1.BackingServiceSpec",
+      "description": "specification of the desired behavior for a BackingService"
+     },
+     "status": {
+      "$ref": "v1.BackingServiceStatus",
+      "description": "status describes the current status of a BackingService"
+     }
+    }
+   },
+   "v1.BackingServiceSpec": {
+    "id": "v1.BackingServiceSpec",
+    "required": [
+     "name",
+     "id",
+     "description",
+     "bindable",
+     "plan_updateable",
+     "tags",
+     "requires",
+     "metadata",
+     "plans",
+     "dashboard_client"
+    ],
+    "properties": {
+     "name": {
+      "type": "string",
+      "description": "name of backingservice"
+     },
+     "id": {
+      "type": "string",
+      "description": "id of backingservice"
+     },
+     "description": {
+      "type": "string",
+      "description": "description of a backingservice"
+     },
+     "bindable": {
+      "type": "boolean",
+      "description": "is backingservice bindable?"
+     },
+     "plan_updateable": {
+      "type": "boolean",
+      "description": "is  backingservice plan updateable"
+     },
+     "tags": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "list of backingservice"
+     },
+     "requires": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "description": "require condition of backingservice"
+     },
+     "metadata": {
+      "type": "any",
+      "description": "metadata of backingservice"
+     },
+     "plans": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.ServicePlan"
+      },
+      "description": "plans of a backingservice"
+     },
+     "dashboard_client": {
+      "type": "any",
+      "description": "DashboardClient of backingservice"
+     }
+    }
+   },
+   "v1.ServicePlan": {
+    "id": "v1.ServicePlan",
+    "required": [
+     "name",
+     "id",
+     "description",
+     "metadata",
+     "free"
+    ],
+    "properties": {
+     "name": {
+      "type": "string"
+     },
+     "id": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "metadata": {
+      "$ref": "v1.ServicePlanMetadata"
+     },
+     "free": {
+      "type": "boolean"
+     }
+    }
+   },
+   "v1.ServicePlanMetadata": {
+    "id": "v1.ServicePlanMetadata",
+    "required": [
+     "bullets",
+     "costs",
+     "displayName"
+    ],
+    "properties": {
+     "bullets": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     },
+     "costs": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.ServicePlanCost"
+      }
+     },
+     "displayName": {
+      "type": "string"
+     }
+    }
+   },
+   "v1.ServicePlanCost": {
+    "id": "v1.ServicePlanCost",
+    "required": [
+     "amount",
+     "unit"
+    ],
+    "properties": {
+     "amount": {
+      "type": "any"
+     },
+     "unit": {
+      "type": "string"
+     }
+    }
+   },
+   "v1.BackingServiceStatus": {
+    "id": "v1.BackingServiceStatus",
+    "properties": {
+     "phase": {
+      "type": "string",
+      "description": "phase is the current lifecycle phase of the servicebroker"
      }
     }
    },

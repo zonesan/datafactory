@@ -2,6 +2,7 @@ package validation
 
 import (
 	authorizationvalidation "github.com/openshift/origin/pkg/authorization/api/validation"
+	backingservicevalidation "github.com/openshift/origin/pkg/backingservice/api/validation"
 	buildvalidation "github.com/openshift/origin/pkg/build/api/validation"
 	deployvalidation "github.com/openshift/origin/pkg/deploy/api/validation"
 	imagevalidation "github.com/openshift/origin/pkg/image/api/validation"
@@ -14,6 +15,7 @@ import (
 	extvalidation "k8s.io/kubernetes/pkg/apis/extensions/validation"
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -77,4 +79,7 @@ func init() {
 	Validator.Register(&userapi.Identity{}, uservalidation.ValidateIdentity, uservalidation.ValidateIdentityUpdate)
 	Validator.Register(&userapi.UserIdentityMapping{}, uservalidation.ValidateUserIdentityMapping, uservalidation.ValidateUserIdentityMappingUpdate)
 	Validator.Register(&userapi.Group{}, uservalidation.ValidateGroup, uservalidation.ValidateGroupUpdate)
+
+	Validator.Register(&backingserviceapi.BackingService{}, backingservicevalidation.ValidateBackingService, backingservicevalidation.ValidateBackingServiceUpdate)
+
 }

@@ -34,6 +34,7 @@ type BackingServiceInstanceSpec struct {
 	BindUuid               string
 	BindDeploymentConfig   map[string]string
 	Credential             map[string]string
+	Tags                   []string
 }
 
 // ProjectStatus is information about the current status of a Project

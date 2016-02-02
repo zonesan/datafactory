@@ -10,10 +10,10 @@ type BackingService struct {
 	kapi.ObjectMeta      `json:"metadata,omitempty"`
 
 	// Spec defines the behavior of the Namespace.
-	Spec BackingServiceSpec `json:"spec,omitempty" description:"spec defines the behavior of the ServiceBroker"`
+	Spec BackingServiceSpec `json:"spec,omitempty" description:"specification of the desired behavior for a BackingService"`
 
 	// Status describes the current status of a Namespace
-	Status BackingServiceStatus `json:"status,omitempty" description:"status describes the current status of a Project; read-only"`
+	Status BackingServiceStatus `json:"status,omitempty" description:"status describes the current status of a BackingService"`
 }
 
 type BackingServiceList struct {
@@ -21,22 +21,22 @@ type BackingServiceList struct {
 	unversioned.ListMeta `json:"metadata,omitempty"`
 
 	// Items is a list of routes
-	Items []BackingService `json:"items" description:"list of servicebrokers"`
+	Items []BackingService `json:"items" description:"list of backingservice"`
 }
 
 type BackingServiceSpec struct {
-	Name           string   `json:"name"`
-	Id             string   `json:"id"`
-	Description    string   `json:"description"`
-	Bindable       bool     `json:"bindable"`
-	PlanUpdateable bool     `json:"plan_updateable, omitempty"`
-	Tags           []string `json:"tags, omitempty"`
-	Requires       []string `json:"requires, omitempty"`
+	Name           string   `json:"name" description:"name of backingservice"`
+	Id             string   `json:"id" description:"id of backingservice"`
+	Description    string   `json:"description" description:"description of a backingservice"`
+	Bindable       bool     `json:"bindable" description:"is backingservice bindable?"`
+	PlanUpdateable bool     `json:"plan_updateable, omitempty" description:"is  backingservice plan updateable"`
+	Tags           []string `json:"tags, omitempty" description:"list of backingservice" tags of BackingService`
+	Requires       []string `json:"requires, omitempty" description:"require condition of backingservice"`
 
 	//Metadata        ServiceMetadata        `json:"metadata, omitempty"`
-	Metadata        map[string]string `json:"metadata, omitempty"`
-	Plans           []ServicePlan     `json:"plans"`
-	DashboardClient map[string]string `json:"dashboard_client"`
+	Metadata        map[string]string `json:"metadata, omitempty" description:"metadata of backingservice"`
+	Plans           []ServicePlan     `json:"plans" description:"plans of a backingservice"`
+	DashboardClient map[string]string `json:"dashboard_client" description:"DashboardClient of backingservice"`
 	//DashboardClient ServiceDashboardClient `json:"dashboard_client"`
 }
 

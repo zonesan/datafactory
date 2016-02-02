@@ -918,6 +918,14 @@ func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.Backi
 	} else {
 		out.Credential = nil
 	}
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
+	}
 	return nil
 }
 
