@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api/v1"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
 )

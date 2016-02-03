@@ -7,8 +7,8 @@ import (
 	osclient "github.com/openshift/origin/pkg/client"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 
+	backingservice "github.com/openshift/origin/pkg/backingservice/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -38,29 +38,18 @@ func (c *ServiceBrokerController) Handle(bs *servicebrokerapi.ServiceBroker) (er
 	services, err := c.ServiceBrokerClient.Catalog(bs.Spec.Url)
 	if err != nil {
 		fmt.Printf("servicebroker controller catalog err %s", err.Error())
-		return err
 	}
 
 	for _, v := range services.Services {
 		fmt.Printf("---------------------->[Debug] %#v", v)
+		backingService := &backingservice.BackingService{}
+		backingService.Spec = backingservice.BackingServiceSpec(v)
+		backingService.Annotations = make(map[string]string)
+		backingService.Name = v.Name
+		backingService.GenerateName = v.Name
+
+		c.Client.BackingServices().Create(backingService)
 	}
-
-	//backingService := &backingservice.BackingService{}
-	//serviceBroker.Spec.Name = o.Name
-	//serviceBroker.Spec.Url = o.Url
-	//serviceBroker.Spec.UserName = o.UserName
-	//serviceBroker.Spec.Password 	=o.Password
-	//serviceBroker.Annotations = make(map[string]string)
-	//serviceBroker.Name = o.Name
-	//serviceBroker.GenerateName = o.Name
-	//
-	//c.Client.BackingServices().Create()
-
-	//if bs.Status.Phase != "test" {
-	//	bs.Status.Phase = "test"
-	//
-	//	c.Client.ServiceBrokers().Update(bs)
-	//}
 
 	return nil
 }
