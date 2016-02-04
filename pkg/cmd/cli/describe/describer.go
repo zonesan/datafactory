@@ -32,11 +32,13 @@ import (
 	"github.com/openshift/origin/pkg/client"
 	imageapi "github.com/openshift/origin/pkg/image/api"
 	projectapi "github.com/openshift/origin/pkg/project/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	templateapi "github.com/openshift/origin/pkg/template/api"
 )
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
+		"ServiceBroker":          &ServiceBrokerDescriber{c},
 		"BackingService":         &BackingServiceDescriber{c},
 		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
 		"Build":                  &BuildDescriber{c, kclient},
@@ -87,6 +89,30 @@ func DescriberFor(kind string, c *client.Client, kclient kclient.Interface, host
 }
 
 // BackingServiceDescriber generates information about a Image
+type ServiceBrokerDescriber struct {
+	client.Interface
+}
+
+// Describe returns the description of an image
+func (d *ServiceBrokerDescriber) Describe(namespace, name string) (string, error) {
+	c := d.ServiceBrokers()
+	bs, err := c.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	return describeServiceBroker(bs)
+}
+
+func describeServiceBroker(sb *servicebrokerapi.ServiceBroker) (string, error) {
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, sb.ObjectMeta)
+		formatString(out, "Status", sb.Status.Phase)
+		return nil
+	})
+}
+
+// BackingServiceDescriber generates information about a Image
 type BackingServiceDescriber struct {
 	client.Interface
 }
@@ -99,10 +125,10 @@ func (d *BackingServiceDescriber) Describe(namespace, name string) (string, erro
 		return "", err
 	}
 
-	return describeBackingService(bs, "")
+	return describeBackingService(bs)
 }
 
-func describeBackingService(bs *backingserviceapi.BackingService, imageName string) (string, error) {
+func describeBackingService(bs *backingserviceapi.BackingService) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bs.ObjectMeta)
 		formatString(out, "Description", bs.Spec.Description)

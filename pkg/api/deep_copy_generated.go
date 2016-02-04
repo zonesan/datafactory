@@ -12,6 +12,7 @@ import (
 	projectapi "github.com/openshift/origin/pkg/project/api"
 	routeapi "github.com/openshift/origin/pkg/route/api"
 	sdnapi "github.com/openshift/origin/pkg/sdn/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	templateapi "github.com/openshift/origin/pkg/template/api"
 	userapi "github.com/openshift/origin/pkg/user/api"
 	pkgapi "k8s.io/kubernetes/pkg/api"
@@ -2898,6 +2899,71 @@ func deepCopy_api_NetNamespaceList(in sdnapi.NetNamespaceList, out *sdnapi.NetNa
 	return nil
 }
 
+func deepCopy_api_ServiceBroker(in servicebrokerapi.ServiceBroker, out *servicebrokerapi.ServiceBroker, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
+	}
+	if err := deepCopy_api_ServiceBrokerSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_api_ServiceBrokerStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_api_ServiceBrokerList(in servicebrokerapi.ServiceBrokerList, out *servicebrokerapi.ServiceBrokerList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]servicebrokerapi.ServiceBroker, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_api_ServiceBroker(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_api_ServiceBrokerSpec(in servicebrokerapi.ServiceBrokerSpec, out *servicebrokerapi.ServiceBrokerSpec, c *conversion.Cloner) error {
+	out.Url = in.Url
+	out.Name = in.Name
+	out.UserName = in.UserName
+	out.Password = in.Password
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapi.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = in.Finalizers[i]
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func deepCopy_api_ServiceBrokerStatus(in servicebrokerapi.ServiceBrokerStatus, out *servicebrokerapi.ServiceBrokerStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
+	return nil
+}
+
 func deepCopy_api_Parameter(in templateapi.Parameter, out *templateapi.Parameter, c *conversion.Cloner) error {
 	out.Name = in.Name
 	out.DisplayName = in.DisplayName
@@ -3283,6 +3349,10 @@ func init() {
 		deepCopy_api_HostSubnetList,
 		deepCopy_api_NetNamespace,
 		deepCopy_api_NetNamespaceList,
+		deepCopy_api_ServiceBroker,
+		deepCopy_api_ServiceBrokerList,
+		deepCopy_api_ServiceBrokerSpec,
+		deepCopy_api_ServiceBrokerStatus,
 		deepCopy_api_Parameter,
 		deepCopy_api_Template,
 		deepCopy_api_TemplateList,
