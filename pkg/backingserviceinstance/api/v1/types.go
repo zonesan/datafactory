@@ -10,7 +10,7 @@ type BackingServiceInstance struct {
 	kapi.ObjectMeta      `json:"metadata,omitempty"`
 
 	// Spec defines the behavior of the Namespace.
-	Spec BackingServiceInstanceSpec `json:"spec,omitempty" description:"spec defines the behavior of the ServiceBroker"`
+	Spec BackingServiceInstanceSpec `json:"spec,omitempty" description:"spec defines the behavior of the BackingServiceInstance"`
 
 	// Status describes the current status of a Namespace
 	Status BackingServiceInstanceStatus `json:"status,omitempty" description:"status describes the current status of a Project; read-only"`
@@ -21,7 +21,7 @@ type BackingServiceInstanceList struct {
 	unversioned.ListMeta `json:"metadata,omitempty"`
 
 	// Items is a list of routes
-	Items []BackingServiceInstance `json:"items" description:"list of servicebrokers"`
+	Items []BackingServiceInstance `json:"items" description:"list of BackingServiceInstances"`
 }
 
 type BackingServiceInstanceSpec struct {
