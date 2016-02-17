@@ -18,7 +18,7 @@ type ServiceBroker struct {
 	Spec ServiceBrokerSpec `json:"spec,omitempty" description:"spec defines the behavior of the ServiceBroker"`
 
 	// Status describes the current status of a Namespace
-	Status ServiceBrokerStatus `json:"status,omitempty" description:"status describes the current status of a Project; read-only"`
+	Status ServiceBrokerStatus `json:"status,omitempty" description:"status describes the current status of a ServiceBroker; read-only"`
 }
 
 type ServiceBrokerList struct {
@@ -30,11 +30,10 @@ type ServiceBrokerList struct {
 }
 
 type ServiceBrokerSpec struct {
-	Url      string `json:"url"`
-	Name     string `json:"brokername"`
-	UserName string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
-
+	Url      string `json:"url" description:"url defines the address of a ServiceBroker service"`
+	Name     string `json:"name" description:"name defines the name of a ServiceBroker service"`
+	UserName string `json:"username" description:"username defines the username to access ServiceBroker service"`
+	Password string `json:"password" description:"password defines the password to access ServiceBroker service"`
 	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
 	Finalizers []kapi.FinalizerName `json:"finalizers,omitempty" description:"an opaque list of values that must be empty to permanently remove object from storage"`
 }

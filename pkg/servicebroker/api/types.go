@@ -11,22 +11,21 @@ const (
 )
 
 type ServiceBroker struct {
-	unversioned.TypeMeta `json:",inline"`
-	kapi.ObjectMeta      `json:"metadata,omitempty"`
+	unversioned.TypeMeta
+	kapi.ObjectMeta
 
 	// Spec defines the behavior of the Namespace.
-	Spec ServiceBrokerSpec `json:"spec,omitempty" description:"spec defines the behavior of the ServiceBroker"`
+	Spec ServiceBrokerSpec
 
 	// Status describes the current status of a Namespace
-	Status ServiceBrokerStatus `json:"status,omitempty" description:"status describes the current status of a Project; read-only"`
+	Status ServiceBrokerStatus
 }
 
 type ServiceBrokerList struct {
-	unversioned.TypeMeta `json:",inline"`
-	unversioned.ListMeta `json:"metadata,omitempty"`
+	unversioned.TypeMeta
+	unversioned.ListMeta
 
-	// Items is a list of routes
-	Items []ServiceBroker `json:"items" description:"list of servicebrokers"`
+	Items []ServiceBroker
 }
 
 type ServiceBrokerSpec struct {
@@ -34,11 +33,11 @@ type ServiceBrokerSpec struct {
 	Name     string
 	UserName string
 	Password string
-	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
-	Finalizers []kapi.FinalizerName `json:"finalizers,omitempty" description:"an opaque list of values that must be empty to permanently remove object from storage"`
+
+	Finalizers []kapi.FinalizerName
 }
 
 // ProjectStatus is information about the current status of a Project
 type ServiceBrokerStatus struct {
-	Phase kapi.NamespacePhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
+	Phase kapi.NamespacePhase
 }

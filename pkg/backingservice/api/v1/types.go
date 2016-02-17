@@ -30,7 +30,7 @@ type BackingServiceSpec struct {
 	Description    string   `json:"description" description:"description of a backingservice"`
 	Bindable       bool     `json:"bindable" description:"is backingservice bindable?"`
 	PlanUpdateable bool     `json:"plan_updateable, omitempty" description:"is  backingservice plan updateable"`
-	Tags           []string `json:"tags, omitempty" description:"list of backingservice" tags of BackingService`
+	Tags           []string `json:"tags, omitempty" description:"list of backingservice tags of BackingService"`
 	Requires       []string `json:"requires, omitempty" description:"require condition of backingservice"`
 
 	//Metadata        ServiceMetadata        `json:"metadata, omitempty"`
