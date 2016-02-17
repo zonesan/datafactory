@@ -27,7 +27,7 @@ type BackingServiceInstanceList struct {
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string `json:"config, omitempty"`
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
-	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 	Binding                bool              `json:"binding, omitempty"`
@@ -64,4 +64,6 @@ const (
 	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
 	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
 	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
+	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )

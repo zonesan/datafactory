@@ -890,7 +890,7 @@ func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.Backi
 		out.Config = nil
 	}
 	out.DashboardUrl = in.DashboardUrl
-	out.BackingServiceGuid = in.BackingServiceGuid
+	out.BackingServiceName = in.BackingServiceName
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
