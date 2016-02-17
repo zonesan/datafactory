@@ -34,6 +34,7 @@ type BackingServiceInstanceSpec struct {
 	BindUuid               string            `json:"bind_uuid, omitempty"`
 	BindDeploymentConfig   map[string]string `json:"bind_deploymentconfig, omitempty"`
 	Credential             map[string]string `json:"credential, omitempty"`
+	Tags                   []string          `json:"tags, omitempty"`
 }
 
 //type ServiceMetadata struct {
