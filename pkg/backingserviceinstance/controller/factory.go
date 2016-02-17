@@ -69,6 +69,7 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 	}
 }
 
+/*
 // buildConfigLW is a ListWatcher implementation for BuildConfigs.
 type backingServiceLW struct {
 	client osclient.Interface
@@ -83,3 +84,5 @@ func (lw *backingServiceLW) List() (runtime.Object, error) {
 func (lw *backingServiceLW) Watch(resourceVersion string) (watch.Interface, error) {
 	return lw.client.BackingServiceInstances().Watch(labels.Everything(), fields.Everything(), resourceVersion)
 }
+
+*/
