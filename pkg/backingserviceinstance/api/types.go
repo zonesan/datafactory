@@ -24,29 +24,48 @@ type BackingServiceInstanceList struct {
 	Items []BackingServiceInstance
 }
 
+/*
+type BackingServiceInstanceSpec struct {	
+	Config                 map[string]string `json:"config, omitempty"`
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+	Binding                bool              `json:"binding, omitempty"`
+	BindUuid               string            `json:"bind_uuid, omitempty"`
+	BindDeploymentConfig   map[string]string `json:"bind_deploymentconfig, omitempty"`
+	Credential             map[string]string `json:"credential, omitempty"`
+	Tags                   []string          `json:"tags, omitempty"`
+}
+*/
+
 type BackingServiceInstanceSpec struct {
-	Config                 map[string]string
-	DashboardUrl           string
-	BackingServiceGuid     string
-	BackingServicePlanGuid string
-	Parameters             map[string]string
-	Binding                bool
-	BindUuid               string
-	BindDeploymentConfig   map[string]string
-	Credential             map[string]string
-	Tags                   []string
+	Provisioning InstanceProvisioning `json:"provisioning, omitempty"`
+	Binding      InstanceBinding      `json:"binding, omitempty"`
 }
 
-// ProjectStatus is information about the current status of a Project
-type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase
+type InstanceProvisioning struct {
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 
-type BackingServiceInstancePhase string
+type InstanceBinding struct {
+	BindUuid                     string            `json:"bind_uuid, omitempty"`
+	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
+	Credential                   map[string]string `json:"credential, omitempty"`
+}
+
+type InstanceBindDeploymentConfig struct {
+	Parameters map[string]string `json:"parameters, omitempty"`
+}
+
+type BackingServiceInstanceStatus string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
+	BackingServiceInstanceStatusActive   BackingServiceInstanceStatus = "Active"
+	BackingServiceInstanceStatusCreated  BackingServiceInstanceStatus = "Created"
+	BackingServiceInstanceStatusInactive BackingServiceInstanceStatus = "Inactive"
+	BackingServiceInstanceStatusModified BackingServiceInstanceStatus = "Modified"
 )

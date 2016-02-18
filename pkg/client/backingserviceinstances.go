@@ -37,7 +37,7 @@ func newBackingServiceInstances(c *Client) *backingserviceinstances {
 // Get returns information about a particular project or an error
 func (c *backingserviceinstances) Get(name string) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Get().Resource("backingserviceinstances").Name(name).Do().Into(result)
+	err = c.r.Get().Resource("backingserviceinsts").Name(name).Do().Into(result)
 	return
 }
 
@@ -45,7 +45,7 @@ func (c *backingserviceinstances) Get(name string) (result *backingserviceinstan
 func (c *backingserviceinstances) List(label labels.Selector, field fields.Selector) (result *backingserviceinstanceapi.BackingServiceInstanceList, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstanceList{}
 	err = c.r.Get().
-		Resource("backingserviceinstances").
+		Resource("backingserviceinsts").
 		LabelsSelectorParam(label).
 		FieldsSelectorParam(field).
 		Do().
@@ -56,20 +56,20 @@ func (c *backingserviceinstances) List(label labels.Selector, field fields.Selec
 // Create creates a new BackingServiceInstance
 func (c *backingserviceinstances) Create(p *backingserviceinstanceapi.BackingServiceInstance) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Post().Resource("backingserviceinstances").Body(p).Do().Into(result)
+	err = c.r.Post().Resource("backingserviceinsts").Body(p).Do().Into(result)
 	return
 }
 
 // Update updates the project on server
 func (c *backingserviceinstances) Update(p *backingserviceinstanceapi.BackingServiceInstance) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Put().Resource("backingserviceinstances").Name(p.Name).Body(p).Do().Into(result)
+	err = c.r.Put().Resource("backingserviceinsts").Name(p.Name).Body(p).Do().Into(result)
 	return
 }
 
 // Delete removes the project on server
 func (c *backingserviceinstances) Delete(name string) (err error) {
-	err = c.r.Delete().Resource("backingserviceinstances").Name(name).Do().Error()
+	err = c.r.Delete().Resource("backingserviceinsts").Name(name).Do().Error()
 	return
 }
 
@@ -77,7 +77,7 @@ func (c *backingserviceinstances) Delete(name string) (err error) {
 func (c *backingserviceinstances) Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
 	return c.r.Get().
 		Prefix("watch").
-		Resource("backingserviceinstances").
+		Resource("backingserviceinsts").
 		Param("resourceVersion", resourceVersion).
 		LabelsSelectorParam(label).
 		FieldsSelectorParam(field).

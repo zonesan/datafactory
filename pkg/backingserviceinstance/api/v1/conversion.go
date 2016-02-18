@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	if err := kapi.Scheme.AddFieldLabelConversionFunc("v1", "BackingServiceInstance",
+	if err := kapi.Scheme.AddFieldLabelConversionFunc("v1", "BackingServiceInst",
 		oapi.GetFieldLabelConversionFunc(newer.BackingServiceInstanceToSelectableFields(&newer.BackingServiceInstance{}), nil),
 	); err != nil {
 		panic(err)

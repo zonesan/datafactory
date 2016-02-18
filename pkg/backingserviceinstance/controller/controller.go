@@ -24,8 +24,8 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceInstanceController) Handle(bs *backingserviceapi.BackingServiceInstance) (err error) {
 
-	if bs.Status.Phase != backingserviceapi.BackingServiceInstancePhaseActive {
-		bs.Status.Phase = backingserviceapi.BackingServiceInstancePhaseActive
+	if bs.Status != backingserviceapi.BackingServiceInstanceStatusActive {
+		bs.Status = backingserviceapi.BackingServiceInstanceStatusActive
 
 		c.Client.BackingServiceInstances().Update(bs)
 	}

@@ -40,7 +40,7 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
 	cache.NewReflector(backingserviceinstanceLW, &backingserviceinstanceapi.BackingServiceInstance{}, queue, 1*time.Minute).Run()
 
-	backingserviceController := &BackingServiceInstanceController{
+	backingserviceInstanceController := &BackingServiceInstanceController{
 		Client:     factory.Client,
 		KubeClient: factory.KubeClient,
 	}
@@ -63,8 +63,8 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 			kutil.NewTokenBucketRateLimiter(1, 10),
 		),
 		Handle: func(obj interface{}) error {
-			backingservice := obj.(*backingserviceinstanceapi.BackingServiceInstance)
-			return backingserviceController.Handle(backingservice)
+			backingserviceinstance := obj.(*backingserviceinstanceapi.BackingServiceInstance)
+			return backingserviceInstanceController.Handle(backingserviceinstance)
 		},
 	}
 }

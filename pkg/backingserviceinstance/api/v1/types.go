@@ -24,7 +24,8 @@ type BackingServiceInstanceList struct {
 	Items []BackingServiceInstance `json:"items" description:"list of BackingServiceInstances"`
 }
 
-type BackingServiceInstanceSpec struct {
+/*
+type BackingServiceInstanceSpec struct {	
 	Config                 map[string]string `json:"config, omitempty"`
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
 	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
@@ -36,32 +37,35 @@ type BackingServiceInstanceSpec struct {
 	Credential             map[string]string `json:"credential, omitempty"`
 	Tags                   []string          `json:"tags, omitempty"`
 }
+*/
 
-//type ServiceMetadata struct {
-//	DisplayName         string `json:"displayName, omitempty"`
-//	ImageUrl            string `json:"imageUrl, omitempty"`
-//	LongDescription     string `json:"longDescription, omitempty"`
-//	ProviderDisplayName string `json:"providerDisplayName, omitempty"`
-//	DocumentationUrl    string `json:"documentationUrl, omitempty"`
-//	SupportUrl          string `json:"supportUrl, omitempty"`
-//}
-
-//type ServiceDashboardClient struct {
-//	Id          string `json:"id, omitempty"`
-//	Secret      string `json:"secret, omitempty"`
-//	RedirectUri string `json:"redirect_uri, omitempty"`
-//}
-
-// ProjectStatus is information about the current status of a Project
-type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
+type BackingServiceInstanceSpec struct {
+	Provisioning InstanceProvisioning `json:"provisioning, omitempty"`
+	Binding      InstanceBinding      `json:"binding, omitempty"`
 }
 
-type BackingServiceInstancePhase string
+type InstanceProvisioning struct {
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+}
+
+type InstanceBinding struct {
+	BindUuid                     string            `json:"bind_uuid, omitempty"`
+	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
+	Credential                   map[string]string `json:"credential, omitempty"`
+}
+
+type InstanceBindDeploymentConfig struct {
+	Parameters map[string]string `json:"parameters, omitempty"`
+}
+
+type BackingServiceInstanceStatus string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
+	BackingServiceInstanceStatusActive   BackingServiceInstanceStatus = "Active"
+	BackingServiceInstanceStatusCreated  BackingServiceInstanceStatus = "Created"
+	BackingServiceInstanceStatusInactive BackingServiceInstanceStatus = "Inactive"
+	BackingServiceInstanceStatusModified BackingServiceInstanceStatus = "Modified"
 )

@@ -59,6 +59,6 @@ func Matcher(label labels.Selector, field fields.Selector) generic.Matcher {
 }
 
 func getAttrs(obj runtime.Object) (objLabels labels.Set, objFields fields.Set, err error) {
-	bs := obj.(*api.BackingServiceInstance)
-	return labels.Set(bs.Labels), api.BackingServiceInstanceToSelectableFields(bs), nil
+	bsi := obj.(*api.BackingServiceInstance)
+	return labels.Set(bsi.Labels), api.BackingServiceInstanceToSelectableFields(bsi), nil
 }
