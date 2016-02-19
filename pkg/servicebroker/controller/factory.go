@@ -57,12 +57,12 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 				if _, isFatal := err.(fatalError); isFatal {
 					return false
 				}
-				if retries.Count > 0 {
+				if retries.Count > 5 {
 					return false
 				}
 				return true
 			},
-			kutil.NewTokenBucketRateLimiter(10, 1),
+			kutil.NewTokenBucketRateLimiter(0.1, 1),
 		),
 		Handle: func(obj interface{}) error {
 			servicebroker := obj.(*servicebrokerapi.ServiceBroker)
