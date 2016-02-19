@@ -39,6 +39,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 		fmt.Printf("servicebroker %s catalog err %s", sb.Name, err.Error())
 		sb.Status.Phase = servicebrokerapi.ServiceBrokerFailed
 		c.Client.ServiceBrokers().Update(sb)
+		return err
 	}
 
 	for _, v := range services.Services {
