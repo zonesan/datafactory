@@ -7,6 +7,7 @@ import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
+	"path"
 )
 
 type ServiceList struct {
