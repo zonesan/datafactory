@@ -14,6 +14,7 @@ import (
 	controller "github.com/openshift/origin/pkg/controller"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
+	"fmt"
 )
 
 type ServiceBrokerControllerFactory struct {
@@ -53,16 +54,20 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 			queue,
 			cache.MetaNamespaceKeyFunc,
 			func(obj interface{}, err error, retries controller.Retry) bool {
+				fmt.Println("-------------------->01")
 				kutil.HandleError(err)
 				if _, isFatal := err.(fatalError); isFatal {
+					fmt.Println("-------------------->02")
 					return false
 				}
 				if retries.Count > 5 {
+					fmt.Println("-------------------->03")
 					return false
 				}
+				fmt.Println("-------------------->04")
 				return true
 			},
-			kutil.NewTokenBucketRateLimiter(0.1, 1),
+			kutil.NewTokenBucketRateLimiter(0.01, 1),
 		),
 		Handle: func(obj interface{}) error {
 			servicebroker := obj.(*servicebrokerapi.ServiceBroker)
