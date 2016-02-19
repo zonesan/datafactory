@@ -62,7 +62,7 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 				}
 				return true
 			},
-			kutil.NewTokenBucketRateLimiter(1, 10),
+			kutil.NewTokenBucketRateLimiter(10, 1),
 		),
 		Handle: func(obj interface{}) error {
 			servicebroker := obj.(*servicebrokerapi.ServiceBroker)
