@@ -36,10 +36,10 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 		return nil
 	}
 
-	time.Sleep(time.Second * 10)
+	time.Sleep(time.Second * 60)
 	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url)
 	if err != nil {
-		fmt.Printf("servicebroker %s catalog err %s", sb.Name, err.Error())
+		fmt.Printf("servicebroker %s catalog err %s\n", sb.Name, err.Error())
 		sb.Status.Phase = servicebrokerapi.ServiceBrokerFailed
 		c.Client.ServiceBrokers().Update(sb)
 		return nil

@@ -57,7 +57,7 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 				if _, isFatal := err.(fatalError); isFatal {
 					return false
 				}
-				if retries.Count > 1 {
+				if retries.Count > 0 {
 					return false
 				}
 				return true
