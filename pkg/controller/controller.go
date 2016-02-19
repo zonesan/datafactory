@@ -4,13 +4,12 @@ import (
 	"k8s.io/kubernetes/pkg/api/unversioned"
 	kcache "k8s.io/kubernetes/pkg/client/cache"
 	kutil "k8s.io/kubernetes/pkg/util"
-	"time"
 )
 
 // RunnableController is a controller which implements a Run loop.
 type RunnableController interface {
 	// Run starts the asynchronous controller loop.
-	Run(periods ...time.Duration)
+	Run()
 }
 
 // RetryController is a RunnableController which delegates resource
@@ -35,12 +34,8 @@ type Queue interface {
 }
 
 // Run begins processing resources from Queue asynchronously.
-func (c *RetryController) Run(periods ...time.Duration) {
-	period := time.Duration(0)
-	if len(periods) > 0 {
-		period = periods[0]
-	}
-	go kutil.Forever(func() { c.handleOne(c.Queue.Pop()) }, period)
+func (c *RetryController) Run() {
+	go kutil.Forever(func() { c.handleOne(c.Queue.Pop()) }, 0)
 }
 
 // RunUntil begins processing resources from Queue asynchronously until stopCh is closed.

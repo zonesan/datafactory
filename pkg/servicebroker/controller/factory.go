@@ -10,7 +10,6 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 	"time"
 
-	"fmt"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
@@ -54,20 +53,16 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 			queue,
 			cache.MetaNamespaceKeyFunc,
 			func(obj interface{}, err error, retries controller.Retry) bool {
-				fmt.Println("-------------------->01")
 				kutil.HandleError(err)
 				if _, isFatal := err.(fatalError); isFatal {
-					fmt.Println("-------------------->02")
 					return false
 				}
-				if retries.Count > 5 {
-					fmt.Println("-------------------->03")
+				if retries.Count > 1 {
 					return false
 				}
-				fmt.Println("-------------------->04")
 				return true
 			},
-			kutil.NewTokenBucketRateLimiter(0.01, 1),
+			kutil.NewTokenBucketRateLimiter(10, 1),
 		),
 		Handle: func(obj interface{}) error {
 			servicebroker := obj.(*servicebrokerapi.ServiceBroker)

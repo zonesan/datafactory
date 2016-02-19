@@ -35,8 +35,8 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 	if sb.Spec.Url == "" {
 		return nil
 	}
+
 	time.Sleep(time.Second * 10)
-	fmt.Println("--------------->")
 	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url)
 	if err != nil {
 		fmt.Printf("servicebroker %s catalog err %s", sb.Name, err.Error())
@@ -54,7 +54,10 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 		backingService.Labels = map[string]string{
 			servicebrokerapi.ServiceBrokerLabel: sb.Name,
 		}
-		c.Client.BackingServices().Create(backingService)
+		if _, err := c.Client.BackingServices().Create(backingService); err == nil {
+			sb.Status.Phase = servicebrokerapi.ServiceBrokerRunning
+			c.Client.ServiceBrokers().Update(sb)
+		}
 	}
 
 	return nil
