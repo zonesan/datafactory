@@ -53,7 +53,7 @@ func (c *MasterConfig) RunServiceBrokerController() {
 		KubeClient: kclient,
 	}
 	controller := factory.Create()
-	controller.Run()
+	controller.Run(10)
 }
 
 // RunBackingServiceController starts the project authorization cache
