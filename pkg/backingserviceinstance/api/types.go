@@ -27,7 +27,7 @@ type BackingServiceInstanceList struct {
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string
 	DashboardUrl           string
-	BackingServiceGuid     string
+	BackingServiceName     string
 	BackingServicePlanGuid string
 	Parameters             map[string]string
 	Binding                bool
@@ -49,4 +49,6 @@ const (
 	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
 	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
 	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
+	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
