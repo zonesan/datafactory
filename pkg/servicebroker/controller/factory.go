@@ -10,11 +10,11 @@ import (
 	"k8s.io/kubernetes/pkg/watch"
 	"time"
 
+	"fmt"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"fmt"
 )
 
 type ServiceBrokerControllerFactory struct {
