@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"strings"
 )
 
 const (
@@ -70,6 +71,10 @@ func (o *NewServiceBrokerOptions) complete(cmd *cobra.Command, f *clientcmd.Fact
 	if len(args) == 0 {
 		cmd.Help()
 		return errors.New("must have exactly one argument")
+	}
+
+	if strings.HasPrefix(o.Url, "http://") {
+		fmt.Println(strings.TrimPrefix(o.Url, "http://"))
 	}
 
 	o.Name = args[0]

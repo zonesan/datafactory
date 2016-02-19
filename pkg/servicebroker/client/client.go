@@ -7,7 +7,6 @@ import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
-	"path"
 )
 
 type ServiceList struct {
@@ -32,7 +31,7 @@ type httpClient struct {
 
 func (c *httpClient) Catalog(Url string) (ServiceList, error) {
 	services := new(ServiceList)
-	b, err := c.Get(path.Join(Url, "v2/catalog"))
+	b, err := c.Get("http://" + Url + "/v2/catalog")
 	if err != nil {
 		fmt.Printf("httpclient catalog err %s", err.Error())
 		return *services, err
