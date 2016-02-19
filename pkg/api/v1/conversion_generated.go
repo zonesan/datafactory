@@ -5934,7 +5934,7 @@ func autoconvert_api_ServiceBrokerStatus_To_v1_ServiceBrokerStatus(in *servicebr
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*servicebrokerapi.ServiceBrokerStatus))(in)
 	}
-	out.Phase = pkgapiv1.NamespacePhase(in.Phase)
+	out.Phase = servicebrokerapiv1.ServiceBrokerPhase(in.Phase)
 	return nil
 }
 
@@ -6019,7 +6019,7 @@ func autoconvert_v1_ServiceBrokerStatus_To_api_ServiceBrokerStatus(in *servicebr
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*servicebrokerapiv1.ServiceBrokerStatus))(in)
 	}
-	out.Phase = pkgapi.NamespacePhase(in.Phase)
+	out.Phase = servicebrokerapi.ServiceBrokerPhase(in.Phase)
 	return nil
 }
 

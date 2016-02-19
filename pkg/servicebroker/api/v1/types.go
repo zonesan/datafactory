@@ -8,7 +8,18 @@ import (
 const (
 	// These are internal finalizer values to Origin
 	FinalizerOrigin kapi.FinalizerName = "openshift.io/origin"
+
+	// ServiceBrokerNew is create by administrator.
+	ServiceBrokerNew ServiceBrokerPhase = "New"
+
+	// ServiceBrokerRunning indicates that servicebroker service working well.
+	ServiceBrokerRunning ServiceBrokerPhase = "Running"
+
+	// ServiceBrokerFailed indicates that servicebroker stopped.
+	ServiceBrokerFailed ServiceBrokerPhase = "Failed"
 )
+
+type ServiceBrokerPhase string
 
 type ServiceBroker struct {
 	unversioned.TypeMeta `json:",inline"`
@@ -38,7 +49,7 @@ type ServiceBrokerSpec struct {
 	Finalizers []kapi.FinalizerName `json:"finalizers,omitempty" description:"an opaque list of values that must be empty to permanently remove object from storage"`
 }
 
-// ProjectStatus is information about the current status of a Project
+// ServiceBrokerStatus is information about the current status of a ServiceBroker
 type ServiceBrokerStatus struct {
-	Phase kapi.NamespacePhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
+	Phase ServiceBrokerPhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
 }

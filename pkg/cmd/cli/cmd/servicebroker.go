@@ -86,6 +86,7 @@ func (o *NewServiceBrokerOptions) Run() error {
 	serviceBroker.Annotations = make(map[string]string)
 	serviceBroker.Name = o.Name
 	serviceBroker.GenerateName = o.Name
+	serviceBroker.Status.Phase = servicebrokerapi.ServiceBrokerNew
 
 	_, err := o.Client.ServiceBrokers().Create(serviceBroker)
 	if err != nil {

@@ -29,25 +29,27 @@ func (e fatalError) Error() string {
 }
 
 // Handle processes a namespace and deletes content in origin if its terminating
-func (c *ServiceBrokerController) Handle(bs *servicebrokerapi.ServiceBroker) (err error) {
+func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (err error) {
 
-	if bs.Spec.Url == "" {
+	if sb.Spec.Url == "" {
 		return nil
 	}
-
-	services, err := c.ServiceBrokerClient.Catalog(bs.Spec.Url)
+	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url)
 	if err != nil {
-		fmt.Printf("servicebroker controller catalog err %s", err.Error())
+		fmt.Printf("servicebroker %s catalog err %s", sb.Name, err.Error())
+		sb.Status.Phase = servicebrokerapi.ServiceBrokerFailed
+		c.Client.ServiceBrokers().Update(sb)
 	}
 
 	for _, v := range services.Services {
-		fmt.Printf("---------------------->[Debug] %#v", v)
 		backingService := &backingservice.BackingService{}
 		backingService.Spec = backingservice.BackingServiceSpec(v)
 		backingService.Annotations = make(map[string]string)
-		backingService.Name = v.Name
+		backingService.Name = sb.Name
 		backingService.GenerateName = v.Name
-
+		backingService.Labels = map[string]string{
+			servicebrokerapi.ServiceBrokerLabel: sb.Name,
+		}
 		c.Client.BackingServices().Create(backingService)
 	}
 

@@ -31,7 +31,7 @@ type httpClient struct {
 
 func (c *httpClient) Catalog(Url string) (ServiceList, error) {
 	services := new(ServiceList)
-	b, err := c.Get(Url)
+	b, err := c.Get(path.Join(Url, "v2/catalog"))
 	if err != nil {
 		fmt.Printf("httpclient catalog err %s", err.Error())
 		return *services, err
