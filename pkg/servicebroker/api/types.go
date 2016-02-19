@@ -13,7 +13,7 @@ const (
 	ServiceBrokerNew ServiceBrokerPhase = "New"
 
 	// ServiceBrokerRunning indicates that servicebroker service working well.
-	ServiceBrokerRunning ServiceBrokerPhase = "Running"
+	ServiceBrokerActive ServiceBrokerPhase = "Active"
 
 	// ServiceBrokerFailed indicates that servicebroker stopped.
 	ServiceBrokerFailed ServiceBrokerPhase = "Failed"

@@ -57,7 +57,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 			servicebrokerapi.ServiceBrokerLabel: sb.Name,
 		}
 		if _, err := c.Client.BackingServices().Create(backingService); err == nil {
-			sb.Status.Phase = servicebrokerapi.ServiceBrokerRunning
+			sb.Status.Phase = servicebrokerapi.ServiceBrokerActive
 			c.Client.ServiceBrokers().Update(sb)
 		}
 	}
