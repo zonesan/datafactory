@@ -3,8 +3,6 @@ package controller
 import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 
-	//servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
-
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
@@ -40,6 +38,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	if bsi.Status.Phase == backingserviceinstanceapi.BackingServiceInstancePhaseReady {
 		return nil
 	}
+
 
 	if ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid); !ok {
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
@@ -81,6 +80,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	}
 	defer resp.Body.Close()
 
+
 	c.Client.BackingServiceInstances().Update(bsi)
 	/*
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseActive {
@@ -112,6 +112,7 @@ func checkIfPlanidExist(client osclient.Interface, planId string) (bool, *backin
 	return false, nil, fatalError(fmt.Sprintf("Can't find plan id %s", planId))
 }
 
+
 func commToServiceBroker(method, path string, jsonData []byte, header map[string]string) (resp *http.Response, err error) {
 
 	fmt.Println(method, path, string(jsonData))
@@ -126,3 +127,4 @@ func commToServiceBroker(method, path string, jsonData []byte, header map[string
 
 	return http.DefaultClient.Do(req)
 }
+
