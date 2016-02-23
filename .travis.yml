@@ -12,7 +12,7 @@ deploy:
     secret_access_key:
       secure: Q9Dxc3YHZH2IhZ4aeUYna1ZeLK8kSRTwoPFtPHAf/oL6sGRjpcmLCgjHBDhTioW+WimAVtwNfvvz5ApNVRi539c9x5zEUmj6+hOQqP5ieiJ2ByVAO2oAkmf327x2O4kZwXkirKBWq82NgY4o8RbGnNhdgYLRZX41Twyzc1892WiC/ADUEqQV72LGgtxBG8zh4dHc+gurrBhbHq3hO5E+vlfUTOuLfmg7jRr0T9fN31AbHUPkTTlDc+K2fJ7XDqxE8MctpPDlWQ85EiavySTGOY0+HDnQ+zePBxxe1DJAVYi/CFceUX5Dox9Bt8aQKkXHNsFuDDDFEBYPk1FDlVmrkYiy4DBYbM9PgfH6Z9vk0t0kRpwr5mY2fzcY2cMkj6icx/lgiZm7OO3fb1scr4SIlYRAp69k5TlnjQIHAeN6/sSttJkfZW4SBUTsDsSJhxBh3rCIY2QhLhsL7Xwp/VSWwCZHndNkdp5HwAS7+u3JmTOpMOXGT2ExgxdLD87+H34MOGrbiNCw3iJFk+jFk7KAyyGPTVgWx5ZypQQy4kHsyfk1qfBThMJKJnYxCdv99Kw8NNKQdMOjq3Eh3PWxHjE+bjzRjxSTDdP2HqGd0Mau9UofZiYgwKQF7/0pVf4n6bVnrvKnQmX7G/3OGZYhEtHoMMiApRfo5pR8tmH0/rTXvPI=
     bucket: asiainfo-datafactory-bin
-    upload-dir: dev-pan
+    upload-dir: develop
     local-dir: _output/local/bin/linux/amd64/
     region: cn-north-1
     acl: ''
