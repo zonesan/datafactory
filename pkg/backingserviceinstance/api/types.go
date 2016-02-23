@@ -20,7 +20,7 @@ type BackingServiceInstanceList struct {
 	unversioned.TypeMeta
 	unversioned.ListMeta
 
-	// Items is a list of routes
+	// Items is a list of BackingServiceInstance
 	Items []BackingServiceInstance
 }
 
