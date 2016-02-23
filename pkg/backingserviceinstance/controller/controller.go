@@ -58,7 +58,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	}
 
 	bsInstanceID := string(util.NewUUID())
-	bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseReady
+
 	bsi.Spec.Parameters = make(map[string]string)
 	bsi.Spec.Parameters["instance_id"] = bsInstanceID
 
@@ -69,9 +69,10 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 
 	if svcinstance, err := servicebroker_create_instance(sbi, bsInstanceID, sb.Spec.Url, sb.Spec.UserName, sb.Spec.Password); err != nil {
 		glog.Errorln(err)
-
+		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
 	} else {
 		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
+		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseReady
 		glog.Infoln("create instance successfully.", svcinstance)
 	}
 
@@ -142,7 +143,7 @@ func servicebroker_create_instance(param *SBServiceInstance, instance_guid, brok
 	header["Content-Type"] = "application/json"
 	header["Authorization"] = basicAuthStr(username, password)
 
-	resp, err := commToServiceBroker("PUT", broker_url+"/v2/service_instances/"+instance_guid, jsonData, header)
+	resp, err := commToServiceBroker("PUT", "http://"+broker_url+"/v2/service_instances/"+instance_guid, jsonData, header)
 	if err != nil {
 
 		glog.Error(err)
@@ -165,13 +166,11 @@ func servicebroker_create_instance(param *SBServiceInstance, instance_guid, brok
 			err = json.Unmarshal(body, svcinstance)
 
 			if err != nil {
-				fmt.Println(err)
+				glog.Error(err)
 				return nil, err
 			}
 		}
 	}
-
-	glog.Info("%v,%+v\n", string(body), svcinstance)
 
 	return svcinstance, nil
 }
