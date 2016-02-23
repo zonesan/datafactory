@@ -43,8 +43,7 @@ func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *
 		Example: fmt.Sprintf(newServiceBrokerExample, fullName),
 		Run: func(cmd *cobra.Command, args []string) {
 			var err error
-
-			if options.complete(cmd, f); err != nil {
+			if err = options.complete(cmd, f); err != nil {
 				kcmdutil.CheckErr(err)
 			}
 

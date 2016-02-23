@@ -14,7 +14,7 @@ type ServiceList struct {
 }
 
 type Interface interface {
-	Catalog(Url string) (ServiceList, error)
+	Catalog(Url string, credential ...string) (ServiceList, error)
 }
 
 func NewServiceBrokerClient() Interface {
@@ -29,9 +29,9 @@ type httpClient struct {
 	Post func(getUrl string, body []byte, credential ...string) ([]byte, error)
 }
 
-func (c *httpClient) Catalog(Url string) (ServiceList, error) {
+func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, error) {
 	services := new(ServiceList)
-	b, err := c.Get("http://" + Url + "/v2/catalog")
+	b, err := c.Get("http://" + Url + "/v2/catalog", credential...)
 	if err != nil {
 		fmt.Printf("httpclient catalog err %s", err.Error())
 		return *services, err

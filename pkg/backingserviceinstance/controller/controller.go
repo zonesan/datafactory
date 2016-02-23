@@ -71,19 +71,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		glog.Errorln(err)
 
 	} else {
-
+		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
 		glog.Infoln("create instance successfully.", svcinstance)
 	}
-
-	/*
-		resp, err := commToServiceBroker("PUT", sbInstanceUrl, jsonData, nil)
-		if err != nil {
-			//glog.Error(err)
-			fmt.Println(err)
-			return err
-		}
-		defer resp.Body.Close()
-	*/
 
 	c.Client.BackingServiceInstances().Update(bsi)
 	return nil
@@ -121,7 +111,6 @@ func commToServiceBroker(method, path string, jsonData []byte, header map[string
 			req.Header.Set(key, value)
 		}
 	}
-
 	return http.DefaultClient.Do(req)
 }
 
