@@ -8,31 +8,70 @@ import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type ServiceList struct {
 	Services []backingserviceapi.BackingServiceSpec `json:"services"`
 }
 
+type CreateServiceInstanceResponse struct {
+	DashboardUrl  string         `json:"dashboard_url"`
+	LastOperation *LastOperation `json:"last_operation, omitempty"`
+}
+
+type LastOperation struct {
+	State                    string `json:"state"`
+	Description              string `json:"description"`
+	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
+}
+
 type Interface interface {
-	Catalog(Url string, credential ...string) (ServiceList, error)
+	Catalog(Url string) (ServiceList, error)
+	CreateInstance() (interface{}, error)
 }
 
 func NewServiceBrokerClient() Interface {
-	return &httpClient{
+	return &sbClient{
 		Get:  httpGet,
 		Post: httpPostJson,
 	}
 }
 
-type httpClient struct {
+type sbClient struct {
+	ServiceBroker struct {
+		name     string
+		url      string
+		user     string
+		password string
+	}
 	Get  func(getUrl string, credential ...string) ([]byte, error)
 	Post func(getUrl string, body []byte, credential ...string) ([]byte, error)
 }
 
-func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, error) {
+func commToServiceBroker(method, path string, jsonData []byte, header map[string]string) (resp *http.Response, err error) {
+	//fmt.Println(method, path, string(jsonData))
+
+	req, err := http.NewRequest(strings.ToUpper(method) /*SERVICE_BROKER_API_SERVER+*/, path, bytes.NewBuffer(jsonData))
+
+	if len(header) > 0 {
+		for key, value := range header {
+			req.Header.Set(key, value)
+		}
+	}
+
+	return http.DefaultClient.Do(req)
+}
+
+func basicAuthStr(username, password string) string {
+	auth := username + ":" + password
+	authstr := base64.StdEncoding.EncodeToString([]byte(auth))
+	return "Basic " + authstr
+}
+
+func (c *sbClient) Catalog(Url string) (ServiceList, error) {
 	services := new(ServiceList)
-	b, err := c.Get("http://"+Url+"/v2/catalog", credential...)
+	b, err := c.Get("http://" + Url + "/v2/catalog")
 	if err != nil {
 		fmt.Printf("httpclient catalog err %s", err.Error())
 		return *services, err
@@ -45,7 +84,6 @@ func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, err
 	return *services, nil
 }
 
-//todo 支持多种自定义认证方式
 func httpGet(getUrl string, credential ...string) ([]byte, error) {
 	var resp *http.Response
 	var err error
@@ -54,10 +92,7 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("[servicebroker http client] err %s, %s\n", getUrl, err)
 		}
-
-		basic := fmt.Sprintf("Basic %s", string(base64Encode([]byte(fmt.Sprintf("%s:%s", credential[0], credential[1])))))
-		req.Header.Set(Authorization, basic)
-
+		req.Header.Set(credential[0], credential[1])
 		resp, err = http.DefaultClient.Do(req)
 		if err != nil {
 			fmt.Errorf("http get err:%s", err.Error())
@@ -76,13 +111,8 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 			return nil, fmt.Errorf("[http get] status err %s, %d\n", getUrl, resp.StatusCode)
 		}
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("=====", err)
-	} else {
-		fmt.Println("-----", string(body))
-	}
-	return body, err
+
+	return ioutil.ReadAll(resp.Body)
 }
 
 func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, error) {
@@ -93,10 +123,7 @@ func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, er
 		return nil, fmt.Errorf("[http] err %s, %s\n", postUrl, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	if len(credential) == 2 {
-		basic := fmt.Sprintf("Basic %s", string(base64Encode([]byte(fmt.Sprintf("%s:%s", credential[0], credential[1])))))
-		req.Header.Set(Authorization, basic)
-	}
+	req.Header.Set(credential[0], credential[1])
 	resp, err = http.DefaultClient.Do(req)
 
 	if err != nil {
@@ -111,10 +138,4 @@ func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, er
 		return nil, fmt.Errorf("[http] read err %s, %s\n", postUrl, err)
 	}
 	return b, nil
-}
-
-const Authorization = "Authorization"
-
-func base64Encode(src []byte) []byte {
-	return []byte(base64.StdEncoding.EncodeToString(src))
 }

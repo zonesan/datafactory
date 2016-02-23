@@ -136,7 +136,11 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 		formatString(out, "Bindable", bs.Spec.Bindable)
 		formatString(out, "Updateable", bs.Spec.PlanUpdateable)
 		for k, v := range bs.Spec.Metadata {
-			formatString(out, k, v)
+			if "imageurl" == strings.ToLower(k) {
+				continue
+			} else {
+				formatString(out, k, v)
+			}
 		}
 		for k, v := range bs.Spec.DashboardClient {
 			formatString(out, "Service"+k, v)
@@ -148,7 +152,6 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			formatString(out, "PlanID", plan.Id)
 			formatString(out, "PlanDesc", plan.Description)
 			formatString(out, "PlanFree", plan.Free)
-			formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
 			fmt.Fprintf(out, "Bullets:\n")
 			for _, bullet := range plan.Metadata.Bullets {
 				fmt.Fprintf(out, "  %s\n", bullet)

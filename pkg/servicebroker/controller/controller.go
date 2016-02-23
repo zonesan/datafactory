@@ -36,7 +36,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 		return nil
 	}
 
-	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url)
+	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url, sb.Spec.UserName, sb.Spec.Password)
 	if err != nil {
 
 		fmt.Printf("ServiceBroker %s catalog err %s\n", sb.Name, err.Error())
