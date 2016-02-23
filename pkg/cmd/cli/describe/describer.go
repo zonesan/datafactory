@@ -175,7 +175,7 @@ type BackingServiceInstanceDescriber struct {
 
 // Describe returns the description of an backingServiceinstance
 func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServiceInstances()
+	c := d.BackingServiceInstances(namespace)
 	bsi, err := c.Get(name)
 	if err != nil {
 		return "", err

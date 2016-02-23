@@ -10,7 +10,7 @@ import (
 
 // BackingServiceInstancesInterface has methods to work with BackingServiceInstance resources in a namespace
 type BackingServiceInstancesInterface interface {
-	BackingServiceInstances() BackingServiceInstanceInterface
+	BackingServiceInstances(namespace string) BackingServiceInstanceInterface
 }
 
 // BackingServiceInstanceInterface exposes methods on project resources.
@@ -25,19 +25,21 @@ type BackingServiceInstanceInterface interface {
 
 type backingserviceinstances struct {
 	r *Client
+	ns string
 }
 
 // newUsers returns a project
-func newBackingServiceInstances(c *Client) *backingserviceinstances {
+func newBackingServiceInstances(c *Client, namespace string) *backingserviceinstances {
 	return &backingserviceinstances{
 		r: c,
+		ns: namespace,
 	}
 }
 
 // Get returns information about a particular project or an error
 func (c *backingserviceinstances) Get(name string) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Get().Resource("backingserviceinsts").Name(name).Do().Into(result)
+	err = c.r.Get().Namespace(c.ns).Resource("backingserviceinstances").Name(name).Do().Into(result)
 	return
 }
 
@@ -45,7 +47,8 @@ func (c *backingserviceinstances) Get(name string) (result *backingserviceinstan
 func (c *backingserviceinstances) List(label labels.Selector, field fields.Selector) (result *backingserviceinstanceapi.BackingServiceInstanceList, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstanceList{}
 	err = c.r.Get().
-		Resource("backingserviceinsts").
+		Namespace(c.ns).
+		Resource("backingserviceinstances").
 		LabelsSelectorParam(label).
 		FieldsSelectorParam(field).
 		Do().
@@ -56,20 +59,20 @@ func (c *backingserviceinstances) List(label labels.Selector, field fields.Selec
 // Create creates a new BackingServiceInstance
 func (c *backingserviceinstances) Create(p *backingserviceinstanceapi.BackingServiceInstance) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Post().Resource("backingserviceinsts").Body(p).Do().Into(result)
+	err = c.r.Post().Namespace(c.ns).Resource("backingserviceinstances").Body(p).Do().Into(result)
 	return
 }
 
 // Update updates the project on server
 func (c *backingserviceinstances) Update(p *backingserviceinstanceapi.BackingServiceInstance) (result *backingserviceinstanceapi.BackingServiceInstance, err error) {
 	result = &backingserviceinstanceapi.BackingServiceInstance{}
-	err = c.r.Put().Resource("backingserviceinsts").Name(p.Name).Body(p).Do().Into(result)
+	err = c.r.Put().Namespace(c.ns).Resource("backingserviceinstances").Name(p.Name).Body(p).Do().Into(result)
 	return
 }
 
 // Delete removes the project on server
 func (c *backingserviceinstances) Delete(name string) (err error) {
-	err = c.r.Delete().Resource("backingserviceinsts").Name(name).Do().Error()
+	err = c.r.Delete().Namespace(c.ns).Resource("backingserviceinstances").Name(name).Do().Error()
 	return
 }
 
@@ -77,7 +80,8 @@ func (c *backingserviceinstances) Delete(name string) (err error) {
 func (c *backingserviceinstances) Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
 	return c.r.Get().
 		Prefix("watch").
-		Resource("backingserviceinsts").
+		Namespace(c.ns).
+		Resource("backingserviceinstances").
 		Param("resourceVersion", resourceVersion).
 		LabelsSelectorParam(label).
 		FieldsSelectorParam(field).

@@ -15,7 +15,7 @@ type FakeBackingServiceInstances struct {
 }
 
 func (c *FakeBackingServiceInstances) Get(name string) (*backingserviceinstanceapi.BackingServiceInstance, error) {
-	obj, err := c.Fake.Invokes(ktestclient.NewRootGetAction("backingserviceinsts", name), &backingserviceinstanceapi.BackingServiceInstance{})
+	obj, err := c.Fake.Invokes(ktestclient.NewRootGetAction("backingserviceinstances", name), &backingserviceinstanceapi.BackingServiceInstance{})
 	if obj == nil {
 		return nil, err
 	}
@@ -24,7 +24,7 @@ func (c *FakeBackingServiceInstances) Get(name string) (*backingserviceinstancea
 }
 
 func (c *FakeBackingServiceInstances) List(label labels.Selector, field fields.Selector) (*backingserviceinstanceapi.BackingServiceInstanceList, error) {
-	obj, err := c.Fake.Invokes(ktestclient.NewRootListAction("backingserviceinsts", label, field), &backingserviceinstanceapi.BackingServiceInstanceList{})
+	obj, err := c.Fake.Invokes(ktestclient.NewRootListAction("backingserviceinstances", label, field), &backingserviceinstanceapi.BackingServiceInstanceList{})
 	if obj == nil {
 		return nil, err
 	}
@@ -33,7 +33,7 @@ func (c *FakeBackingServiceInstances) List(label labels.Selector, field fields.S
 }
 
 func (c *FakeBackingServiceInstances) Create(inObj *backingserviceinstanceapi.BackingServiceInstance) (*backingserviceinstanceapi.BackingServiceInstance, error) {
-	obj, err := c.Fake.Invokes(ktestclient.NewRootCreateAction("backingserviceinsts", inObj), inObj)
+	obj, err := c.Fake.Invokes(ktestclient.NewRootCreateAction("backingserviceinstances", inObj), inObj)
 	if obj == nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *FakeBackingServiceInstances) Create(inObj *backingserviceinstanceapi.Ba
 }
 
 func (c *FakeBackingServiceInstances) Update(inObj *backingserviceinstanceapi.BackingServiceInstance) (*backingserviceinstanceapi.BackingServiceInstance, error) {
-	obj, err := c.Fake.Invokes(ktestclient.NewRootUpdateAction("backingserviceinsts", inObj), inObj)
+	obj, err := c.Fake.Invokes(ktestclient.NewRootUpdateAction("backingserviceinstances", inObj), inObj)
 	if obj == nil {
 		return nil, err
 	}
@@ -51,6 +51,6 @@ func (c *FakeBackingServiceInstances) Update(inObj *backingserviceinstanceapi.Ba
 }
 
 func (c *FakeBackingServiceInstances) Delete(name string) error {
-	_, err := c.Fake.Invokes(ktestclient.NewRootDeleteAction("backingserviceinsts", name), &backingserviceinstanceapi.BackingServiceInstance{})
+	_, err := c.Fake.Invokes(ktestclient.NewRootDeleteAction("backingserviceinstances", name), &backingserviceinstanceapi.BackingServiceInstance{})
 	return err
 }

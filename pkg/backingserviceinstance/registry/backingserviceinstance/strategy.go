@@ -18,7 +18,7 @@ type Strategy struct {
 
 // Strategy is the default logic that applies when creating and updating HostSubnet
 // objects via the REST API.
-var BsStrategy = Strategy{kapi.Scheme}
+var BsiStrategy = Strategy{kapi.Scheme}
 
 func (Strategy) PrepareForUpdate(obj, old runtime.Object) {}
 

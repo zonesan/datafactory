@@ -27,7 +27,7 @@ func (c *BackingServiceInstanceController) Handle(bs *backingserviceapi.BackingS
 	if bs.Status != backingserviceapi.BackingServiceInstanceStatusActive {
 		bs.Status = backingserviceapi.BackingServiceInstanceStatusActive
 
-		c.Client.BackingServiceInstances().Update(bs)
+		c.Client.BackingServiceInstances(bs.ObjectMeta.Namespace).Update(bs)
 	}
 
 	return nil

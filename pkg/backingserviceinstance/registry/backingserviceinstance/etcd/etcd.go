@@ -20,7 +20,7 @@ type REST struct {
 
 // NewREST returns a new REST.
 func NewREST(s storage.Interface) *REST {
-	prefix := "/backingserviceinsts"
+	prefix := "/backingserviceinstances"
 	store := &etcdgeneric.Etcd{
 		NewFunc:     func() runtime.Object { return &api.BackingServiceInstance{} },
 		NewListFunc: func() runtime.Object { return &api.BackingServiceInstanceList{} },
@@ -36,10 +36,10 @@ func NewREST(s storage.Interface) *REST {
 		PredicateFunc: func(label labels.Selector, field fields.Selector) generic.Matcher {
 			return backingserviceinstance.Matcher(label, field)
 		},
-		EndpointName: "backingserviceinst",
+		EndpointName: "backingserviceinstance",
 
-		CreateStrategy: backingserviceinstance.BsStrategy,
-		UpdateStrategy: backingserviceinstance.BsStrategy,
+		CreateStrategy: backingserviceinstance.BsiStrategy,
+		UpdateStrategy: backingserviceinstance.BsiStrategy,
 
 		ReturnDeletedObject: false,
 

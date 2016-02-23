@@ -117,7 +117,7 @@ func init() {
 	kindToRootScope := map[string]bool{
 		"ServiceBroker":      true,
 		"BackingService":     true,
-		"BackingServiceInst": true,
+		"BackingServiceInstance": true,
 
 		"Status": true,
 

@@ -453,7 +453,7 @@ func expandResourceShortcut(resource string) string {
 		"pvc":     "persistentVolumeClaims",
 		"bs":      "backingservices",
 		"sb":      "servicebrokers",
-		"bsi":     "backingserviceinsts",
+		"bsi":     "backingserviceinstances",
 	}
 	if expanded, ok := shortForms[resource]; ok {
 		return expanded
