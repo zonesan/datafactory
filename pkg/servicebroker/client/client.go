@@ -7,6 +7,7 @@ import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
+	"encoding/base64"
 )
 
 type ServiceList struct {
@@ -43,7 +44,7 @@ func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, err
 
 	return *services, nil
 }
-
+//todo 支持多种自定义认证方式
 func httpGet(getUrl string, credential ...string) ([]byte, error) {
 	var resp *http.Response
 	var err error
@@ -52,7 +53,10 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 		if err != nil {
 			return nil, fmt.Errorf("[servicebroker http client] err %s, %s\n", getUrl, err)
 		}
-		req.Header.Set(credential[0], credential[1])
+
+		basic := fmt.Sprintf("Basic %s", string(base64Encode([]byte(fmt.Sprintf("%s:%s", credential[0], credential[1])))))
+		req.Header.Set(Authorization, basic)
+
 		resp, err = http.DefaultClient.Do(req)
 		if err != nil {
 			fmt.Errorf("http get err:%s", err.Error())
@@ -83,7 +87,10 @@ func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, er
 		return nil, fmt.Errorf("[http] err %s, %s\n", postUrl, err)
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set(credential[0], credential[1])
+	if len(credential) == 2 {
+		basic := fmt.Sprintf("Basic %s", string(base64Encode([]byte(fmt.Sprintf("%s:%s", credential[0], credential[1])))))
+		req.Header.Set(Authorization, basic)
+	}
 	resp, err = http.DefaultClient.Do(req)
 
 	if err != nil {
@@ -98,4 +105,10 @@ func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, er
 		return nil, fmt.Errorf("[http] read err %s, %s\n", postUrl, err)
 	}
 	return b, nil
+}
+
+const Authorization = "Authorization"
+
+func base64Encode(src []byte) []byte {
+	return []byte(base64.StdEncoding.EncodeToString(src))
 }
