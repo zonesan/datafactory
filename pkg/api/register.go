@@ -4,6 +4,7 @@ import (
 	"k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/runtime"
 
+	_ "github.com/openshift/origin/pkg/application/api"
 	_ "github.com/openshift/origin/pkg/authorization/api"
 	_ "github.com/openshift/origin/pkg/backingservice/api"
 	_ "github.com/openshift/origin/pkg/backingserviceinstance/api"
