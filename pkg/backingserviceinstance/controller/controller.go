@@ -41,15 +41,14 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		return nil
 	}
 
-	if ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid); !ok {
+	ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
+	if !ok {
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
 			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
 			c.Client.BackingServiceInstances().Update(bsi)
 		}
 
 		return err
-	} else {
-		bsi.Spec.BackingServiceName = bs.ObjectMeta.Name
 	}
 
 	sb, err := c.Client.ServiceBrokers().Get(bsi.Spec.BackingServiceName)
@@ -58,12 +57,14 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	}
 
 	bsInstanceID := string(util.NewUUID())
-
+	bsi.Spec.BackingServiceName = bs.Spec.Name
+	bsi.Spec.BackingServiceID = bs.Spec.Id
+	bsi.Spec.InstanceID = bsInstanceID
 	bsi.Spec.Parameters = make(map[string]string)
 	bsi.Spec.Parameters["instance_id"] = bsInstanceID
 
-	sbi := &SBServiceInstance{}
-	sbi.ServiceId = bsInstanceID
+	sbi := &ServiceInstance{}
+	sbi.ServiceId = bs.Spec.Id
 	sbi.PlanId = bsi.Spec.BackingServicePlanGuid
 	sbi.OrganizationGuid = bsi.Namespace
 
@@ -115,7 +116,7 @@ func commToServiceBroker(method, path string, jsonData []byte, header map[string
 	return http.DefaultClient.Do(req)
 }
 
-type SBServiceInstance struct {
+type ServiceInstance struct {
 	ServiceId        string `json:"service_id"`
 	PlanId           string `json:"plan_id"`
 	OrganizationGuid string `json:"organization_guid"`
@@ -133,7 +134,33 @@ type CreateServiceInstanceResponse struct {
 	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }
 
-func servicebroker_create_instance(param *SBServiceInstance, instance_guid, broker_url, username, password string) (*CreateServiceInstanceResponse, error) {
+type ServiceBinding struct {
+	ServiceId       string                 `json:"service_id"`
+	PlanId          string                 `json:"plan_id"`
+	AppGuid         string                 `json:"app_guid,omitempty"`
+	BindResource    map[string]string      `json:"bind_resource,omitempty"`
+	Parameters      map[string]interface{} `json:"parameters,omitempty"`
+	svc_instance_id string
+}
+
+type ServiceBindingResponse struct {
+	Credentials     Credential `json:"credentials"`
+	SyslogDrainUrl  string     `json:"syslog_drain_url"`
+	RouteServiceUrl string     `json:"route_service_url"`
+}
+
+type Credential struct {
+	Uri      string `json:"uri"`
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Host     string `json:"host"`
+	Port     string `json:"port"`
+	Vhost    string `json:"vhost"`
+	//Database string `json:"database"`
+}
+
+func servicebroker_create_instance(param *ServiceInstance, instance_guid, broker_url, username, password string) (*CreateServiceInstanceResponse, error) {
 	jsonData, err := json.Marshal(param)
 	if err != nil {
 		return nil, err
@@ -173,6 +200,88 @@ func servicebroker_create_instance(param *SBServiceInstance, instance_guid, brok
 	}
 
 	return svcinstance, nil
+}
+
+func servicebroker_binding(param *ServiceBinding, binding_guid, broker_url, username, password string) (*ServiceBindingResponse, error) {
+	jsonData, err := json.Marshal(param)
+	if err != nil {
+		return nil, err
+	}
+
+	header := make(map[string]string)
+	header["Content-Type"] = "application/json"
+	header["Authorization"] = basicAuthStr(username, password)
+
+	resp, err := commToServiceBroker("PUT", "http://"+broker_url+"/v2/service_instances/"+param.svc_instance_id+"/service_bindings/"+binding_guid, jsonData, header)
+	if err != nil {
+
+		glog.Error(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	glog.Infof("respcode from PUT /v2/service_instances/%s/service_bindings/%s: %v", param.svc_instance_id, binding_guid, resp.StatusCode)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		glog.Error(err)
+		return nil, err
+	}
+	svcBinding := &ServiceBindingResponse{}
+
+	glog.Infof("%v,%+v\n", string(body), svcBinding)
+	if resp.StatusCode == http.StatusOK {
+		if len(body) > 0 {
+			err = json.Unmarshal(body, svcBinding)
+
+			if err != nil {
+				glog.Error(err)
+				return nil, err
+			}
+		}
+	}
+
+	return svcBinding, nil
+}
+
+func servicebroker_unbinding(bsi *backingserviceinstanceapi.BackingServiceInstance, broker_url, username, password string) (interface{}, error) {
+
+	header := make(map[string]string)
+	header["Content-Type"] = "application/json"
+	header["Authorization"] = basicAuthStr(username, password)
+
+	resp, err := commToServiceBroker("DELETE", "http://"+broker_url+"/v2/service_instances/"+bsi.Spec.InstanceID+"/service_bindings/"+bsi.Spec.BindUuid+"?service_id="+bsi.Spec.BackingServiceID+"&plan_id="+bsi.Spec.BackingServicePlanGuid, nil, header)
+	if err != nil {
+
+		glog.Error(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	glog.Infof("respcode from DELETE /v2/service_instances/%s/service_bindings/%s: %v", bsi.Spec.InstanceID, bsi.Spec.BindUuid, resp.StatusCode)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		glog.Error(err)
+		return nil, err
+	}
+	type UnBindindResp struct {
+		Response interface{}
+	}
+	svcUnbinding := &UnBindindResp{}
+
+	if resp.StatusCode == http.StatusOK {
+		if len(body) > 0 {
+			err = json.Unmarshal(body, svcUnbinding)
+
+			if err != nil {
+				glog.Error(err)
+				return nil, err
+			}
+		}
+	}
+	glog.Infof("%v,%+v\n", string(body), svcUnbinding)
+	return svcUnbinding, nil
 }
 
 func basicAuthStr(username, password string) string {

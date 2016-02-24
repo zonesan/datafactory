@@ -1513,8 +1513,10 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	} else {
 		out.Config = nil
 	}
+	out.InstanceID = in.InstanceID
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
@@ -1631,8 +1633,10 @@ func autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec
 	} else {
 		out.Config = nil
 	}
+	out.InstanceID = in.InstanceID
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)

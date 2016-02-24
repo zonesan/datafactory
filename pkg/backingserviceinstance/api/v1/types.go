@@ -26,8 +26,10 @@ type BackingServiceInstanceList struct {
 
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string `json:"config, omitempty"`
+	InstanceID             string            `json:"instance_id, omitempty"`
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 	Binding                bool              `json:"binding, omitempty"`

@@ -15835,7 +15835,7 @@
     "required": [
      "config",
      "dashboard_url",
-     "backingservice_guid",
+     "backingservice_name",
      "backingservice_plan_guid",
      "parameters",
      "binding",
@@ -15851,7 +15851,7 @@
      "dashboard_url": {
       "type": "string"
      },
-     "backingservice_guid": {
+     "backingservice_name": {
       "type": "string"
      },
      "backingservice_plan_guid": {

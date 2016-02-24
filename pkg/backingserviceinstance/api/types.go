@@ -26,8 +26,10 @@ type BackingServiceInstanceList struct {
 
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string
+	InstanceID             string
 	DashboardUrl           string
 	BackingServiceName     string
+	BackingServiceID       string
 	BackingServicePlanGuid string
 	Parameters             map[string]string
 	Binding                bool
