@@ -15732,7 +15732,7 @@
       "items": {
        "$ref": "v1.BackingServiceInstance"
       },
-      "description": "list of servicebrokers"
+      "description": "list of BackingServiceInstances"
      }
     }
    },
@@ -15766,10 +15766,10 @@
      },
      "spec": {
       "$ref": "v1.BackingServiceInstanceSpec",
-      "description": "spec defines the behavior of the ServiceBroker"
+      "description": "spec defines the behavior of the BackingServiceInstance"
      },
      "status": {
-      "$ref": "v1.BackingServiceInstanceStatus",
+      "type": "string",
       "description": "status describes the current status of a Project; read-only"
      }
     }
@@ -15833,21 +15833,27 @@
    "v1.BackingServiceInstanceSpec": {
     "id": "v1.BackingServiceInstanceSpec",
     "required": [
-     "config",
+     "provisioning",
+     "binding"
+    ],
+    "properties": {
+     "provisioning": {
+      "$ref": "v1.InstanceProvisioning"
+     },
+     "binding": {
+      "$ref": "v1.InstanceBinding"
+     }
+    }
+   },
+   "v1.InstanceProvisioning": {
+    "id": "v1.InstanceProvisioning",
+    "required": [
      "dashboard_url",
      "backingservice_guid",
      "backingservice_plan_guid",
-     "parameters",
-     "binding",
-     "bind_uuid",
-     "bind_deploymentconfig",
-     "credential",
-     "tags"
+     "parameters"
     ],
     "properties": {
-     "config": {
-      "type": "any"
-     },
      "dashboard_url": {
       "type": "string"
      },
@@ -15859,10 +15865,17 @@
      },
      "parameters": {
       "type": "any"
-     },
-     "binding": {
-      "type": "boolean"
-     },
+     }
+    }
+   },
+   "v1.InstanceBinding": {
+    "id": "v1.InstanceBinding",
+    "required": [
+     "bind_uuid",
+     "bind_deploymentconfig",
+     "credential"
+    ],
+    "properties": {
      "bind_uuid": {
       "type": "string"
      },
@@ -15871,21 +15884,6 @@
      },
      "credential": {
       "type": "any"
-     },
-     "tags": {
-      "type": "array",
-      "items": {
-       "type": "string"
-      }
-     }
-    }
-   },
-   "v1.BackingServiceInstanceStatus": {
-    "id": "v1.BackingServiceInstanceStatus",
-    "properties": {
-     "phase": {
-      "type": "string",
-      "description": "phase is the current lifecycle phase of the servicebroker"
      }
     }
    },

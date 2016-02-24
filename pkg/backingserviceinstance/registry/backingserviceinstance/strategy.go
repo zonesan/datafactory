@@ -14,11 +14,12 @@ import (
 // sdnStrategy implements behavior for HostSubnets
 type Strategy struct {
 	runtime.ObjectTyper
+	kapi.NameGenerator
 }
 
 // Strategy is the default logic that applies when creating and updating HostSubnet
 // objects via the REST API.
-var BsiStrategy = Strategy{kapi.Scheme}
+var BsiStrategy = Strategy{kapi.Scheme, kapi.SimpleNameGenerator}
 
 func (Strategy) PrepareForUpdate(obj, old runtime.Object) {}
 

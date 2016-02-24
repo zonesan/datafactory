@@ -53,7 +53,6 @@ type storage struct {
 // NewRegistry returns a new Registry interface for the given Storage. Any mismatched
 // types will panic.
 func NewRegistry(s Storage, status, internal rest.Updater) Registry {
-	log.Debug("new Registry called.")
 	return &storage{Storage: s, status: status, internal: internal}
 }
 
@@ -78,7 +77,6 @@ func (s *storage) CreateBackingServiceInstance(ctx kapi.Context, backingservicei
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("created backingserviceinstance %+v", obj)
 	return obj.(*api.BackingServiceInstance), nil
 }
 
