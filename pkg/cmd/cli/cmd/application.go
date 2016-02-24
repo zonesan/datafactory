@@ -60,9 +60,9 @@ func NewCmdApplication(fullName string, f *clientcmd.Factory, out io.Writer) *co
 
 func (o *NewApplicationOptions) complete(cmd *cobra.Command, f *clientcmd.Factory) error {
 	args := cmd.Flags().Args()
-	if len(args) != 2 {
+	if len(args) != 1 {
 		cmd.Help()
-		return errors.New("must have exactly two argument")
+		return errors.New("must have exactly one argument")
 	}
 
 	o.Name = args[0]

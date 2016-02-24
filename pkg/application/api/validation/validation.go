@@ -46,7 +46,7 @@ func ValidationApplicationItems(items applicationapi.ItemList) (bool, string) {
 // since its name validation is more restrictive than default namespace name validation
 func ValidateApplication(application *applicationapi.Application) fielderrors.ValidationErrorList {
 	result := fielderrors.ValidationErrorList{}
-	result = append(result, validation.ValidateObjectMeta(&application.ObjectMeta, false, ValidateApplicationName).Prefix("metadata")...)
+	result = append(result, validation.ValidateObjectMeta(&application.ObjectMeta, true, ValidateApplicationName).Prefix("metadata")...)
 
 	if ok, err := ValidationApplicationItems(application.Spec.Items); !ok {
 		result = append(result, fielderrors.NewFieldInvalid("items", application.Spec.Items, err))
