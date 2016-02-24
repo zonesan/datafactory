@@ -3,6 +3,7 @@ package validation
 import (
 	authorizationvalidation "github.com/openshift/origin/pkg/authorization/api/validation"
 	backingservicevalidation "github.com/openshift/origin/pkg/backingservice/api/validation"
+	backingserviceinstancevalidation "github.com/openshift/origin/pkg/backingserviceinstance/api/validation"
 	buildvalidation "github.com/openshift/origin/pkg/build/api/validation"
 	deployvalidation "github.com/openshift/origin/pkg/deploy/api/validation"
 	imagevalidation "github.com/openshift/origin/pkg/image/api/validation"
@@ -17,6 +18,7 @@ import (
 
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -84,5 +86,5 @@ func init() {
 
 	Validator.Register(&servicebrokerapi.ServiceBroker{}, servicebrokervalidation.ValidateServiceBroker, servicebrokervalidation.ValidateServiceBrokerUpdate)
 	Validator.Register(&backingserviceapi.BackingService{}, backingservicevalidation.ValidateBackingService, backingservicevalidation.ValidateBackingServiceUpdate)
-
+	Validator.Register(&backingserviceinstanceapi.BackingServiceInstance{}, backingserviceinstancevalidation.ValidateBackingServiceInstance, backingserviceinstancevalidation.ValidateBackingServiceInstanceUpdate)
 }

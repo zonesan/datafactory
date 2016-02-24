@@ -2,6 +2,7 @@ package controller
 
 import (
 	"k8s.io/kubernetes/pkg/client/cache"
+	kapi "k8s.io/kubernetes/pkg/api"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
@@ -24,23 +25,22 @@ type BackingServiceInstanceControllerFactory struct {
 
 // Create creates a BackingServiceInstanceControllerFactory.
 func (factory *BackingServiceInstanceControllerFactory) Create() controller.RunnableController {
-
 	backingserviceinstanceLW := &cache.ListWatch{
 		ListFunc: func() (runtime.Object, error) {
 
-			return factory.Client.BackingServiceInstances().List(labels.Everything(), fields.Everything())
+			return factory.Client.BackingServiceInstances(kapi.NamespaceAll).List(labels.Everything(), fields.Everything())
 
 			//return factory.KubeClient.Namespaces().List(labels.Everything(), fields.Everything())
 		},
 		WatchFunc: func(resourceVersion string) (watch.Interface, error) {
-			return factory.Client.BackingServiceInstances().Watch(labels.Everything(), fields.Everything(), resourceVersion)
+			return factory.Client.BackingServiceInstances(kapi.NamespaceAll).Watch(labels.Everything(), fields.Everything(), resourceVersion)
 			//return factory.KubeClient.Namespaces().Watch(labels.Everything(), fields.Everything(), resourceVersion)
 		},
 	}
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
 	cache.NewReflector(backingserviceinstanceLW, &backingserviceinstanceapi.BackingServiceInstance{}, queue, 1*time.Minute).Run()
 
-	backingserviceController := &BackingServiceInstanceController{
+	backingserviceInstanceController := &BackingServiceInstanceController{
 		Client:     factory.Client,
 		KubeClient: factory.KubeClient,
 	}
@@ -63,8 +63,8 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 			kutil.NewTokenBucketRateLimiter(1, 10),
 		),
 		Handle: func(obj interface{}) error {
-			backingservice := obj.(*backingserviceinstanceapi.BackingServiceInstance)
-			return backingserviceController.Handle(backingservice)
+			backingserviceinstance := obj.(*backingserviceinstanceapi.BackingServiceInstance)
+			return backingserviceInstanceController.Handle(backingserviceinstance)
 		},
 	}
 }
@@ -77,12 +77,12 @@ type backingServiceLW struct {
 
 // List lists all BuildConfigs.
 func (lw *backingServiceLW) List() (runtime.Object, error) {
-	return lw.client.BackingServiceInstances().List(labels.Everything(), fields.Everything())
+	return lw.client.BackingServiceInstances(kapi.NamespaceAll).List(labels.Everything(), fields.Everything())
 }
 
 // Watch watches all BuildConfigs.
 func (lw *backingServiceLW) Watch(resourceVersion string) (watch.Interface, error) {
-	return lw.client.BackingServiceInstances().Watch(labels.Everything(), fields.Everything(), resourceVersion)
+	return lw.client.BackingServiceInstances(kapi.NamespaceAll).Watch(labels.Everything(), fields.Everything(), resourceVersion)
 }
 
 */

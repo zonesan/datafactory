@@ -32,7 +32,7 @@ import (
 var (
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
-	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BINDING", "STATUS"}
 	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
 	imageColumns                  = []string{"NAME", "DOCKER REF"}
@@ -169,7 +169,7 @@ func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.
 	return nil
 }
 
-func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+func printBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
 	/*
 		var labels []string
 		for k, v := range bs.Labels {
@@ -178,7 +178,7 @@ func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceIns
 		}
 	*/
 
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Binding, bs.Status.Phase)
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%v\t%s\n", bsi.Name, formatLabels(bsi.Labels), bsi.Spec.Provisioning.BackingServiceName, bsi.Spec.Provisioning.BackingServicePlanGuid, bsi.Spec.Binding.BindUuid, bsi.Status.Phase)
 	return err
 }
 

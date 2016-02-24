@@ -41,42 +41,42 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		return nil
 	}
 
-	if ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid); !ok {
+	if ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.Provisioning.BackingServicePlanGuid); !ok {
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
 			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-			c.Client.BackingServiceInstances().Update(bsi)
+			c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
 		}
 
 		return err
 	} else {
-		bsi.Spec.BackingServiceName = bs.ObjectMeta.Name
+		bsi.Spec.Provisioning.BackingServiceName = bs.ObjectMeta.Name
 	}
 
-	sb, err := c.Client.ServiceBrokers().Get(bsi.Spec.BackingServiceName)
+	sb, err := c.Client.ServiceBrokers().Get(bsi.Spec.Provisioning.BackingServiceName)
 	if err != nil {
 		return err
 	}
 
 	bsInstanceID := string(util.NewUUID())
 
-	bsi.Spec.Parameters = make(map[string]string)
-	bsi.Spec.Parameters["instance_id"] = bsInstanceID
+	bsi.Spec.Provisioning.Parameters = make(map[string]string)
+	bsi.Spec.Provisioning.Parameters["instance_id"] = bsInstanceID
 
 	sbi := &SBServiceInstance{}
 	sbi.ServiceId = bsInstanceID
-	sbi.PlanId = bsi.Spec.BackingServicePlanGuid
+	sbi.PlanId = bsi.Spec.Provisioning.BackingServicePlanGuid
 	sbi.OrganizationGuid = bsi.Namespace
 
 	if svcinstance, err := servicebroker_create_instance(sbi, bsInstanceID, sb.Spec.Url, sb.Spec.UserName, sb.Spec.Password); err != nil {
 		glog.Errorln(err)
 		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
 	} else {
-		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
+		bsi.Spec.Provisioning.DashboardUrl = svcinstance.DashboardUrl
 		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseReady
 		glog.Infoln("create instance successfully.", svcinstance)
 	}
 
-	c.Client.BackingServiceInstances().Update(bsi)
+	c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
 	return nil
 }
 
