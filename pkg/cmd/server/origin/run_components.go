@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/glog"
 
+	applicatioincontroller "github.com/openshift/origin/pkg/application/controller"
 	backingservicecontroller "github.com/openshift/origin/pkg/backingservice/controller"
 	backingserviceinstancecontroller "github.com/openshift/origin/pkg/backingserviceinstance/controller"
 	servicebrokercontroller "github.com/openshift/origin/pkg/servicebroker/controller"
@@ -44,6 +45,17 @@ import (
 	"github.com/openshift/origin/pkg/cmd/server/bootstrappolicy"
 	serviceaccountcontrollers "github.com/openshift/origin/pkg/serviceaccounts/controllers"
 )
+
+// RunApplicationController starts the project authorization cache
+func (c *MasterConfig) RunApplicationController() {
+	osclient, kclient := c.OriginNamespaceControllerClients()
+	factory := applicatioincontroller.ApplicationControllerFactory{
+		Client:     osclient,
+		KubeClient: kclient,
+	}
+	controller := factory.Create()
+	controller.Run()
+}
 
 // RunServiceBrokerController starts the project authorization cache
 func (c *MasterConfig) RunServiceBrokerController() {

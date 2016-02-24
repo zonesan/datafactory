@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	"strings"
+	"net/url"
 )
 
 const (
@@ -72,10 +72,13 @@ func (o *NewServiceBrokerOptions) complete(cmd *cobra.Command, f *clientcmd.Fact
 		return errors.New("must have exactly one argument")
 	}
 
-	if strings.HasPrefix(o.Url, "http://") {
-		fmt.Println(strings.TrimPrefix(o.Url, "http://"))
+	URL, err := url.Parse(o.Url)
+	if err != nil {
+		cmd.Help()
+		return errors.New("param url hava wrong format")
 	}
 
+	o.Url = URL.Host
 	o.Name = args[0]
 
 	return nil

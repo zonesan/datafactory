@@ -2,12 +2,12 @@ package client
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
-	"encoding/base64"
 )
 
 type ServiceList struct {
@@ -32,7 +32,7 @@ type httpClient struct {
 
 func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, error) {
 	services := new(ServiceList)
-	b, err := c.Get("http://" + Url + "/v2/catalog", credential...)
+	b, err := c.Get("http://"+Url+"/v2/catalog", credential...)
 	if err != nil {
 		fmt.Printf("httpclient catalog err %s", err.Error())
 		return *services, err
@@ -44,6 +44,7 @@ func (c *httpClient) Catalog(Url string, credential ...string) (ServiceList, err
 
 	return *services, nil
 }
+
 //todo 支持多种自定义认证方式
 func httpGet(getUrl string, credential ...string) ([]byte, error) {
 	var resp *http.Response
