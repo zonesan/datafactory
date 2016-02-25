@@ -14,6 +14,7 @@ import (
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util/sets"
 
+	applicationapi	"github.com/openshift/origin/pkg/application/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
@@ -30,6 +31,7 @@ import (
 )
 
 var (
+	applicationColumns	      = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
 	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
@@ -71,6 +73,8 @@ var (
 func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, columnLabels []string) *kctl.HumanReadablePrinter {
 	// TODO: support cross namespace listing
 	p := kctl.NewHumanReadablePrinter(noHeaders, withNamespace, wide, showAll, columnLabels)
+	p.Handler(applicationColumns, printApplication)
+	p.Handler(applicationColumns, printApplicationList)
 	p.Handler(serviceBrokerColumns, printServiceBroker)
 	p.Handler(serviceBrokerColumns, printServiceBrokerList)
 	p.Handler(backingServiceColumns, printBackingService)
@@ -146,16 +150,37 @@ func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, 
 
 const templateDescriptionLen = 80
 
-func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
-	/*
-		var labels []string
-		for k, v := range bs.Labels {
-			label := fmt.Sprintf("%s=%s", k, v)
-			labels = append(labels, label)
-		}
-	*/
+func printApplication(application *applicationapi.Application, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", application.Name, application.Namespace, labels.Set(application.Labels), formatRelativeTime(application.CreationTimestamp.Time), application.Status.Phase)
+	return err
+}
 
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
+type SortableApplications []applicationapi.Application
+
+func (list SortableApplications) Len() int {
+	return len(list)
+}
+
+func (list SortableApplications) Swap(i, j int) {
+	list[i], list[j] = list[j], list[i]
+}
+
+func (list SortableApplications) Less(i, j int) bool {
+	return list[i].ObjectMeta.Name < list[j].ObjectMeta.Name
+}
+
+func printApplicationList(applications *applicationapi.ApplicationList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	sort.Sort(SortableApplications(applications.Items))
+	for _, application := range applications.Items {
+		if err := printApplication(&application, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, labels.Set(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
 	return err
 }
 
@@ -170,15 +195,7 @@ func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.
 }
 
 func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
-	/*
-		var labels []string
-		for k, v := range bs.Labels {
-			label := fmt.Sprintf("%s=%s", k, v)
-			labels = append(labels, label)
-		}
-	*/
-
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Binding, bs.Status.Phase)
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, labels.Set(bs.Labels), bs.Spec.Binding, bs.Status.Phase)
 	return err
 }
 

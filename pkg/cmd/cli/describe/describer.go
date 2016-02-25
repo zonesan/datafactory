@@ -24,6 +24,7 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/util/sets"
 
+	applicationapi "github.com/openshift/origin/pkg/application/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
@@ -38,6 +39,7 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
+		"Application":		  &ApplicationDescriber{c},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
 		"BackingService":         &BackingServiceDescriber{c},
 		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
@@ -164,6 +166,28 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			}
 
 		}
+		return nil
+	})
+}
+
+type ApplicationDescriber struct {
+	client.Interface
+}
+
+func (app *ApplicationDescriber) Describe(namespace, name string) (string, error) {
+	a := app.Applications(namespace)
+	application, err := a.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	return describeApplication(application)
+}
+
+func describeApplication(app *applicationapi.Application) (string, error) {
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, app.ObjectMeta)
+		formatString(out, "Status", app.Status.Phase)
 		return nil
 	})
 }
