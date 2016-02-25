@@ -15834,8 +15834,10 @@
     "id": "v1.BackingServiceInstanceSpec",
     "required": [
      "config",
+     "instance_id",
      "dashboard_url",
      "backingservice_name",
+     "backingservice_id",
      "backingservice_plan_guid",
      "parameters",
      "binding",
@@ -15848,10 +15850,16 @@
      "config": {
       "type": "any"
      },
+     "instance_id": {
+      "type": "string"
+     },
      "dashboard_url": {
       "type": "string"
      },
      "backingservice_name": {
+      "type": "string"
+     },
+     "backingservice_id": {
       "type": "string"
      },
      "backingservice_plan_guid": {

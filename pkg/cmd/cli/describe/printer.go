@@ -178,7 +178,7 @@ func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceIns
 		}
 	*/
 
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Binding, bs.Status.Phase)
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bound, bs.Status.Phase)
 	return err
 }
 

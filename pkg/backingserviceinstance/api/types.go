@@ -24,6 +24,7 @@ type BackingServiceInstanceList struct {
 	Items []BackingServiceInstance
 }
 
+/*
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string
 	InstanceID             string
@@ -37,6 +38,28 @@ type BackingServiceInstanceSpec struct {
 	BindDeploymentConfig   map[string]string
 	Credential             map[string]string
 	Tags                   []string
+}
+*/
+type BackingServiceInstanceSpec struct {
+	InstanceProvisioning
+	InstanceBinding
+	Bound      bool
+	InstanceID string
+	Tags       []string
+}
+
+type InstanceProvisioning struct {
+	DashboardUrl           string
+	BackingServiceName     string
+	BackingServiceID       string
+	BackingServicePlanGuid string
+	Parameters             map[string]string
+}
+
+type InstanceBinding struct {
+	BindUuid                     string
+	InstanceBindDeploymentConfig map[string]string
+	Credential                   map[string]string
 }
 
 // ProjectStatus is information about the current status of a Project

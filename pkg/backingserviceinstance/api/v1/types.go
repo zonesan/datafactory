@@ -24,6 +24,7 @@ type BackingServiceInstanceList struct {
 	Items []BackingServiceInstance `json:"items" description:"list of servicebrokers"`
 }
 
+/*
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string `json:"config, omitempty"`
 	InstanceID             string            `json:"instance_id, omitempty"`
@@ -37,6 +38,28 @@ type BackingServiceInstanceSpec struct {
 	BindDeploymentConfig   map[string]string `json:"bind_deploymentconfig, omitempty"`
 	Credential             map[string]string `json:"credential, omitempty"`
 	Tags                   []string          `json:"tags, omitempty"`
+}
+*/
+type BackingServiceInstanceSpec struct {
+	InstanceProvisioning `json:"provisioning, omitempty"`
+	InstanceBinding      `json:"binding, omitempty"`
+	Bound                bool     `json:"bound, omitempty"`
+	InstanceID           string   `json:"instance_id, omitempty"`
+	Tags                 []string `json:"tags, omitempty"`
+}
+
+type InstanceProvisioning struct {
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceID       string            `json:"backingservice_id, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+}
+
+type InstanceBinding struct {
+	BindUuid                     string            `json:"bind_uuid, omitempty"`
+	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
+	Credential                   map[string]string `json:"credential, omitempty"`
 }
 
 //type ServiceMetadata struct {

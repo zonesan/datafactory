@@ -858,45 +858,14 @@ func deepCopy_api_BackingServiceInstanceList(in backingserviceinstanceapi.Backin
 }
 
 func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.BackingServiceInstanceSpec, out *backingserviceinstanceapi.BackingServiceInstanceSpec, c *conversion.Cloner) error {
-	if in.Config != nil {
-		out.Config = make(map[string]string)
-		for key, val := range in.Config {
-			out.Config[key] = val
-		}
-	} else {
-		out.Config = nil
+	if err := deepCopy_api_InstanceProvisioning(in.InstanceProvisioning, &out.InstanceProvisioning, c); err != nil {
+		return err
 	}
+	if err := deepCopy_api_InstanceBinding(in.InstanceBinding, &out.InstanceBinding, c); err != nil {
+		return err
+	}
+	out.Bound = in.Bound
 	out.InstanceID = in.InstanceID
-	out.DashboardUrl = in.DashboardUrl
-	out.BackingServiceName = in.BackingServiceName
-	out.BackingServiceID = in.BackingServiceID
-	out.BackingServicePlanGuid = in.BackingServicePlanGuid
-	if in.Parameters != nil {
-		out.Parameters = make(map[string]string)
-		for key, val := range in.Parameters {
-			out.Parameters[key] = val
-		}
-	} else {
-		out.Parameters = nil
-	}
-	out.Binding = in.Binding
-	out.BindUuid = in.BindUuid
-	if in.BindDeploymentConfig != nil {
-		out.BindDeploymentConfig = make(map[string]string)
-		for key, val := range in.BindDeploymentConfig {
-			out.BindDeploymentConfig[key] = val
-		}
-	} else {
-		out.BindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
-	}
 	if in.Tags != nil {
 		out.Tags = make([]string, len(in.Tags))
 		for i := range in.Tags {
@@ -910,6 +879,43 @@ func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.Backin
 
 func deepCopy_api_BackingServiceInstanceStatus(in backingserviceinstanceapi.BackingServiceInstanceStatus, out *backingserviceinstanceapi.BackingServiceInstanceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_api_InstanceBinding(in backingserviceinstanceapi.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, c *conversion.Cloner) error {
+	out.BindUuid = in.BindUuid
+	if in.InstanceBindDeploymentConfig != nil {
+		out.InstanceBindDeploymentConfig = make(map[string]string)
+		for key, val := range in.InstanceBindDeploymentConfig {
+			out.InstanceBindDeploymentConfig[key] = val
+		}
+	} else {
+		out.InstanceBindDeploymentConfig = nil
+	}
+	if in.Credential != nil {
+		out.Credential = make(map[string]string)
+		for key, val := range in.Credential {
+			out.Credential[key] = val
+		}
+	} else {
+		out.Credential = nil
+	}
+	return nil
+}
+
+func deepCopy_api_InstanceProvisioning(in backingserviceinstanceapi.InstanceProvisioning, out *backingserviceinstanceapi.InstanceProvisioning, c *conversion.Cloner) error {
+	out.DashboardUrl = in.DashboardUrl
+	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
+	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	if in.Parameters != nil {
+		out.Parameters = make(map[string]string)
+		for key, val := range in.Parameters {
+			out.Parameters[key] = val
+		}
+	} else {
+		out.Parameters = nil
+	}
 	return nil
 }
 
@@ -3263,6 +3269,8 @@ func init() {
 		deepCopy_api_BackingServiceInstanceList,
 		deepCopy_api_BackingServiceInstanceSpec,
 		deepCopy_api_BackingServiceInstanceStatus,
+		deepCopy_api_InstanceBinding,
+		deepCopy_api_InstanceProvisioning,
 		deepCopy_api_BinaryBuildRequestOptions,
 		deepCopy_api_BinaryBuildSource,
 		deepCopy_api_Build,
