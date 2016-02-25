@@ -284,6 +284,48 @@ func servicebroker_unbinding(bsi *backingserviceinstanceapi.BackingServiceInstan
 	return svcUnbinding, nil
 }
 
+func servicebroker_deprovisioning(bsi *backingserviceinstanceapi.BackingServiceInstance, broker_url, username, password string) (interface{}, error) {
+
+	header := make(map[string]string)
+	header["Content-Type"] = "application/json"
+	header["Authorization"] = basicAuthStr(username, password)
+
+	resp, err := commToServiceBroker("DELETE", "http://"+broker_url+"/v2/service_instances/"+bsi.Spec.InstanceID+"?service_id="+bsi.Spec.BackingServiceID+"&plan_id="+bsi.Spec.BackingServicePlanGuid, nil, header)
+	if err != nil {
+
+		glog.Error(err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	glog.Infof("respcode from DELETE /v2/service_instances/%s: %v", bsi.Spec.InstanceID, resp.StatusCode)
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		glog.Error(err)
+		return nil, err
+	}
+	type DeprovisioningResp struct {
+		Response interface{}
+	}
+	svcDeprovisioning := &DeprovisioningResp{}
+
+	if resp.StatusCode == http.StatusOK {
+		if len(body) > 0 {
+			err = json.Unmarshal(body, svcDeprovisioning)
+
+			if err != nil {
+				glog.Error(err)
+				return nil, err
+			}
+		}
+	}
+	glog.Infof("%v,%+v\n", string(body), svcDeprovisioning)
+	return svcDeprovisioning, nil
+}
+
+
+
 func basicAuthStr(username, password string) string {
 	auth := username + ":" + password
 	authstr := base64.StdEncoding.EncodeToString([]byte(auth))
