@@ -3,9 +3,9 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
@@ -21,8 +21,8 @@ Create a new BackingServiceInstance
 )
 
 type NewBackingServiceInstanceOptions struct {
-	Name      string
-	
+	Name string
+
 	DashboardUrl           string
 	BackingServiceName     string
 	BackingServicePlanGuid string
@@ -61,7 +61,7 @@ func NewCmdNewBackingServiceInstance(fullName string, f *clientcmd.Factory, out 
 	cmd.Flags().StringVar(&options.DashboardUrl, "dashboard_url", "", "Dashboard URL")
 	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService GUID")
 	cmd.Flags().StringVar(&options.BackingServicePlanGuid, "backingservice_plan_guid", "", "BackingService Plan GUID")
-	
+
 	return cmd
 }
 
@@ -79,27 +79,27 @@ func (o *NewBackingServiceInstanceOptions) complete(cmd *cobra.Command, f *clien
 
 func (o *NewBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	backingServiceInstance := &backingserviceinstanceapi.BackingServiceInstance{}
-	
+
 	namespace, _, err := f.DefaultNamespace()
 	if err != nil {
 		return err
 	}
-	
+
 	backingServiceInstance.Annotations = make(map[string]string)
 	backingServiceInstance.Name = o.Name
 	backingServiceInstance.GenerateName = o.Name
-	
+
 	backingServiceInstance.Spec.Provisioning.DashboardUrl = o.DashboardUrl
 	backingServiceInstance.Spec.Provisioning.BackingServiceName = o.BackingServiceName
 	backingServiceInstance.Spec.Provisioning.BackingServicePlanGuid = o.BackingServicePlanGuid
 	backingServiceInstance.Spec.Provisioning.Parameters = make(map[string]string)
-	
-	//backingServiceInstance.Spec.Binding.BindUuid = 
+
+	//backingServiceInstance.Spec.Binding.BindUuid =
 	backingServiceInstance.Spec.Binding.InstanceBindDeploymentConfig = make(map[string]string)
 	backingServiceInstance.Spec.Binding.Credential = make(map[string]string)
-	
-	//backingServiceInstance.Status = 
-	
+
+	//backingServiceInstance.Status =
+
 	_, err = o.Client.BackingServiceInstances(namespace).Create(backingServiceInstance)
 	if err != nil {
 		return err

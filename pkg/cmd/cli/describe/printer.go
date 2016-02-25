@@ -14,7 +14,7 @@ import (
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util/sets"
 
-	applicationapi	"github.com/openshift/origin/pkg/application/api"
+	applicationapi "github.com/openshift/origin/pkg/application/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
@@ -31,7 +31,7 @@ import (
 )
 
 var (
-	applicationColumns	      = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
+	applicationColumns            = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
 	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BINDING", "STATUS"}

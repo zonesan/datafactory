@@ -25,7 +25,7 @@ type BackingServiceInstanceList struct {
 }
 
 /*
-type BackingServiceInstanceSpec struct {	
+type BackingServiceInstanceSpec struct {
 	Config                 map[string]string `json:"config, omitempty"`
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
 	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`

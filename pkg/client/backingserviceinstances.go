@@ -24,14 +24,14 @@ type BackingServiceInstanceInterface interface {
 }
 
 type backingserviceinstances struct {
-	r *Client
+	r  *Client
 	ns string
 }
 
 // newUsers returns a project
 func newBackingServiceInstances(c *Client, namespace string) *backingserviceinstances {
 	return &backingserviceinstances{
-		r: c,
+		r:  c,
 		ns: namespace,
 	}
 }

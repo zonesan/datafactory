@@ -39,7 +39,7 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
-		"Application":		  &ApplicationDescriber{c},
+		"Application":            &ApplicationDescriber{c},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
 		"BackingService":         &BackingServiceDescriber{c},
 		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
