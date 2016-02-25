@@ -138,7 +138,11 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 		formatString(out, "Bindable", bs.Spec.Bindable)
 		formatString(out, "Updateable", bs.Spec.PlanUpdateable)
 		for k, v := range bs.Spec.Metadata {
-			formatString(out, k, v)
+			if "imageurl" == strings.ToLower(k) {
+				continue
+			} else {
+				formatString(out, k, v)
+			}
 		}
 		for k, v := range bs.Spec.DashboardClient {
 			formatString(out, "Service"+k, v)
@@ -150,7 +154,6 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			formatString(out, "PlanID", plan.Id)
 			formatString(out, "PlanDesc", plan.Description)
 			formatString(out, "PlanFree", plan.Free)
-			formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
 			fmt.Fprintf(out, "Bullets:\n")
 			for _, bullet := range plan.Metadata.Bullets {
 				fmt.Fprintf(out, "  %s\n", bullet)
@@ -199,7 +202,7 @@ type BackingServiceInstanceDescriber struct {
 
 // Describe returns the description of an backingServiceinstance
 func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServiceInstances()
+	c := d.BackingServiceInstances(namespace)
 	bsi, err := c.Get(name)
 	if err != nil {
 		return "", err
@@ -209,48 +212,27 @@ func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (stri
 }
 
 func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, imageName string) (string, error) {
-	return "", nil
-	/*
-		return tabbedString(func(out *tabwriter.Writer) error {
-			formatMeta(out, bsi.ObjectMeta)
-			formatString(out, "Description", bsi.Spec.Description)
-			formatString(out, "Status", bsi.Status.Phase)
-			formatString(out, "Bindable", bsi.Spec.Bindable)
-			formatString(out, "Updateable", bsi.Spec.PlanUpdateable)
-			for k, v := range bsi.Spec.Metadata {
-				formatString(out, k, v)
-			}
-			for k, v := range bsi.Spec.DashboardClient {
-				formatString(out, "Service"+k, v)
-			}
-			plan := bsi.Spec.Plan
-			{
-				fmt.Fprintln(out, "────────────────────")
-				formatString(out, "Plan", plan.Name)
-
-				formatString(out, "PlanID", plan.Id)
-				formatString(out, "PlanDesc", plan.Description)
-				formatString(out, "PlanFree", plan.Free)
-				formatString(out, "PlanDisplayName", plan.Metadata.DisplayName)
-				fmt.Fprintf(out, "Bullets:\n")
-				for _, bullet := range plan.Metadata.Bullets {
-					fmt.Fprintf(out, "  %s\n", bullet)
-				}
-				//formatString(out,"PlanBullets",strings.Join(plan.Metadata.Bullets,","))
-				fmt.Fprintf(out, "PlanCosts:\n")
-				for _, cost := range plan.Metadata.Costs {
-					fmt.Fprintf(out, "  CostUnit:\t%s\n", cost.Unit)
-					fmt.Fprintf(out, "  Amount:\n")
-					for k, v := range cost.Amount {
-						fmt.Fprintf(out, "    %v: %v\n", k, v)
-					}
-				}
-
-			}
-			formatString(out, "Used", bsi.Spec.Used)
-			return nil
-		})
-	*/
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatMeta(out, bsi.ObjectMeta)
+		formatString(out, "Status", bsi.Status.Phase)
+		formatString(out, "DashboardUrl", bsi.Spec.Provisioning.DashboardUrl)
+		formatString(out, "BackingServiceName", bsi.Spec.Provisioning.BackingServiceName)
+		formatString(out, "BackingServicePlanGuid", bsi.Spec.Provisioning.BackingServicePlanGuid)
+		fmt.Fprintf(out, "Parameters:\n")
+		for k, v := range bsi.Spec.Provisioning.Parameters {
+			formatString(out, k, v)
+		}
+		formatString(out, "BindUuid", bsi.Spec.Binding.BindUuid)
+		fmt.Fprintf(out, "DeploymentConfig:\n")
+		for k, v := range bsi.Spec.Binding.InstanceBindDeploymentConfig {
+			formatString(out, k, v)
+		}
+		fmt.Fprintf(out, "Credential:\n")
+		for k, v := range bsi.Spec.Binding.Credential {
+			formatString(out, k, v)
+		}
+		return nil
+	})
 }
 
 // BuildDescriber generates information about a build

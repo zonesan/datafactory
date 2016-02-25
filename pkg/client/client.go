@@ -74,8 +74,8 @@ func (c *Client) BackingServices() BackingServiceInterface {
 }
 
 // BackingServiceInstance provides a REST client for backingserviceinstance
-func (c *Client) BackingServiceInstances() BackingServiceInstanceInterface {
-	return newBackingServiceInstances(c)
+func (c *Client) BackingServiceInstances(namespace string) BackingServiceInstanceInterface {
+	return newBackingServiceInstances(c, namespace)
 }
 
 // Builds provides a REST client for Builds

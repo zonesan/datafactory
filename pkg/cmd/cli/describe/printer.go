@@ -34,7 +34,7 @@ var (
 	applicationColumns	      = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
-	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BINDING", "STATUS"}
 	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
 	imageColumns                  = []string{"NAME", "DOCKER REF"}

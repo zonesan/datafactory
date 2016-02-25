@@ -8,11 +8,14 @@ import (
 	etcdgeneric "k8s.io/kubernetes/pkg/registry/generic/etcd"
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
+	"k8s.io/kubernetes/pkg/runtime"
 
 	"github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
-	"k8s.io/kubernetes/pkg/runtime"
+	
 )
+
+const BackingServiceInstancePath = "/backingserviceinstances"
 
 type REST struct {
 	store *etcdgeneric.Etcd
@@ -20,15 +23,14 @@ type REST struct {
 
 // NewREST returns a new REST.
 func NewREST(s storage.Interface) *REST {
-	prefix := "/backingserviceinstances"
 	store := &etcdgeneric.Etcd{
 		NewFunc:     func() runtime.Object { return &api.BackingServiceInstance{} },
 		NewListFunc: func() runtime.Object { return &api.BackingServiceInstanceList{} },
 		KeyRootFunc: func(ctx kapi.Context) string {
-			return prefix
+			return etcdgeneric.NamespaceKeyRootFunc(ctx, BackingServiceInstancePath)
 		},
-		KeyFunc: func(ctx kapi.Context, name string) (string, error) {
-			return etcdgeneric.NoNamespaceKeyFunc(ctx, prefix, name)
+		KeyFunc: func(ctx kapi.Context, id string) (string, error) {
+			return etcdgeneric.NamespaceKeyFunc(ctx, BackingServiceInstancePath, id)
 		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) {
 			return obj.(*api.BackingServiceInstance).Name, nil
@@ -38,8 +40,8 @@ func NewREST(s storage.Interface) *REST {
 		},
 		EndpointName: "backingserviceinstance",
 
-		CreateStrategy: backingserviceinstance.BsStrategy,
-		UpdateStrategy: backingserviceinstance.BsStrategy,
+		CreateStrategy: backingserviceinstance.BsiStrategy,
+		UpdateStrategy: backingserviceinstance.BsiStrategy,
 
 		ReturnDeletedObject: false,
 

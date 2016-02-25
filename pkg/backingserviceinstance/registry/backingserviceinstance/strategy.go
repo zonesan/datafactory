@@ -14,17 +14,18 @@ import (
 // sdnStrategy implements behavior for HostSubnets
 type Strategy struct {
 	runtime.ObjectTyper
+	kapi.NameGenerator
 }
 
 // Strategy is the default logic that applies when creating and updating HostSubnet
 // objects via the REST API.
-var BsStrategy = Strategy{kapi.Scheme}
+var BsiStrategy = Strategy{kapi.Scheme, kapi.SimpleNameGenerator}
 
 func (Strategy) PrepareForUpdate(obj, old runtime.Object) {}
 
 // NamespaceScoped is false for sdns
 func (Strategy) NamespaceScoped() bool {
-	return false
+	return true
 }
 
 func (Strategy) GenerateName(base string) string {
@@ -59,6 +60,6 @@ func Matcher(label labels.Selector, field fields.Selector) generic.Matcher {
 }
 
 func getAttrs(obj runtime.Object) (objLabels labels.Set, objFields fields.Set, err error) {
-	bs := obj.(*api.BackingServiceInstance)
-	return labels.Set(bs.Labels), api.BackingServiceInstanceToSelectableFields(bs), nil
+	bsi := obj.(*api.BackingServiceInstance)
+	return labels.Set(bsi.Labels), api.BackingServiceInstanceToSelectableFields(bsi), nil
 }

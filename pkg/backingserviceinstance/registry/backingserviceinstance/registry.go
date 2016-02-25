@@ -53,7 +53,6 @@ type storage struct {
 // NewRegistry returns a new Registry interface for the given Storage. Any mismatched
 // types will panic.
 func NewRegistry(s Storage, status, internal rest.Updater) Registry {
-	log.Debug("new Registry called.")
 	return &storage{Storage: s, status: status, internal: internal}
 }
 
@@ -65,8 +64,8 @@ func (s *storage) ListBackingServiceInstances(ctx kapi.Context, label labels.Sel
 	return obj.(*api.BackingServiceInstanceList), nil
 }
 
-func (s *storage) GetBackingServiceInstance(ctx kapi.Context, backingServiceID string) (*api.BackingServiceInstance, error) {
-	obj, err := s.Get(ctx, backingServiceID)
+func (s *storage) GetBackingServiceInstance(ctx kapi.Context, backingServiceInstanceID string) (*api.BackingServiceInstance, error) {
+	obj, err := s.Get(ctx, backingServiceInstanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -78,36 +77,35 @@ func (s *storage) CreateBackingServiceInstance(ctx kapi.Context, backingservicei
 	if err != nil {
 		return nil, err
 	}
-	log.Debugf("created backingserviceinstance %+v", obj)
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) UpdateBackingServiceInstance(ctx kapi.Context, backingService *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
-	obj, _, err := s.internal.Update(ctx, backingService)
+func (s *storage) UpdateBackingServiceInstance(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+	obj, _, err := s.internal.Update(ctx, backingServiceInstance)
 	if err != nil {
 		return nil, err
 	}
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) UpdateBackingServiceInstanceSpec(ctx kapi.Context, backingService *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
-	obj, _, err := s.Update(ctx, backingService)
+func (s *storage) UpdateBackingServiceInstanceSpec(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+	obj, _, err := s.Update(ctx, backingServiceInstance)
 	if err != nil {
 		return nil, err
 	}
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) UpdateBackingServiceInstanceStatus(ctx kapi.Context, backingService *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
-	obj, _, err := s.status.Update(ctx, backingService)
+func (s *storage) UpdateBackingServiceInstanceStatus(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+	obj, _, err := s.status.Update(ctx, backingServiceInstance)
 	if err != nil {
 		return nil, err
 	}
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) DeleteBackingServiceInstance(ctx kapi.Context, backingServiceID string) (*unversioned.Status, error) {
-	obj, err := s.Delete(ctx, backingServiceID, nil)
+func (s *storage) DeleteBackingServiceInstance(ctx kapi.Context, backingServiceInstanceID string) (*unversioned.Status, error) {
+	obj, err := s.Delete(ctx, backingServiceInstanceID, nil)
 	if err != nil {
 		return nil, err
 	}
