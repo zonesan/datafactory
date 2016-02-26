@@ -1505,11 +1505,21 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapi.BackingServiceInstanceSpec))(in)
 	}
-	if err := convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(&in.Provisioning, &out.Provisioning, s); err != nil {
+	if err := convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.Binding, &out.Binding, s); err != nil {
+	if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
 		return err
+	}
+	out.Bound = in.Bound
+	out.InstanceID = in.InstanceID
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
 	}
 	return nil
 }
@@ -1564,6 +1574,7 @@ func autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in *backing
 	}
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
@@ -1634,11 +1645,21 @@ func autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapiv1.BackingServiceInstanceSpec))(in)
 	}
-	if err := convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(&in.Provisioning, &out.Provisioning, s); err != nil {
+	if err := convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.Binding, &out.Binding, s); err != nil {
+	if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
 		return err
+	}
+	out.Bound = in.Bound
+	out.InstanceID = in.InstanceID
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
 	}
 	return nil
 }
@@ -1693,6 +1714,7 @@ func autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in *backing
 	}
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)

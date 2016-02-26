@@ -26,6 +26,7 @@ type LastOperation struct {
 	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
 }
 
+/*
 type Interface interface {
 	Catalog(Url string) (ServiceList, error)
 	CreateInstance() (interface{}, error)
@@ -52,7 +53,7 @@ type sbClient struct {
 func commToServiceBroker(method, path string, jsonData []byte, header map[string]string) (resp *http.Response, err error) {
 	//fmt.Println(method, path, string(jsonData))
 
-	req, err := http.NewRequest(strings.ToUpper(method) /*SERVICE_BROKER_API_SERVER+*/, path, bytes.NewBuffer(jsonData))
+	req, err := http.NewRequest(strings.ToUpper(method) , path, bytes.NewBuffer(jsonData))
 
 	if len(header) > 0 {
 		for key, value := range header {
@@ -139,3 +140,4 @@ func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, er
 	}
 	return b, nil
 }
+*/
