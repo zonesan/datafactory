@@ -286,8 +286,9 @@ func describeApplication(app *applicationapi.Application, itemStr string) (strin
 		formatString(out, "Namespace", app.Namespace)
 		formatString(out, "Labels", formatLabels(app.Labels))
 		formatTime(out, "Create Time", app.ObjectMeta.CreationTimestamp.Time)
-		formatTime(out, "Delete Time", app.ObjectMeta.DeletionTimestamp.Time)
-		formatString(out, "Items", app.Status.Phase)
+		//formatTime(out, "Delete Time", app.ObjectMeta.DeletionTimestamp.Time.String())
+		//todo 查看 DeletionTimestamp 如何生成
+		formatString(out, "Items", itemStr)
 		formatString(out, "Status", app.Status.Phase)
 		formatString(out, "Event", "todo")
 		//todo 查看Event 如何输出
