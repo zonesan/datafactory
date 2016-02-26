@@ -25,6 +25,7 @@ Create a new application to partition resources for a comfortable knowledge of m
 type NewApplicationOptions struct {
 	Name  string
 	Items applicationapi.ItemList
+	Item string
 
 	Client client.Interface
 
@@ -57,6 +58,8 @@ func NewCmdApplication(fullName string, f *clientcmd.Factory, out io.Writer) *co
 		},
 	}
 
+	cmd.Flags().StringVar(&options.Item, "items", "", "application items")
+
 	return cmd
 }
 
@@ -67,7 +70,7 @@ func (o *NewApplicationOptions) complete(cmd *cobra.Command, f *clientcmd.Factor
 		return errors.New("must have exactly one argument")
 	}
 
-	flagItems := strings.TrimSpace(cmd.Flag("items").Value.String())
+	flagItems := strings.TrimSpace(o.Item)
 	if len(flagItems) == 0 {
 		return errors.New("items length must not be 0")
 	}
