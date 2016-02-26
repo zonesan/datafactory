@@ -11,7 +11,7 @@ WORKDIR datafactory
 ADD . .
 
 RUN make build && \
-    mv _output/local/bin/linux/amd64/openshift /bin/ && \
+    cp -a _output/local/bin/linux/amd64/* /usr/bin/ && \
     rm -rf ../datafactory /usr/local/go
 
 WORKDIR /var/lib/origin
