@@ -66,8 +66,9 @@ type ApplicationStatus struct {
 type ItemList []Item
 
 type Item struct {
-	Kind   string `json:"kind" description:"kind defines the item kind of a item in Application"`
-	Name   string `json:"name" description:"name defines the item name of a item in Application"`
+	Kind string `json:"kind" description:"kind defines the item kind of a item in Application"`
+	Name string `json:"name" description:"name defines the item name of a item in Application"`
+
 	Status string `json:"status" description:"status defines a operate to the item label"`
 }
 

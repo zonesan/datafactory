@@ -261,8 +261,6 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		}
 	}
 
-
-
 	return globalErr
 }
 
@@ -278,4 +276,3 @@ func updateLabelByItem(label map[string]string, item applicationapi.Item) bool {
 
 	return false
 }
-

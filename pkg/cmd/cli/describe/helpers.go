@@ -221,3 +221,7 @@ func formatImageStreamTags(out *tabwriter.Writer, stream *imageapi.ImageStream) 
 		}
 	}
 }
+
+func printItem(kind, name, ceateTime string) string {
+	return fmt.Sprintf("\t%s\t%s\t%s\t\n", kind, name, ceateTime)
+}
