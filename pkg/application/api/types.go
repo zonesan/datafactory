@@ -15,13 +15,16 @@ const (
 	// ApplicationRunning indicates that Application service working well.
 	ApplicationActive ApplicationPhase = "Active"
 
+	// ApplicationUpdating indicates that Application is updating.
+	ApplicationUpdating ApplicationPhase = "Updating"
+
 	// ApplicationFailed indicates that Application stopped.
 	ApplicationFailed ApplicationPhase = "Failed"
 )
 
 var ApplicationItemSupportKinds = []string{
 	"Build", "BuildConfig", "DeploymentConfig", "ImageStream", "ImageStreamTag", "ImageStreamImage", //openshift kind
-	"Event", "Node", "Pod", "ReplicationController", "Service", "PersistentVolume", "PersistentVolumeClaim", //k8s kind
+	"Event", "Node", "Job", "Pod", "ReplicationController", "Service", "PersistentVolume", "PersistentVolumeClaim", //k8s kind
 	"ServiceBroker", "BackingService", "BackingServiceInstance",
 }
 
@@ -44,10 +47,10 @@ type ApplicationList struct {
 }
 
 type ApplicationSpec struct {
-	Name        string
-	Description string
-	ImageUrl    string
-	Items       ItemList
+	Name string
+	//Description string
+	//ImageUrl    string
+	Items ItemList
 
 	Finalizers []kapi.FinalizerName
 }
@@ -59,6 +62,13 @@ type ApplicationStatus struct {
 type ItemList []Item
 
 type Item struct {
-	Kind string
-	Name string
+	Kind   string
+	Name   string
+	Status string
 }
+
+const (
+	ApplicationItemStatusAdd    = "add"
+	ApplicationItemStatusDelete = "delete"
+	ApplicationSelector         = "openshift.io/application"
+)

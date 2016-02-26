@@ -4,11 +4,13 @@ import (
 	"errors"
 	"fmt"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
+	applicationutil "github.com/openshift/origin/pkg/application/util"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"strings"
 )
 
 const (
@@ -21,8 +23,9 @@ Create a new application to partition resources for a comfortable knowledge of m
 )
 
 type NewApplicationOptions struct {
-	Name   string
-	Items  string
+	Name  string
+	Items applicationapi.ItemList
+
 	Client client.Interface
 
 	Out io.Writer
@@ -41,6 +44,7 @@ func NewCmdApplication(fullName string, f *clientcmd.Factory, out io.Writer) *co
 			var err error
 			if err = options.complete(cmd, f); err != nil {
 				kcmdutil.CheckErr(err)
+				return
 			}
 
 			if options.Client, _, err = f.Clients(); err != nil {
@@ -53,8 +57,6 @@ func NewCmdApplication(fullName string, f *clientcmd.Factory, out io.Writer) *co
 		},
 	}
 
-	cmd.Flags().StringVar(&options.Items, "items", "", "Application Items")
-
 	return cmd
 }
 
@@ -65,6 +67,17 @@ func (o *NewApplicationOptions) complete(cmd *cobra.Command, f *clientcmd.Factor
 		return errors.New("must have exactly one argument")
 	}
 
+	flagItems := strings.TrimSpace(cmd.Flag("items").Value.String())
+	if len(flagItems) == 0 {
+		return errors.New("items length must not be 0")
+	}
+
+	items, err := applicationutil.Parse(flagItems)
+	if err != nil {
+		return err
+	}
+
+	o.Items = items
 	o.Name = args[0]
 
 	return nil
@@ -72,13 +85,14 @@ func (o *NewApplicationOptions) complete(cmd *cobra.Command, f *clientcmd.Factor
 
 func (o *NewApplicationOptions) Run(f *clientcmd.Factory) error {
 	application := &applicationapi.Application{}
-	//application.Spec.ItemsName = o.Name
+
 	namespace, _, err := f.DefaultNamespace()
 	if err != nil {
 		return err
 	}
-
+	application.Spec.Items = o.Items
 	application.Annotations = make(map[string]string)
+	application.Labels = map[string]string{}
 	application.Name = o.Name
 	application.GenerateName = o.Name
 	application.Status.Phase = applicationapi.ApplicationNew

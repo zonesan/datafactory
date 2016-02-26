@@ -15,13 +15,16 @@ const (
 	// ApplicationRunning indicates that Application service working well.
 	ApplicationActive ApplicationPhase = "Active"
 
+	// ApplicationUpdating indicates that Application is updating.
+	ApplicationUpdating ApplicationPhase = "Updating"
+
 	// ApplicationFailed indicates that Application stopped.
 	ApplicationFailed ApplicationPhase = "Failed"
 )
 
 var ApplicationItemSupportKinds = []string{
 	"Build", "BuildConfig", "DeploymentConfig", "ImageStream", "ImageStreamTag", "ImageStreamImage", //openshift kind
-	"Event", "Node", "Pod", "ReplicationController", "Service", "PersistentVolume", "PersistentVolumeClaim", //k8s kind
+	"Event", "Node", "Job", "Pod", "ReplicationController", "Service", "PersistentVolume", "PersistentVolumeClaim", //k8s kind
 	"ServiceBroker", "BackingService", "BackingServiceInstance",
 }
 
@@ -47,10 +50,10 @@ type ApplicationList struct {
 }
 
 type ApplicationSpec struct {
-	Name        string   `json:"name" description:"name defines the name of a Application"`
-	Description string   `json:"description" description:"description defines the description of a Application"`
-	ImageUrl    string   `json:"imageUrl" description:"imageUrl defines the image url of a Application"`
-	Items       ItemList `json:"items" description:"items defines the resources to be labeled in a Application"`
+	Name string `json:"name" description:"name defines the name of a Application"`
+	//Description string   `json:"description" description:"description defines the description of a Application"`
+	//ImageUrl    string   `json:"imageUrl" description:"imageUrl defines the image url of a Application"`
+	Items ItemList `json:"items" description:"items defines the resources to be labeled in a Application"`
 	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
 	Finalizers []kapi.FinalizerName `json:"finalizers,omitempty" description:"an opaque list of values that must be empty to permanently remove object from storage"`
 }
@@ -63,6 +66,13 @@ type ApplicationStatus struct {
 type ItemList []Item
 
 type Item struct {
-	Kind string `json:"kind" description:"kind defines the item kind of a item in Application"`
-	Name string `json:"name" description:"name defines the item name of a item in Application"`
+	Kind   string `json:"kind" description:"kind defines the item kind of a item in Application"`
+	Name   string `json:"name" description:"name defines the item name of a item in Application"`
+	Status string `json:"status" description:"status defines a operate to the item label"`
 }
+
+const (
+	ApplicationItemStatusAdd    = "add"
+	ApplicationItemStatusDelete = "delete"
+	ApplicationSelector         = "openshift.io/application"
+)
