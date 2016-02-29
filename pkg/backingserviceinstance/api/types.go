@@ -75,3 +75,15 @@ const (
 	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
+
+type BindingRequest struct {
+	unversioned.TypeMeta
+	// TODO: build request should allow name generation via Name and GenerateName, build config
+	// name should be provided as a separate field
+	kapi.ObjectMeta
+
+	// the application to be bound
+	//app *Application
+	ApplicationUuid string `json:"application_uuid, omitempty"`
+}
+

@@ -77,6 +77,7 @@ func NewCommandCLI(name, fullName string, in io.Reader, out, errout io.Writer) *
 				cmd.NewCmdProject(fullName+" project", f, out),
 				cmd.NewCmdServiceBroker(fullName+" new-servicebroker", f, out),
 				cmd.NewCmdNewBackingServiceInstance(fullName+" new-backingserviceinstance", f, out),
+				cmd.NewCmdEditBackingServiceInstance(fullName+" edit-backingserviceinstance", f, out),
 			},
 		},
 		{
@@ -91,6 +92,8 @@ func NewCommandCLI(name, fullName string, in io.Reader, out, errout io.Writer) *
 				cmd.NewCmdImportImage(fullName, f, out),
 				cmd.NewCmdScale(fullName, f, out),
 				cmd.NewCmdTag(fullName, f, out),
+				cmd.NewCmdBindBackingServiceInstance(fullName+" bind-backingserviceinstance", f, out),
+				cmd.NewCmdUnbindBackingServiceInstance(fullName+" unbind-backingserviceinstance", f, out),
 			},
 		},
 		{

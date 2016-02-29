@@ -334,10 +334,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 		glog.Fatalf("Unable to configure Kubelet client: %v", err)
 	}
 
-	serviceBrokerStorage := servicebroker.NewREST(c.EtcdHelper)
-	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
-	backingServiceInstanceStorage := backingserviceinstance.NewREST(c.EtcdHelper)
-
+	serviceBrokerStorage       := servicebroker.NewREST(c.EtcdHelper)
+	backingServiceStorage      := backingservice.NewREST(c.EtcdHelper)
+	backingServiceInstanceEtcd := backingserviceinstance.NewREST(c.EtcdHelper)
+	
 	buildStorage, buildDetailsStorage := buildetcd.NewStorage(c.EtcdHelper)
 	buildRegistry := buildregistry.NewRegistry(buildStorage)
 
@@ -444,7 +444,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	storage := map[string]rest.Storage{
 		"serviceBrokers":          serviceBrokerStorage,
 		"backingServices":         backingServiceStorage,
-		"backingServiceInstances": backingServiceInstanceStorage,
+		
+		"backingServiceInstances"        : backingServiceInstanceEtcd.BackingServiceInstance,
+		"backingServiceInstances/binding": backingServiceInstanceEtcd.Binding,
+		
 		"images":                  imageStorage,
 		"imageStreams":            imageStreamStorage,
 		"imageStreams/status":     imageStreamStatusStorage,
