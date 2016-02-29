@@ -52,6 +52,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if b.Labels == nil {
+					b.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(b.Labels, item)
 				_, globalErr = build.Update(b)
 				if globalErr == nil {
@@ -64,6 +68,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if bc.Labels == nil {
+					bc.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(bc.Labels, item)
@@ -80,6 +88,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if dc.Labels == nil {
+					dc.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(dc.Labels, item)
 				_, globalErr = deploymentConfig.Update(dc)
 				if globalErr == nil {
@@ -92,6 +104,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if is.Labels == nil {
+					is.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(is.Labels, item)
@@ -122,6 +138,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if e.Labels == nil {
+					e.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(e.Labels, item)
 				_, globalErr = event.Update(e)
 				if globalErr == nil {
@@ -134,6 +154,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if n.Labels == nil {
+					n.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(n.Labels, item)
@@ -152,6 +176,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if p.Labels == nil {
+					p.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(p.Labels, item)
 				_, globalErr = pod.Update(p)
 				if globalErr == nil {
@@ -164,6 +192,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if rc.Labels == nil {
+					rc.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(rc.Labels, item)
@@ -180,6 +212,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if s.Labels == nil {
+					s.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(s.Labels, item)
 				_, globalErr = servce.Update(s)
 				if globalErr == nil {
@@ -192,6 +228,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if pv.Labels == nil {
+					pv.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(pv.Labels, item)
@@ -208,6 +248,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if pvc.Labels == nil {
+					pvc.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(pvc.Labels, item)
 				_, globalErr = persistentVolumeClaim.Update(pvc)
 				if globalErr == nil {
@@ -220,6 +264,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if sb.Labels == nil {
+					sb.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(sb.Labels, item)
@@ -236,6 +284,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					continue
 				}
 
+				if bs.Labels == nil {
+					bs.Labels = make(map[string]string)
+				}
+
 				updateLabelByItem(bs.Labels, item)
 				_, globalErr = backingService.Update(bs)
 				if globalErr == nil {
@@ -248,6 +300,10 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				if err != nil {
 					glog.Error(err)
 					continue
+				}
+
+				if bsi.Labels == nil {
+					bsi.Labels = make(map[string]string)
 				}
 
 				updateLabelByItem(bsi.Labels, item)
@@ -266,9 +322,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 }
 
 func updateLabelByItem(label map[string]string, item applicationapi.Item) bool {
-	if label == nil {
-		label = make(map[string]string)
-	}
+
 	switch item.Status {
 	case applicationapi.ApplicationItemStatusAdd:
 		label[applicationapi.ApplicationSelector] = item.Name
