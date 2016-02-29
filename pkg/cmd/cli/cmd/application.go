@@ -25,7 +25,7 @@ Create a new application to partition resources for a comfortable knowledge of m
 type NewApplicationOptions struct {
 	Name  string
 	Items applicationapi.ItemList
-	Item string
+	Item  string
 
 	Client client.Interface
 

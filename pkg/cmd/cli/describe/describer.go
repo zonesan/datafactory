@@ -177,7 +177,7 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 }
 
 type ApplicationDescriber struct {
-	osClient client.Interface
+	osClient   client.Interface
 	kubeClient kclient.Interface
 }
 

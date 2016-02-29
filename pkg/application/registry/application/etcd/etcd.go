@@ -2,6 +2,7 @@ package etcd
 
 import (
 	kapi "k8s.io/kubernetes/pkg/api"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/registry/generic"
@@ -79,6 +80,21 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 
 // Delete deletes an existing image specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+	appObj, err := r.Get(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	namespace := appObj.(*api.Application)
+
+	if namespace.DeletionTimestamp.IsZero() {
+		now := unversioned.Now()
+		namespace.DeletionTimestamp = &now
+		namespace.Status.Phase = api.ApplicationDeletingItemLabel
+		result, _, err := r.store.Update(ctx, namespace)
+		return result, err
+	}
+
 	return r.store.Delete(ctx, name, options)
 }
 

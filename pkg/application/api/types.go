@@ -20,6 +20,9 @@ const (
 
 	// ApplicationFailed indicates that Application stopped.
 	ApplicationFailed ApplicationPhase = "Failed"
+
+	ApplicationDeletingItemLabel ApplicationPhase = "Delabel"
+	ApplicationDeletingAll       ApplicationPhase = "Delall"
 )
 
 var ApplicationItemSupportKinds = []string{
