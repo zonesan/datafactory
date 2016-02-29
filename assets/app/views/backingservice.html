@@ -1,0 +1,62 @@
+<div class="container">
+  <div>
+    <breadcrumbs breadcrumbs="breadcrumbs"></breadcrumbs>
+    <alerts alerts="alerts"></alerts>
+    <div ng-if="!loaded">Loading...</div>
+    <div ng-if="backingservice">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="tile">
+            <h1>
+              {{backingservice.metadata.name}}
+              <span ng-if="backingservice.status.message" class="pficon pficon-warning-triangle-o" style="cursor: help;" data-toggle="popover" data-placement="right" data-trigger="hover" dynamic-content="{{backingservice.status.message}}"></span>
+              <small class="meta">created <relative-timestamp timestamp="backingservice.metadata.creationTimestamp"></relative-timestamp></small>
+              <div class="pull-right dropdown">
+                <a href="" class="dropdown-toggle resource-actions-dropdown" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i><span class="sr-only">Actions</span></a>
+                <ul class="dropdown-menu actions action-button">
+                  <li>
+                    <edit-link
+                      resource="backingservice"
+                      kind="backingservices"
+                      alerts="alerts">
+                    </edit-link>
+                  </li>
+                  <li>
+                    <delete-link
+                      resource-type="backingservice"
+                      resource-name="{{backingservice.metadata.name}}"
+                      project-name="{{backingservice.metadata.namespace}}"
+                      alerts="alerts">
+                    </delete-link>
+                  </li>
+                </ul>
+              </div>
+            </h1>
+            <labels ng-if="backingserviceConfigName" labels="backingservice.metadata.labels" clickable="true" kind="backingservices" title-kind="backingservices for backingservice config {{backingserviceConfigName}}" project-name="{{backingservice.metadata.namespace}}" limit="3" navigate-url="project/{{backingservice.metadata.namespace}}/browse/backingservices/{{backingserviceConfigName}}"></labels>
+            <labels ng-if="!backingserviceConfigName" labels="backingservice.metadata.labels" limit="3"></labels>
+
+            <uib-tabset>
+              <uib-tab active="selectedTab.details">
+                <uib-tab-heading>Details</uib-tab-heading>
+                <ng-include src=" 'views/_backingservice-details.html' "></ng-include>
+              </uib-tab>
+
+              <uib-tab active="selectedTab.logs">
+                <uib-tab-heading>Logs</uib-tab-heading>
+                <log-viewer
+                  ng-if="selectedTab.logs"
+                  kind="backingservices/log"
+                  name="backingservice.metadata.name"
+                  context="logContext"
+                  status="backingservice.status.phase"
+                  start="backingservice.status.startTimestamp | date : 'short'"
+                  end="backingservice.status.completionTimestamp | date : 'short'">
+                </log-viewer>
+              </uib-tab>
+            </uib-tabset>
+          </div>
+        </div>
+      </div><!-- /.row -->
+    </div><!-- /backingservice -->
+  </div>
+</div>

@@ -4,39 +4,26 @@
       <h1>Backing Services</h1>
     </div>
     <alerts alerts="alerts"></alerts>
-    <h2>Persistent Volume Claims</h2>
     <table class="table table-bordered table-hover table-mobile">
       <thead>
       <tr>
         <th>Name</th>
-        <th>Status</th>
-        <th>Capacity</th>
-        <th>Access Modes</th>
-        <th>Age</th>
+        <th>version</th>
+        <th>description</th>
       </tr>
       </thead>
-      <tbody ng-if="(pvcs | hashSize) == 0">
+      <tbody ng-if="(backingservices | hashSize) == 0">
       <tr><td colspan="5"><em>{{emptyMessage}}</em></td></tr>
       </tbody>
-      <tbody ng-repeat="pvc in pvcs | orderObjectsByDate : true">
+      <tbody ng-repeat="backingservice in backingservices | orderObjectsByDate : true">
       <tr>
-        <td data-title="Name"><a ng-href="{{pvc | navigateResourceURL}}">{{pvc.metadata.name}}</a></td>
-        <td data-title="Status">
-          <status-icon status="pvc.status.phase" disable-animation></status-icon>
-          {{pvc.status.phase}}
-          <span ng-if="pvc.spec.volumeName">to volume <strong>{{pvc.spec.volumeName}}</strong></span>
+        <td data-title="Name"><a ng-href="backingservices/{{backingservice.metadata.name}}">{{backingservice.metadata.name}}</a></td>
+        <td data-title="version">
+          {{backingservice.apiVersion}}
         </td>
-        <td data-title="Capacity">
-            <span ng-if="pvc.spec.volumeName">
-              <span ng-if="pvc.status.capacity['storage']">{{pvc.status.capacity['storage'] | usageWithUnits: 'storage'}}</span>
-              <span ng-if="!pvc.status.capacity['storage']">unknown</span>
-            </span>
-            <span ng-if="!pvc.spec.volumeName">
-              <span>-</span>
-            </span>
+        <td data-title="description">
+          {{backingservice.spec.description}}
         </td>
-        <td data-title="Access Modes">{{pvc.spec.accessModes | accessModes:'long' | join}}</td>
-        <td data-title="Age"><relative-timestamp timestamp="pvc.metadata.creationTimestamp" drop-suffix="true"></relative-timestamp></td>
       </tr>
       </tbody>
     </table>

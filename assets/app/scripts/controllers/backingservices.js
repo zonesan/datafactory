@@ -2,7 +2,7 @@
 
 /**
  * @ngdoc function
- * @name openshiftConsole.controller:BuildsController
+ * @name openshiftConsole.controller:BackingservicesController
  * @description
  * # ProjectController
  * Controller of the openshiftConsole
