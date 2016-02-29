@@ -273,7 +273,7 @@ func (appDescriber *ApplicationDescriber) Describe(namespace, name string) (stri
 			itemCreateTime = bsi.CreationTimestamp.String()
 		}
 
-		itemDescriberStr += printItem(item.Name, item.Kind, itemCreateTime)
+		itemDescriberStr += printItem(item.Kind, item.Name, itemCreateTime)
 	}
 
 	return describeApplication(application, itemDescriberStr)
