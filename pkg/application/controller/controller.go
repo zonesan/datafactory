@@ -34,6 +34,7 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 	}
 
 	application.Status.Phase = applicationapi.ApplicationActive
+	c.Client.Applications(application.Namespace).Update(application)
 
 	return nil
 }
@@ -265,6 +266,9 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 }
 
 func updateLabelByItem(label map[string]string, item applicationapi.Item) bool {
+	if label == nil {
+		label = make(map[string]string)
+	}
 	switch item.Status {
 	case applicationapi.ApplicationItemStatusAdd:
 		label[applicationapi.ApplicationSelector] = item.Name
