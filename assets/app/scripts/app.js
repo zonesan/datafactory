@@ -71,6 +71,7 @@ angular
       .subPath("Routes", "routes", builder.join(templatePath, 'browse/routes.html'))
       .subPath("Services", "services", builder.join(templatePath, 'services.html'))
       .subPath("Storage", "storage", builder.join(templatePath, 'storage.html'))
+      .subPath("My Backing Services", "backingserviceinstances", builder.join(templatePath, 'backingservicesinstances.html'))
       .build();
     tab.icon = "sitemap";
     tabs.push(tab);
@@ -105,6 +106,10 @@ angular
       .when('/backingservices', {
         templateUrl: 'views/backingservices.html',
         controller: 'BackingservicesController'
+      })
+      .when('/project/:project/browse/backingserviceinstances', {
+        templateUrl: 'views/backingservicesinstances.html',
+        controller: 'BackingserviceInstancesController'
       })
       .when('/project/:project/overview', {
         templateUrl: 'views/project.html',
