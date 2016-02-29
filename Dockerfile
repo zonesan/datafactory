@@ -9,7 +9,6 @@ RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /
 WORKDIR datafactory
 
 ADD . .
-ADD ./.git ./.git
 
 RUN make build && \
     cp -a _output/local/bin/linux/amd64/* /usr/bin/ && \
