@@ -107,9 +107,15 @@ angular
         templateUrl: 'views/backingservices.html',
         controller: 'BackingservicesController'
       })
+
       .when('/project/:project/browse/backingserviceinstances', {
         templateUrl: 'views/backingservicesinstances.html',
         controller: 'BackingserviceInstancesController'
+      })
+      .when('/backingservices/:backingservice', {
+        templateUrl: 'views/backingservice.html',
+        controller: 'BackingserviceController'
+
       })
       .when('/project/:project/overview', {
         templateUrl: 'views/project.html',
