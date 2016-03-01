@@ -23,6 +23,8 @@ const (
 
 	ApplicationDeletingItemLabel ApplicationPhase = "Delabel"
 	ApplicationDeletingAll       ApplicationPhase = "Delall"
+
+	ApplicationDeleting ApplicationPhase = "Deleting"
 )
 
 var ApplicationItemSupportKinds = []string{

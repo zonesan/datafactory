@@ -47,6 +47,9 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 		application.Status.Phase = applicationapi.ApplicationActive
 		c.Client.Applications(application.Namespace).Update(application)
 		return nil
+
+	case applicationapi.ApplicationDeleting:
+		c.Client.Applications(application.Namespace).Delete(application.Name)
 	}
 
 	return nil

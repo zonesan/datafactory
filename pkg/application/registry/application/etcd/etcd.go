@@ -85,13 +85,13 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 		return nil, err
 	}
 
-	namespace := appObj.(*api.Application)
+	application := appObj.(*api.Application)
 
-	if namespace.DeletionTimestamp.IsZero() {
+	if application.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
-		namespace.DeletionTimestamp = &now
-		namespace.Status.Phase = api.ApplicationDeletingItemLabel
-		result, _, err := r.store.Update(ctx, namespace)
+		application.DeletionTimestamp = &now
+		application.Status.Phase = api.ApplicationDeletingItemLabel
+		result, _, err := r.store.Update(ctx, application)
 		return result, err
 	}
 

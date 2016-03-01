@@ -23,6 +23,9 @@ const (
 
 	ApplicationDeletingItemLabel ApplicationPhase = "Delabel"
 	ApplicationDeletingAll       ApplicationPhase = "Delall"
+
+	// ApplicationFailed indicates that Application is going to deleting.
+	ApplicationDeleting ApplicationPhase = "Deleting"
 )
 
 var ApplicationItemSupportKinds = []string{

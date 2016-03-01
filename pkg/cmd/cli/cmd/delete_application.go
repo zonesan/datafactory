@@ -93,6 +93,12 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 		if errs := deleteAllContent(o.Client, o.KClient, app); len(errs) > 0 {
 			return errutil.NewAggregate(errs)
 		}
+
+		app.Status.Phase = applicationapi.ApplicationDeleting
+		if _, err := o.Client.Applications(namespace).Update(app); err != nil {
+			return err
+		}
+
 	}
 
 	if err = o.Client.Applications(namespace).Delete(app.Name); err != nil {
