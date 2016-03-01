@@ -16069,7 +16069,10 @@
     "id": "v1.BackingServiceInstanceSpec",
     "required": [
      "provisioning",
-     "binding"
+     "binding",
+     "bound",
+     "instance_id",
+     "tags"
     ],
     "properties": {
      "provisioning": {
@@ -16077,6 +16080,18 @@
      },
      "binding": {
       "$ref": "v1.InstanceBinding"
+     },
+     "bound": {
+      "type": "boolean"
+     },
+     "instance_id": {
+      "type": "string"
+     },
+     "tags": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
      }
     }
    },
@@ -16085,6 +16100,7 @@
     "required": [
      "dashboard_url",
      "backingservice_name",
+     "backingservice_id",
      "backingservice_plan_guid",
      "parameters"
     ],
@@ -16093,6 +16109,9 @@
       "type": "string"
      },
      "backingservice_name": {
+      "type": "string"
+     },
+     "backingservice_id": {
       "type": "string"
      },
      "backingservice_plan_guid": {

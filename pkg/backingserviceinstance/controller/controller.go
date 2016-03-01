@@ -41,6 +41,12 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		return nil
 	}
 
+	if bsi.Status.Phase == backingserviceinstanceapi.BackingServiceInstancePhaseInactive {
+		glog.Infoln("deleting ",bsi.Name)
+		return c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
+
+	}
+
 	ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
 	if !ok {
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
