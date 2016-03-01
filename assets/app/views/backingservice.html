@@ -46,7 +46,10 @@
             <thead>
             <tr>
               <th>Name</th>
+              <th>DisplayName</th>
+              <th>Costs</th>
               <th>Description</th>
+              <th>Bullets</th>
             </tr>
             </thead>
             <tbody ng-repeat="plan in backingservice.spec.plans">
@@ -54,8 +57,17 @@
               <td data-title="Name">
                 {{plan.name}}
               </td>
+              <td data-title="DisplayName">
+                {{plan.metadata.displayName}}
+              </td>
+              <td data-title="Costs">
+                {{plan.metadata.costs}}
+              </td>
               <td data-title="Description">
                 {{plan.description}}
+              </td>
+              <td data-title="Bullets">
+                <span ng-bind-html="plan.metadata.bullets | join: '<br>'"></span>
               </td>
             </tr>
             </tbody>
