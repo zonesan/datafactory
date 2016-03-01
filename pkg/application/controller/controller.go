@@ -4,6 +4,7 @@ import (
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
 	"errors"
+	"fmt"
 	"github.com/golang/glog"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
 	osclient "github.com/openshift/origin/pkg/client"
@@ -53,6 +54,7 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 
 func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) (err error) {
 	var globalErr error
+	applicationSelector := fmt.Sprintf("%s/Application", app.Namespace)
 	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "Build":
@@ -67,7 +69,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if b.Labels != nil {
-					delete(b.Labels, applicationapi.ApplicationSelector)
+					delete(b.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -76,7 +78,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					b.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(b.Labels, item)
+				whetherUpdate = optLabelByItemStatus(b.Labels, item.Status, applicationSelector, item.Name)
 
 			}
 
@@ -99,7 +101,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bc.Labels != nil {
-					delete(bc.Labels, applicationapi.ApplicationSelector)
+					delete(bc.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -108,7 +110,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bc.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(bc.Labels, item)
+				whetherUpdate = optLabelByItemStatus(bc.Labels, item.Status, applicationSelector, item.Name)
 
 			}
 
@@ -131,7 +133,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if dc.Labels != nil {
-					delete(dc.Labels, applicationapi.ApplicationSelector)
+					delete(dc.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -140,7 +142,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					dc.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(dc.Labels, item)
+				whetherUpdate = optLabelByItemStatus(dc.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -162,7 +164,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if is.Labels != nil {
-					delete(is.Labels, applicationapi.ApplicationSelector)
+					delete(is.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -171,7 +173,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					is.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(is.Labels, item)
+				whetherUpdate = optLabelByItemStatus(is.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -185,14 +187,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			//if ist, err := c.Client.ImageStreamTags(app.Namespace).Get(item.Name); ist != nil {
 			//	return err
 			//} else {
-			//	ist.Labels[applicationapi.ApplicationSelector] = app.Name
+			//	ist.Labels[applicationSelector] = app.Name
 			//}
 
 		case "ImageStreamImage":
 			//if isi, err := c.Client.ImageStreamImages(app.Namespace).Get(item.Name); isi != nil {
 			//	return err
 			//} else {
-			//	isi.Labels[applicationapi.ApplicationSelector] = app.Name
+			//	isi.Labels[applicationSelector] = app.Name
 			//}
 
 		case "Event":
@@ -207,7 +209,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if e.Labels != nil {
-					delete(e.Labels, applicationapi.ApplicationSelector)
+					delete(e.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -216,7 +218,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					e.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(e.Labels, item)
+				whetherUpdate = optLabelByItemStatus(e.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -238,7 +240,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if n.Labels != nil {
-					delete(n.Labels, applicationapi.ApplicationSelector)
+					delete(n.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -247,7 +249,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					n.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(n.Labels, item)
+				whetherUpdate = optLabelByItemStatus(n.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -271,7 +273,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if p.Labels != nil {
-					delete(p.Labels, applicationapi.ApplicationSelector)
+					delete(p.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -280,7 +282,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					p.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(p.Labels, item)
+				whetherUpdate = optLabelByItemStatus(p.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -302,7 +304,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if rc.Labels != nil {
-					delete(rc.Labels, applicationapi.ApplicationSelector)
+					delete(rc.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -311,7 +313,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					rc.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(rc.Labels, item)
+				whetherUpdate = optLabelByItemStatus(rc.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -333,7 +335,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if s.Labels != nil {
-					delete(s.Labels, applicationapi.ApplicationSelector)
+					delete(s.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -342,7 +344,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					s.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(s.Labels, item)
+				whetherUpdate = optLabelByItemStatus(s.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -364,7 +366,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if pv.Labels != nil {
-					delete(pv.Labels, applicationapi.ApplicationSelector)
+					delete(pv.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -373,7 +375,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					pv.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(pv.Labels, item)
+				whetherUpdate = optLabelByItemStatus(pv.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -395,7 +397,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if pvc.Labels != nil {
-					delete(pvc.Labels, applicationapi.ApplicationSelector)
+					delete(pvc.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -404,7 +406,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					pvc.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(pvc.Labels, item)
+				whetherUpdate = optLabelByItemStatus(pvc.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -426,7 +428,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if sb.Labels != nil {
-					delete(sb.Labels, applicationapi.ApplicationSelector)
+					delete(sb.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -435,7 +437,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					sb.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(sb.Labels, item)
+				whetherUpdate = optLabelByItemStatus(sb.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -457,7 +459,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bs.Labels != nil {
-					delete(bs.Labels, applicationapi.ApplicationSelector)
+					delete(bs.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -466,7 +468,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bs.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(bs.Labels, item)
+				whetherUpdate = optLabelByItemStatus(bs.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -488,7 +490,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bsi.Labels != nil {
-					delete(bsi.Labels, applicationapi.ApplicationSelector)
+					delete(bsi.Labels, applicationSelector)
 					whetherUpdate = true
 				}
 
@@ -497,7 +499,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bsi.Labels = make(map[string]string)
 				}
 
-				whetherUpdate = updateLabelByItem(bsi.Labels, item)
+				whetherUpdate = optLabelByItemStatus(bsi.Labels, item.Status, applicationSelector, item.Name)
 			}
 
 			if whetherUpdate {
@@ -515,14 +517,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 	return globalErr
 }
 
-func updateLabelByItem(label map[string]string, item applicationapi.Item) bool {
+func optLabelByItemStatus(label map[string]string, status, labelKey, labelValue string) bool {
 
-	switch item.Status {
+	switch status {
 	case applicationapi.ApplicationItemStatusAdd:
-		label[applicationapi.ApplicationSelector] = item.Name
+		label[labelKey] = labelValue
 		return true
 	case applicationapi.ApplicationItemStatusDelete:
-		delete(label, applicationapi.ApplicationSelector)
+		delete(label, labelKey)
 		return true
 	}
 
