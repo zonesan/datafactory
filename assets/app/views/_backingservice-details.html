@@ -29,13 +29,16 @@
         <dt>doc</dt>
         <dd>
           <a ng-href="{{backingservice.spec.metadata.documentationUrl}}" target="_blank">{{backingservice.spec.metadata.documentationUrl}}</a></dd>
-        <!--metadata-imgUrl:{{backingservice.spec.metadata.imgUrl}}-->
+        <dt>metadata-imgUrl</dt>
+        <dd><img data-src="{{backingservice.spec.metadata.imgUrl}}" alt="imgUrl"></dd>
         <dt>description</dt>
         <dd>{{backingservice.spec.metadata.longDescription}}</dd>
         <dt>providerDisplayName</dt>
         <dd>{{backingservice.spec.metadata.providerDisplayName}}</dd>
         <dt>supportUrl</dt>
-        <dd>{{backingservice.spec.metadata.supportUrl}}</dd>
+        <dd>
+          <a ng-href="{{backingservice.spec.metadata.supportUrl}}" target="_blank">{{backingservice.spec.metadata.supportUrl}}</a>
+        </dd>
         <!--<dt>plans</dt>-->
         <!--<dd>{{backingservice.spec.plans}}</dd>-->
       </dl>
