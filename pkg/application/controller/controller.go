@@ -7,6 +7,7 @@ import (
 	"github.com/golang/glog"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	"fmt"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -27,18 +28,25 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *ApplicationController) Handle(application *applicationapi.Application) (err error) {
 
-	if err := c.HandleAppItems(application); err != nil {
-		application.Status.Phase = applicationapi.ApplicationFailed
-		c.Client.Applications(application.Namespace).Update(application)
-		return err
-	}
-
+	fmt.Printf("-----> %#v\n", *application)
 	switch application.Status.Phase {
 	case applicationapi.ApplicationDeletingItemLabel:
+		if err := c.HandleAppItems(application); err != nil {
+			application.Status.Phase = applicationapi.ApplicationFailed
+			c.Client.Applications(application.Namespace).Update(application)
+			return err
+		}
 		c.Client.Applications(application.Namespace).Delete(application.Name)
+		return nil
 	default:
+		if err := c.HandleAppItems(application); err != nil {
+			application.Status.Phase = applicationapi.ApplicationFailed
+			c.Client.Applications(application.Namespace).Update(application)
+			return err
+		}
 		application.Status.Phase = applicationapi.ApplicationActive
 		c.Client.Applications(application.Namespace).Update(application)
+		return nil
 	}
 
 	return nil
@@ -56,10 +64,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if b.Labels != nil {
 					delete(b.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -67,13 +77,15 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					b.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(b.Labels, item)
+				whetherUpdate = updateLabelByItem(b.Labels, item)
 
 			}
 
-			_, globalErr = build.Update(b)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = build.Update(b)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "BuildConfig":
@@ -84,10 +96,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bc.Labels != nil {
 					delete(bc.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -95,13 +109,15 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bc.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(bc.Labels, item)
+				whetherUpdate = updateLabelByItem(bc.Labels, item)
 
 			}
 
-			_, globalErr = buildConfig.Update(bc)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = buildConfig.Update(bc)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "DeploymentConfig":
@@ -112,10 +128,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if dc.Labels != nil {
 					delete(dc.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -123,12 +141,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					dc.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(dc.Labels, item)
+				whetherUpdate = updateLabelByItem(dc.Labels, item)
 			}
 
-			_, globalErr = deploymentConfig.Update(dc)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = deploymentConfig.Update(dc)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "ImageStream":
@@ -139,10 +159,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if is.Labels != nil {
 					delete(is.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -150,12 +172,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					is.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(is.Labels, item)
+				whetherUpdate = updateLabelByItem(is.Labels, item)
 			}
 
-			_, globalErr = imageStream.Update(is)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = imageStream.Update(is)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "ImageStreamTag":
@@ -180,10 +204,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if e.Labels != nil {
 					delete(e.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -191,12 +217,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					e.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(e.Labels, item)
+				whetherUpdate = updateLabelByItem(e.Labels, item)
 			}
 
-			_, globalErr = event.Update(e)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = event.Update(e)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "Node":
@@ -207,10 +235,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if n.Labels != nil {
 					delete(n.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -218,12 +248,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					n.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(n.Labels, item)
+				whetherUpdate = updateLabelByItem(n.Labels, item)
 			}
 
-			_, globalErr = node.Update(n)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = node.Update(n)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "Job":
@@ -236,10 +268,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if p.Labels != nil {
 					delete(p.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -247,12 +281,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					p.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(p.Labels, item)
+				whetherUpdate = updateLabelByItem(p.Labels, item)
 			}
 
-			_, globalErr = pod.Update(p)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = pod.Update(p)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "ReplicationController":
@@ -263,10 +299,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if rc.Labels != nil {
 					delete(rc.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -274,12 +312,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					rc.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(rc.Labels, item)
+				whetherUpdate = updateLabelByItem(rc.Labels, item)
 			}
 
-			_, globalErr = replicationController.Update(rc)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = replicationController.Update(rc)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "Service":
@@ -290,10 +330,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if s.Labels != nil {
 					delete(s.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -301,12 +343,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					s.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(s.Labels, item)
+				whetherUpdate = updateLabelByItem(s.Labels, item)
 			}
 
-			_, globalErr = servce.Update(s)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = servce.Update(s)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "PersistentVolume":
@@ -317,10 +361,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if pv.Labels != nil {
 					delete(pv.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -328,12 +374,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					pv.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(pv.Labels, item)
+				whetherUpdate = updateLabelByItem(pv.Labels, item)
 			}
 
-			_, globalErr = persistentVolume.Update(pv)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = persistentVolume.Update(pv)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "PersistentVolumeClaim":
@@ -344,10 +392,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if pvc.Labels != nil {
 					delete(pvc.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -355,12 +405,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					pvc.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(pvc.Labels, item)
+				whetherUpdate = updateLabelByItem(pvc.Labels, item)
 			}
 
-			_, globalErr = persistentVolumeClaim.Update(pvc)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = persistentVolumeClaim.Update(pvc)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "ServiceBroker":
@@ -371,10 +423,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if sb.Labels != nil {
 					delete(sb.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -382,12 +436,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					sb.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(sb.Labels, item)
+				whetherUpdate = updateLabelByItem(sb.Labels, item)
 			}
 
-			_, globalErr = serviceBroker.Update(sb)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = serviceBroker.Update(sb)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "BackingService":
@@ -398,10 +454,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bs.Labels != nil {
 					delete(bs.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -409,12 +467,14 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bs.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(bs.Labels, item)
+				whetherUpdate = updateLabelByItem(bs.Labels, item)
 			}
 
-			_, globalErr = backingService.Update(bs)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = backingService.Update(bs)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
 
 		case "BackingServiceInstance":
@@ -425,10 +485,12 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 				continue
 			}
 
+			whetherUpdate := false
 			switch app.Status.Phase {
 			case applicationapi.ApplicationDeletingItemLabel:
 				if bsi.Labels != nil {
 					delete(bsi.Labels, applicationapi.ApplicationSelector)
+					whetherUpdate = true
 				}
 
 			default:
@@ -436,13 +498,16 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					bsi.Labels = make(map[string]string)
 				}
 
-				updateLabelByItem(bsi.Labels, item)
+				whetherUpdate = updateLabelByItem(bsi.Labels, item)
 			}
 
-			_, globalErr = backingServiceInstance.Update(bsi)
-			if globalErr == nil {
-				app.Spec.Items[i].Status = ""
+			if whetherUpdate {
+				_, globalErr = backingServiceInstance.Update(bsi)
+				if globalErr == nil {
+					app.Spec.Items[i].Status = ""
+				}
 			}
+
 
 		default:
 			globalErr = errors.New("unknown resource " + item.Kind + "=" + item.Name)
