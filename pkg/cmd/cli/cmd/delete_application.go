@@ -73,6 +73,8 @@ func (o *DeleteApplicationOptions) complete(cmd *cobra.Command, f *clientcmd.Fac
 		return errors.New("must have exactly one argument")
 	}
 
+	o.Name = args[0]
+
 	return nil
 }
 
