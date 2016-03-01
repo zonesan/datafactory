@@ -9,15 +9,15 @@
  */
 angular.module('openshiftConsole')
   .controller('BackingserviceInstancesController', function ($scope, AuthService, DataService) {
-
+    $scope.emptyMessage = 'No instances to show';
     AuthService.withUser().then(function() {
-      loadBackingServices();
+      loadBackingServiceInstances();
     });
 
-    var loadBackingServices = function() {
-      DataService.list("backingserviceinstances", $scope, function(backingservices){
-        $scope.backingservices = backingservices.by("metadata.name");
-        console.log("backingservices", $scope.backingservices);
+    var loadBackingServiceInstances = function() {
+      DataService.list("backingserviceinstances", $scope, function(backingserviceinstances){
+        $scope.backingserviceinstances = backingserviceinstances.by("metadata.name");
+        console.log("backingserviceinstances", $scope.backingserviceinstances);
       });
     };
 

@@ -1,0 +1,56 @@
+<div class="content">
+  <project-page>
+  <alerts alerts="alerts"></alerts>
+    <div class="page-header page-header-bleed-right">
+      <h1>{{backingserviceinstance.metadata.name}}
+      <small class="meta">created <relative-timestamp timestamp="backingserviceinstance.metadata.creationTimestamp"></relative-timestamp></small>
+        <div class="pull-right dropdown">
+          <a href="" class="dropdown-toggle resource-actions-dropdown" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i><span class="sr-only">Actions</span></a>
+            <ul class="dropdown-menu actions action-button">
+              <li>
+                <edit-link
+                  resource="backingserviceinstances"
+                  kind="backingserviceinstances"
+                  alerts="alerts">
+                </edit-link>
+              </li>
+              <li>
+                <delete-link
+                  resource-type="backingserviceinstances"
+                  resource-name="{{backingserviceinstance.metadata.name}}"
+                  project-name="{{backingservice.metadata.namespace}}"
+                  alerts="alerts">
+                </delete-link>
+              </li>
+              </ul>
+      </div>
+    </h1>
+  </div>
+    
+    
+                
+<!--     <table class="table table-bordered table-hover table-mobile">
+      <thead>
+      <tr>
+        <th>Backing Service Name</th>
+        <th>Instance Name</th>
+        <th>Created Time</th>
+      </tr>
+      </thead>
+      <tbody ng-if="(backingserviceinstances | hashSize) == 0">
+      <tr><td colspan="5"><em>{{emptyMessage}}</em></td></tr>
+      </tbody>
+      <tbody ng-repeat="bsi in backingserviceinstances | orderObjectsByDate : true">
+      <tr>
+        <td data-title="Backing Service Name"><a ng-href="{{bsi | navigateResourceURL}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
+        <td data-title="Instance Name">
+        <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
+        <td data-title="Created Time">
+        <a ng-href="{{bsi | navigateResourceURL}}"></a>   
+        <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp> 
+        </td>
+      </tr>
+      </tbody>
+    </table> -->
+  </project-page>
+</div>
