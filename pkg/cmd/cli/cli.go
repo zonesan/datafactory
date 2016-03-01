@@ -76,6 +76,7 @@ func NewCommandCLI(name, fullName string, in io.Reader, out, errout io.Writer) *
 				cmd.NewCmdStatus(cmd.StatusRecommendedName, fullName+" "+cmd.StatusRecommendedName, f, out),
 				cmd.NewCmdProject(fullName+" project", f, out),
 				cmd.NewCmdApplication(fullName+" new-application ", f, out),
+				cmd.NewCmdDeleteApplication(fullName+" delete-application ", f, out),
 				cmd.NewCmdServiceBroker(fullName+" new-servicebroker", f, out),
 				cmd.NewCmdNewBackingServiceInstance(fullName+" new-backingserviceinstance", f, out),
 			},
