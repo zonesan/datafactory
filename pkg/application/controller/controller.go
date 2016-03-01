@@ -7,7 +7,6 @@ import (
 	"github.com/golang/glog"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
 	osclient "github.com/openshift/origin/pkg/client"
-	"fmt"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -28,7 +27,6 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *ApplicationController) Handle(application *applicationapi.Application) (err error) {
 
-	fmt.Printf("-----> %#v\n", *application)
 	switch application.Status.Phase {
 	case applicationapi.ApplicationDeletingItemLabel:
 		if err := c.HandleAppItems(application); err != nil {
@@ -38,7 +36,8 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 		}
 		c.Client.Applications(application.Namespace).Delete(application.Name)
 		return nil
-	default:
+
+	case applicationapi.ApplicationNew:
 		if err := c.HandleAppItems(application); err != nil {
 			application.Status.Phase = applicationapi.ApplicationFailed
 			c.Client.Applications(application.Namespace).Update(application)
@@ -507,7 +506,6 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 					app.Spec.Items[i].Status = ""
 				}
 			}
-
 
 		default:
 			globalErr = errors.New("unknown resource " + item.Kind + "=" + item.Name)

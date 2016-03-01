@@ -76,13 +76,8 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 			return nil, fmt.Errorf("[http get] status err %s, %d\n", getUrl, resp.StatusCode)
 		}
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("=====", err)
-	} else {
-		fmt.Println("-----", string(body))
-	}
-	return body, err
+
+	return ioutil.ReadAll(resp.Body)
 }
 
 func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, error) {
