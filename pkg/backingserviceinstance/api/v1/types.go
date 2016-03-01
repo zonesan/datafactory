@@ -53,6 +53,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	BackingServicePlanName string 		 `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 

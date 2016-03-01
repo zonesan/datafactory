@@ -64,9 +64,17 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	bsInstanceID := string(util.NewUUID())
 	bsi.Spec.BackingServiceName = bs.Spec.Name
 	bsi.Spec.BackingServiceID = bs.Spec.Id
+
 	bsi.Spec.InstanceID = bsInstanceID
 	bsi.Spec.Parameters = make(map[string]string)
 	bsi.Spec.Parameters["instance_id"] = bsInstanceID
+
+	for _, plan := range bs.Spec.Plans{
+		if bsi.Spec.BackingServicePlanGuid == plan.Id{
+			bsi.Spec.BackingServicePlanName = plan.Name
+			break
+		}
+	}
 
 	sbi := &ServiceInstance{}
 	sbi.ServiceId = bs.Spec.Id
