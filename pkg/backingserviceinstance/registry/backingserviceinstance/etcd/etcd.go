@@ -87,6 +87,7 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 }
 
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+	// todo: check/unbind bindings
 	return r.store.Delete(ctx, name, options)
 }
 
@@ -105,14 +106,17 @@ func NewBindingREST() *BindingREST {
 }
 
 func (r *BindingREST) New() runtime.Object {
-	return &api.BindingRequest{}
+	return &api.BindingRequestOptions{}
 }
 
 func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	glog.Infoln("to create a bsi binding.")
 	
 	// todo
-	// request := obj.(*api.BindingRequest)
+	bro := obj.(*api.BindingRequestOptions)
+	glog.Infoln("bro.BindKind", bro.BindKind)
+	glog.Infoln("bro.BindResourceVersion", bro.BindResourceVersion)
+	glog.Infoln("bro.ResourceName", bro.ResourceName)
 	// 
 	// return BackingServiceInstance
 
@@ -122,7 +126,9 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
 	glog.Infoln("to delete a bsi binding")
 	
+	// todo
 	// return BackingServiceInstance
 	
 	return nil, errors.New("not implenmented yet")
 }
+

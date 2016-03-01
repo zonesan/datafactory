@@ -896,7 +896,7 @@ func deepCopy_v1_BackingServiceInstanceStatus(in backingserviceinstanceapiv1.Bac
 	return nil
 }
 
-func deepCopy_v1_BindingRequest(in backingserviceinstanceapiv1.BindingRequest, out *backingserviceinstanceapiv1.BindingRequest, c *conversion.Cloner) error {
+func deepCopy_v1_BindingRequestOptions(in backingserviceinstanceapiv1.BindingRequestOptions, out *backingserviceinstanceapiv1.BindingRequestOptions, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -907,7 +907,9 @@ func deepCopy_v1_BindingRequest(in backingserviceinstanceapiv1.BindingRequest, o
 	} else {
 		out.ObjectMeta = newVal.(pkgapiv1.ObjectMeta)
 	}
-	out.ApplicationUuid = in.ApplicationUuid
+	out.BindKind = in.BindKind
+	out.BindResourceVersion = in.BindResourceVersion
+	out.ResourceName = in.ResourceName
 	return nil
 }
 
@@ -3167,7 +3169,7 @@ func init() {
 		deepCopy_v1_BackingServiceInstanceList,
 		deepCopy_v1_BackingServiceInstanceSpec,
 		deepCopy_v1_BackingServiceInstanceStatus,
-		deepCopy_v1_BindingRequest,
+		deepCopy_v1_BindingRequestOptions,
 		deepCopy_v1_InstanceBinding,
 		deepCopy_v1_InstanceProvisioning,
 		deepCopy_v1_BinaryBuildRequestOptions,

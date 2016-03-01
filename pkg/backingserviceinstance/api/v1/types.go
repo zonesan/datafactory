@@ -76,13 +76,25 @@ const (
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
 
-type BindingRequest struct {
+//=====================================================
+// 
+//=====================================================
+
+const BindKind_DeploymentConfig = "DeploymentConfig"
+
+//type BindingRequest struct {
+//	unversioned.TypeMeta
+//	kapi.ObjectMeta
+//
+//	// the dc
+//	DeploymentConfigName string `json:"deployment_name, omitempty"`
+//}
+
+type BindingRequestOptions struct {
 	unversioned.TypeMeta
-	// TODO: build request should allow name generation via Name and GenerateName, build config
-	// name should be provided as a separate field
 	kapi.ObjectMeta
 
-	// the application to be bound
-	//app *Application
-	ApplicationUuid string `json:"application_uuid, omitempty"`
+	BindKind            string `json:"bindKind, omitempty"`
+	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
+	ResourceName        string `json:"resourceName, omitempty"`
 }
