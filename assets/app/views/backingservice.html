@@ -32,29 +32,46 @@
                 </ul>
               </div>
             </h1>
-            <labels ng-if="backingserviceConfigName" labels="backingservice.metadata.labels" clickable="true" kind="backingservices" title-kind="backingservices for backingservice config {{backingserviceConfigName}}" project-name="{{backingservice.metadata.namespace}}" limit="3" navigate-url="project/{{backingservice.metadata.namespace}}/browse/backingservices/{{backingserviceConfigName}}"></labels>
-            <labels ng-if="!backingserviceConfigName" labels="backingservice.metadata.labels" limit="3"></labels>
+            <labels labels="backingservice.metadata.labels" clickable="false" kind="backingservices" limit="3"></labels>
 
-            <uib-tabset>
-              <uib-tab active="selectedTab.details">
-                <uib-tab-heading>Details</uib-tab-heading>
-                <ng-include src=" 'views/_backingservice-details.html' "></ng-include>
-              </uib-tab>
+            <ng-include src=" 'views/_backingservice-details.html' "></ng-include>
 
-              <uib-tab active="selectedTab.logs">
-                <uib-tab-heading>Logs</uib-tab-heading>
-                <log-viewer
-                  ng-if="selectedTab.logs"
-                  kind="backingservices/log"
-                  name="backingservice.metadata.name"
-                  context="logContext"
-                  status="backingservice.status.phase"
-                  start="backingservice.status.startTimestamp | date : 'short'"
-                  end="backingservice.status.completionTimestamp | date : 'short'">
-                </log-viewer>
-              </uib-tab>
-            </uib-tabset>
           </div>
+
+          <h1>
+            plans
+          </h1>
+
+          <table class="table table-bordered table-hover table-mobile" ng-if="(backingservice.spec.plans | hashSize) != 0">
+            <thead>
+            <tr>
+              <th>Name</th>
+              <th>DisplayName</th>
+              <th>Costs</th>
+              <th>Description</th>
+              <th>Bullets</th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="plan in backingservice.spec.plans">
+            <tr>
+              <td data-title="Name">
+                {{plan.name}}
+              </td>
+              <td data-title="DisplayName">
+                {{plan.metadata.displayName}}
+              </td>
+              <td data-title="Costs">
+                {{plan.metadata.costs}}
+              </td>
+              <td data-title="Description">
+                {{plan.description}}
+              </td>
+              <td data-title="Bullets">
+                <span ng-bind-html="plan.metadata.bullets | join: '<br>'"></span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div><!-- /.row -->
     </div><!-- /backingservice -->

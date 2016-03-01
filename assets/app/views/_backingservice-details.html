@@ -2,42 +2,26 @@
   <div class="row">
     <div class="col-lg-6">
 
-      <h3>Info</h3>
+      <h3>information</h3>
       <dl class="dl-horizontal left">
         <dt>name</dt>
-        <dd>{{backingservice.metadata.name}}</dd>
+        <dd>{{backingservice.spec.name}}</dd>
         <dt>generateName</dt>
-        <dd>{{backingservice.metadata.generateName}}</dd>
-        <dt>resourceVersion</dt>
-        <dd>{{backingservice.metadata.resourceVersion}}</dd>
-        <!--<dt>selfLink</dt>-->
-        <!--<dd>{{backingservice.metadata.selfLink}}</dd>-->
-        <dt>uid</dt>
-        <dd>{{backingservice.metadata.uid}}</dd>
-        <dt>bindable</dt>
-        <dd>{{backingservice.spec.bindable}}</dd>
-        <dt>dashboard client</dt>
-        <dd>{{backingservice.spec.dashboard_client}}</dd>
-        <dt>description</dt>
         <dd>{{backingservice.spec.description}}</dd>
-        <dt>id</dt>
-        <dd>{{backingservice.spec.id}}</dd>
-        <dt>plan updateable</dt>
-        <dd>{{backingservice.spec.plan_updateable}}</dd>
-        <dt>requires</dt>
-        <dd>{{backingservice.spec.requires}}</dd>
-        <dt>doc</dt>
+        <dt>documentationUrl</dt>
         <dd>
-          <a ng-href="{{backingservice.spec.metadata.documentationUrl}}" target="_blank">{{backingservice.spec.metadata.documentationUrl}}</a></dd>
-        <!--metadata-imgUrl:{{backingservice.spec.metadata.imgUrl}}-->
-        <dt>description</dt>
-        <dd>{{backingservice.spec.metadata.longDescription}}</dd>
+          <a ng-href="{{backingservice.spec.metadata.documentationUrl}}" target="_blank">{{backingservice.spec.metadata.documentationUrl}}</a>
+        </dd>
         <dt>providerDisplayName</dt>
         <dd>{{backingservice.spec.metadata.providerDisplayName}}</dd>
         <dt>supportUrl</dt>
-        <dd>{{backingservice.spec.metadata.supportUrl}}</dd>
-        <!--<dt>plans</dt>-->
-        <!--<dd>{{backingservice.spec.plans}}</dd>-->
+        <dd>
+          <a ng-href="{{backingservice.spec.metadata.supportUrl}}" target="_blank">{{backingservice.spec.metadata.supportUrl}}</a>
+        </dd>
+
+        <dt>dashboard_client</dt>
+        <dd>{{backingservice.spec.dashboard_client}}</dd>
+
       </dl>
 
       <h3>Status</h3>
@@ -50,5 +34,4 @@
       </dl>
     </div>
   </div>
-  <annotations annotations="backingservice.metadata.annotations"></annotations>
 </div>
