@@ -87,5 +87,6 @@ type Item struct {
 const (
 	ApplicationItemStatusAdd    = "add"
 	ApplicationItemStatusDelete = "delete"
-	ApplicationSelector         = "openshift.io/application"
+	ApplicationItemStatusErr    = "error"
+	ApplicationItemStatusOk     = "ok"
 )

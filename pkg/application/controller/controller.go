@@ -102,9 +102,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := build.Update(b); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "BuildConfig":
@@ -134,9 +136,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := buildConfig.Update(bc); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "DeploymentConfig":
@@ -165,9 +169,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := deploymentConfig.Update(dc); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "ImageStream":
@@ -196,9 +202,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := imageStream.Update(is); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "ImageStreamTag":
@@ -241,9 +249,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := event.Update(e); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "Node":
@@ -272,9 +282,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := node.Update(n); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "Job":
@@ -305,9 +317,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := pod.Update(p); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "ReplicationController":
@@ -336,9 +350,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := replicationController.Update(rc); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "Service":
@@ -367,9 +383,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := servce.Update(s); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "PersistentVolume":
@@ -398,9 +416,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := persistentVolume.Update(pv); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "PersistentVolumeClaim":
@@ -429,9 +449,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := persistentVolumeClaim.Update(pvc); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "ServiceBroker":
@@ -460,9 +482,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := serviceBroker.Update(sb); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "BackingService":
@@ -491,9 +515,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := backingService.Update(bs); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		case "BackingServiceInstance":
@@ -522,9 +548,11 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 
 			if whetherUpdate {
 				if _, err := backingServiceInstance.Update(bsi); err != nil {
-					app.Spec.Items[i].Status = ""
+					app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusErr
 					errs = append(errs, err)
 				}
+
+				app.Spec.Items[i].Status = applicationapi.ApplicationItemStatusOk
 			}
 
 		default:
