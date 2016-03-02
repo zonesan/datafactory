@@ -90,8 +90,8 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 	}
 
 	if !o.OnlyLabel {
-		if errs := deleteAllContent(o.Client, o.KClient, app); len(errs) > 0 {
-			return errutil.NewAggregate(errs)
+		if err := deleteAllContent(o.Client, o.KClient, app); err != nil {
+			return err
 		}
 
 		app.Status.Phase = applicationapi.ApplicationDeleting
@@ -108,7 +108,7 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 	return nil
 }
 
-func deleteAllContent(c client.Interface, kc kclient.Interface, app *applicationapi.Application) []error {
+func deleteAllContent(c client.Interface, kc kclient.Interface, app *applicationapi.Application) error {
 	errs := []error{}
 	for _, item := range app.Spec.Items {
 		switch item.Kind {
@@ -209,5 +209,5 @@ func deleteAllContent(c client.Interface, kc kclient.Interface, app *application
 		}
 	}
 
-	return errs
+	return errutil.NewAggregate(errs)
 }

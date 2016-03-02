@@ -1,13 +1,13 @@
 package controller
 
 import (
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-
 	"errors"
 	"fmt"
-	"github.com/golang/glog"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	kerrors "k8s.io/kubernetes/pkg/api/errors"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	errutil "k8s.io/kubernetes/pkg/util/errors"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -55,16 +55,16 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 	return nil
 }
 
-func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) (err error) {
-	var globalErr error
+func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) error {
+	errs := []error{}
 	applicationSelector := fmt.Sprintf("%s/Application", app.Namespace)
 	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "Build":
 			build := c.Client.Builds(app.Namespace)
 			b, err := build.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -86,17 +86,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = build.Update(b)
-				if globalErr == nil {
+				if _, err := build.Update(b); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "BuildConfig":
 			buildConfig := c.Client.BuildConfigs(app.Namespace)
 			bc, err := buildConfig.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -118,17 +118,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = buildConfig.Update(bc)
-				if globalErr == nil {
+				if _, err := buildConfig.Update(bc); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "DeploymentConfig":
 			deploymentConfig := c.Client.DeploymentConfigs(app.Namespace)
 			dc, err := deploymentConfig.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -149,17 +149,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = deploymentConfig.Update(dc)
-				if globalErr == nil {
+				if _, err := deploymentConfig.Update(dc); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "ImageStream":
 			imageStream := c.Client.ImageStreams(app.Namespace)
 			is, err := imageStream.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -180,9 +180,9 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = imageStream.Update(is)
-				if globalErr == nil {
+				if _, err := imageStream.Update(is); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
@@ -203,8 +203,8 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Event":
 			event := c.KubeClient.Events(app.Namespace)
 			e, err := event.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -225,17 +225,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = event.Update(e)
-				if globalErr == nil {
+				if _, err := event.Update(e); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "Node":
 			node := c.KubeClient.Nodes()
 			n, err := node.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -256,9 +256,9 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = node.Update(n)
-				if globalErr == nil {
+				if _, err := node.Update(n); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
@@ -267,8 +267,8 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Pod":
 			pod := c.KubeClient.Pods(app.Namespace)
 			p, err := pod.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -289,17 +289,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = pod.Update(p)
-				if globalErr == nil {
+				if _, err := pod.Update(p); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "ReplicationController":
 			replicationController := c.KubeClient.ReplicationControllers(app.Namespace)
 			rc, err := replicationController.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -320,17 +320,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = replicationController.Update(rc)
-				if globalErr == nil {
+				if _, err := replicationController.Update(rc); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "Service":
 			servce := c.KubeClient.Services(app.Namespace)
 			s, err := servce.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -351,17 +351,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = servce.Update(s)
-				if globalErr == nil {
+				if _, err := servce.Update(s); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "PersistentVolume":
 			persistentVolume := c.KubeClient.PersistentVolumes()
 			pv, err := persistentVolume.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -382,17 +382,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = persistentVolume.Update(pv)
-				if globalErr == nil {
+				if _, err := persistentVolume.Update(pv); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "PersistentVolumeClaim":
 			persistentVolumeClaim := c.KubeClient.PersistentVolumeClaims(app.Namespace)
 			pvc, err := persistentVolumeClaim.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -413,17 +413,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = persistentVolumeClaim.Update(pvc)
-				if globalErr == nil {
+				if _, err := persistentVolumeClaim.Update(pvc); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "ServiceBroker":
 			serviceBroker := c.Client.ServiceBrokers()
 			sb, err := serviceBroker.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -444,17 +444,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = serviceBroker.Update(sb)
-				if globalErr == nil {
+				if _, err := serviceBroker.Update(sb); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "BackingService":
 			backingService := c.Client.BackingServices()
 			bs, err := backingService.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -475,17 +475,17 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = backingService.Update(bs)
-				if globalErr == nil {
+				if _, err := backingService.Update(bs); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		case "BackingServiceInstance":
 			backingServiceInstance := c.Client.BackingServiceInstances(app.Namespace)
 			bsi, err := backingServiceInstance.Get(item.Name)
-			if err != nil {
-				glog.Error(err)
+			if err != nil && kerrors.IsNotFound(err) {
+				errs = append(errs, err)
 				continue
 			}
 
@@ -506,18 +506,18 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 			}
 
 			if whetherUpdate {
-				_, globalErr = backingServiceInstance.Update(bsi)
-				if globalErr == nil {
+				if _, err := backingServiceInstance.Update(bsi); err != nil {
 					app.Spec.Items[i].Status = ""
+					errs = append(errs, err)
 				}
 			}
 
 		default:
-			globalErr = errors.New("unknown resource " + item.Kind + "=" + item.Name)
+			errs = append(errs, errors.New("unknown resource "+item.Kind+"="+item.Name))
 		}
 	}
 
-	return globalErr
+	return errutil.NewAggregate(errs)
 }
 
 func optLabelByItemStatus(label map[string]string, status, labelKey, labelValue string) bool {
