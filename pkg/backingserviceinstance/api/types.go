@@ -93,7 +93,9 @@ const BindKind_DeploymentConfig = "DeploymentConfig"
 type BindingRequestOptions struct {
 	unversioned.TypeMeta
 	kapi.ObjectMeta
-
+	
+	
+	
 	BindKind            string `json:"bindKind, omitempty"`
 	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
 	ResourceName        string `json:"resourceName, omitempty"`

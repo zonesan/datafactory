@@ -129,6 +129,8 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	if err != nil {
 		return err
 	}
+	
+	fmt.Fprintf(out, "Backing Service Instance has been created.\n")
 
 	return nil
 }
@@ -224,6 +226,8 @@ func (o *EditBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 	if err != nil {
 		return err
 	}
+	
+	fmt.Fprintf(out, "Backing Service Instance has been updated.\n")
 
 	return nil
 }
@@ -318,6 +322,8 @@ func (o *BindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 	if err != nil {
 		return err
 	}
+	
+	fmt.Fprintf(out, "Backing Service Instance has been bound.\n")
 
 	return nil
 }
@@ -390,6 +396,7 @@ func (o *UnbindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientc
 	}
 	
 	//>> todo: maybe better do this is in DeleteBinding
+	/*
 	_, err = client.BackingServiceInstances(namespace).Get(o.Name)
 	if err != nil {
 		return err
@@ -399,12 +406,15 @@ func (o *UnbindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientc
 	if err != nil {
 		return err
 	}
+	*/
 	//<<
 	
 	err = client.BackingServiceInstances(namespace).DeleteBinding(o.Name)
 	if err != nil {
 		return err
 	}
+	
+	fmt.Fprintf(out, "Backing Service Instance has been unbound.\n")
 
 	return nil
 }
