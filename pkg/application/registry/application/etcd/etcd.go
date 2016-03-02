@@ -90,7 +90,7 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 	if application.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
 		application.DeletionTimestamp = &now
-		application.Status.Phase = api.ApplicationDeletingItemLabel
+		application.Status.Phase = api.ApplicationTerminatingLabel
 		result, _, err := r.store.Update(ctx, application)
 		return result, err
 	}

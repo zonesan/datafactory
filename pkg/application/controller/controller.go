@@ -8,6 +8,7 @@ import (
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	errutil "k8s.io/kubernetes/pkg/util/errors"
+	"strings"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -29,33 +30,47 @@ func (e fatalError) Error() string {
 func (c *ApplicationController) Handle(application *applicationapi.Application) (err error) {
 
 	switch application.Status.Phase {
-	case applicationapi.ApplicationDeletingItemLabel:
-		if err := c.HandleAppItems(application); err != nil {
-			application.Status.Phase = applicationapi.ApplicationFailed
-			c.Client.Applications(application.Namespace).Update(application)
-			return err
-		}
-		c.Client.Applications(application.Namespace).Delete(application.Name)
-		return nil
 
 	case applicationapi.ApplicationNew:
-		if err := c.HandleAppItems(application); err != nil {
-			application.Status.Phase = applicationapi.ApplicationFailed
+
+		if err := c.UpsertHandle(application); err != nil {
+			application.Status.Phase = applicationapi.ApplicationInActive
 			c.Client.Applications(application.Namespace).Update(application)
+
 			return err
 		}
+
 		application.Status.Phase = applicationapi.ApplicationActive
 		c.Client.Applications(application.Namespace).Update(application)
-		return nil
 
-	case applicationapi.ApplicationDeleting:
+	case applicationapi.ApplicationTerminatingLabel:
+
+		if err := c.UpsertHandle(application); err != nil {
+			application.Status.Phase = applicationapi.ApplicationTerminatingErr
+			c.Client.Applications(application.Namespace).Update(application)
+
+			return err
+		}
+
+		c.Client.Applications(application.Namespace).Delete(application.Name)
+
+	case applicationapi.ApplicationTerminating:
+
+		if err := c.DeleteHandle(application); err != nil {
+
+			application.Status.Phase = applicationapi.ApplicationTerminatingErr
+			c.Client.Applications(application.Namespace).Update(application)
+
+			return err
+		}
+
 		c.Client.Applications(application.Namespace).Delete(application.Name)
 	}
 
 	return nil
 }
 
-func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) error {
+func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) error {
 	errs := []error{}
 	applicationSelector := fmt.Sprintf("%s/Application", app.Namespace)
 	for i, item := range app.Spec.Items {
@@ -70,7 +85,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if b.Labels != nil {
 					delete(b.Labels, applicationSelector)
 					whetherUpdate = true
@@ -102,7 +117,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if bc.Labels != nil {
 					delete(bc.Labels, applicationSelector)
 					whetherUpdate = true
@@ -134,7 +149,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if dc.Labels != nil {
 					delete(dc.Labels, applicationSelector)
 					whetherUpdate = true
@@ -165,7 +180,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if is.Labels != nil {
 					delete(is.Labels, applicationSelector)
 					whetherUpdate = true
@@ -210,7 +225,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if e.Labels != nil {
 					delete(e.Labels, applicationSelector)
 					whetherUpdate = true
@@ -241,7 +256,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if n.Labels != nil {
 					delete(n.Labels, applicationSelector)
 					whetherUpdate = true
@@ -274,7 +289,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if p.Labels != nil {
 					delete(p.Labels, applicationSelector)
 					whetherUpdate = true
@@ -305,7 +320,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if rc.Labels != nil {
 					delete(rc.Labels, applicationSelector)
 					whetherUpdate = true
@@ -336,7 +351,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if s.Labels != nil {
 					delete(s.Labels, applicationSelector)
 					whetherUpdate = true
@@ -367,7 +382,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if pv.Labels != nil {
 					delete(pv.Labels, applicationSelector)
 					whetherUpdate = true
@@ -398,7 +413,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if pvc.Labels != nil {
 					delete(pvc.Labels, applicationSelector)
 					whetherUpdate = true
@@ -429,7 +444,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if sb.Labels != nil {
 					delete(sb.Labels, applicationSelector)
 					whetherUpdate = true
@@ -460,7 +475,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if bs.Labels != nil {
 					delete(bs.Labels, applicationSelector)
 					whetherUpdate = true
@@ -491,7 +506,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 
 			whetherUpdate := false
 			switch app.Status.Phase {
-			case applicationapi.ApplicationDeletingItemLabel:
+			case applicationapi.ApplicationTerminatingLabel:
 				if bsi.Labels != nil {
 					delete(bsi.Labels, applicationSelector)
 					whetherUpdate = true
@@ -532,4 +547,167 @@ func optLabelByItemStatus(label map[string]string, status, labelKey, labelValue 
 	}
 
 	return false
+}
+
+func (c *ApplicationController) DeleteHandle(app *applicationapi.Application) error {
+	return deleteAllContent(c.Client, c.KubeClient, app)
+}
+
+func deleteAllContent(c osclient.Interface, kc kclient.Interface, app *applicationapi.Application) error {
+	errs := []error{}
+	for _, item := range app.Spec.Items {
+		labelString := fmt.Sprintf("%s/Application=%s", app.Namespace, item.Name)
+
+		switch item.Kind {
+		case "Build":
+			itemResource, err := c.Builds(app.Namespace).Get(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.Builds(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.Builds(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
+			}
+
+		case "BuildConfig":
+			itemResource, err := c.BuildConfigs(app.Namespace).Get(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.BuildConfigs(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.BuildConfigs(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
+			}
+
+		case "DeploymentConfig":
+			err := c.DeploymentConfigs(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "ImageStream":
+			err := c.ImageStreams(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "ImageStreamTag":
+
+		case "ImageStreamImage":
+
+		case "Event":
+			err := kc.Events(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "Node":
+			err := kc.Nodes().Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "Job":
+
+		case "Pod":
+			// todo make sure deleteOption
+			err := kc.Pods(app.Namespace).Delete(item.Name, nil)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "ReplicationController":
+			err := kc.ReplicationControllers(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "Service":
+			err := kc.Services(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "PersistentVolume":
+			err := kc.PersistentVolumes().Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "PersistentVolumeClaim":
+			err := kc.PersistentVolumeClaims(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "ServiceBroker":
+			err := c.ServiceBrokers().Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "BackingService":
+			err := c.BackingServices().Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		case "BackingServiceInstance":
+			err := c.BackingServiceInstances(app.Namespace).Delete(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+			}
+
+		default:
+			err := errors.New("unknown resource " + item.Kind + "=" + item.Name)
+			errs = append(errs, err)
+		}
+	}
+
+	return errutil.NewAggregate(errs)
+}
+
+func containsOtherApplicationLabel(label map[string]string, labelStr string) bool {
+	list := getApplicationLabels(label)
+	if len(list) > 1 {
+		for _, v := range list {
+			if v == labelStr {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+func getApplicationLabels(label map[string]string) []string {
+	arr := []string{}
+
+	if label != nil {
+		for k, v := range label {
+			if strings.HasSuffix(k, "/Application") {
+				arr = append(arr, fmt.Sprintf("%s/Application=%s", k, v))
+			}
+		}
+	}
+
+	return arr
 }

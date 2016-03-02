@@ -8,10 +8,8 @@ import (
 	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
 	"github.com/spf13/cobra"
 	"io"
-	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	errutil "k8s.io/kubernetes/pkg/util/errors"
 )
 
 const (
@@ -89,125 +87,17 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 		return err
 	}
 
-	if !o.OnlyLabel {
-		if err := deleteAllContent(o.Client, o.KClient, app); err != nil {
+	if o.OnlyLabel {
+		if err = o.Client.Applications(namespace).Delete(app.Name); err != nil {
 			return err
 		}
-
-		app.Status.Phase = applicationapi.ApplicationDeleting
-		if _, err := o.Client.Applications(namespace).Update(app); err != nil {
-			return err
-		}
-
+		return nil
 	}
 
-	if err = o.Client.Applications(namespace).Delete(app.Name); err != nil {
+	app.Status.Phase = applicationapi.ApplicationTerminating
+	if _, err := o.Client.Applications(namespace).Update(app); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-func deleteAllContent(c client.Interface, kc kclient.Interface, app *applicationapi.Application) error {
-	errs := []error{}
-	for _, item := range app.Spec.Items {
-		switch item.Kind {
-		case "Build":
-			err := c.Builds(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "BuildConfig":
-			err := c.BuildConfigs(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "DeploymentConfig":
-			err := c.DeploymentConfigs(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "ImageStream":
-			err := c.ImageStreams(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "ImageStreamTag":
-
-		case "ImageStreamImage":
-
-		case "Event":
-			err := kc.Events(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "Node":
-			err := kc.Nodes().Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "Job":
-
-		case "Pod":
-			// todo make sure deleteOption
-			err := kc.Pods(app.Namespace).Delete(item.Name, nil)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "ReplicationController":
-			err := kc.ReplicationControllers(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "Service":
-			err := kc.Services(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "PersistentVolume":
-			err := kc.PersistentVolumes().Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "PersistentVolumeClaim":
-			err := kc.PersistentVolumeClaims(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "ServiceBroker":
-			err := c.ServiceBrokers().Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "BackingService":
-			err := c.BackingServices().Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		case "BackingServiceInstance":
-			err := c.BackingServiceInstances(app.Namespace).Delete(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-			}
-
-		default:
-			err := errors.New("unknown resource " + item.Kind + "=" + item.Name)
-			errs = append(errs, err)
-		}
-	}
-
-	return errutil.NewAggregate(errs)
 }

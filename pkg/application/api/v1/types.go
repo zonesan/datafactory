@@ -15,16 +15,23 @@ const (
 	// ApplicationRunning indicates that Application service working well.
 	ApplicationActive ApplicationPhase = "Active"
 
+	// ApplicationRunning indicates that Application service Inactive.
+	ApplicationInActive ApplicationPhase = "InActive"
+
 	// ApplicationUpdating indicates that Application is updating.
 	ApplicationUpdating ApplicationPhase = "Updating"
 
 	// ApplicationFailed indicates that Application stopped.
 	ApplicationFailed ApplicationPhase = "Failed"
 
-	ApplicationDeletingItemLabel ApplicationPhase = "Delabel"
-	ApplicationDeletingAll       ApplicationPhase = "Delall"
+	// ApplicationDeletingLabel indicates that Application is delete label.
+	ApplicationTerminatingLabel ApplicationPhase = "Terminating Label"
 
-	ApplicationDeleting ApplicationPhase = "Deleting"
+	// ApplicationFailed indicates that Application is delete all resources.
+	ApplicationTerminating ApplicationPhase = "Terminating"
+
+	// ApplicationFailed indicates that Application is delete resources error.
+	ApplicationTerminatingErr ApplicationPhase = "Error"
 )
 
 var ApplicationItemSupportKinds = []string{
