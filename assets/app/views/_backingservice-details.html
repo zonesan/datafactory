@@ -20,7 +20,13 @@
         </dd>
 
         <dt>仪表盘</dt>
-        <dd>{{backingservice.spec.dashboard_client}}</dd>
+        <dd>
+          <span ng-if="backingservice.spec.dashboard_client">
+            <span ng-repeat="(k, v) in backingservice.spec.dashboard_client">
+              <strong>{{k}}</strong>: {{v}}<br>
+            </span>
+          </span>
+        </dd>
 
       </dl>
 
