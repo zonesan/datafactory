@@ -23,9 +23,9 @@ type Registry interface {
 	// UpdateImageStream updates an image stream.
 	UpdateBackingServiceInstance(ctx kapi.Context, repo *api.BackingServiceInstance) (*api.BackingServiceInstance, error)
 	// UpdateImageStreamSpec updates an image stream's spec.
-	UpdateBackingServiceInstanceSpec(ctx kapi.Context, repo *api.BackingServiceInstance) (*api.BackingServiceInstance, error)
+	//UpdateBackingServiceInstanceSpec(ctx kapi.Context, repo *api.BackingServiceInstance) (*api.BackingServiceInstance, error)
 	// UpdateImageStreamStatus updates an image stream's status.
-	UpdateBackingServiceInstanceStatus(ctx kapi.Context, repo *api.BackingServiceInstance) (*api.BackingServiceInstance, error)
+	//UpdateBackingServiceInstanceStatus(ctx kapi.Context, repo *api.BackingServiceInstance) (*api.BackingServiceInstance, error)
 	// DeleteImageStream deletes an image stream.
 	DeleteBackingServiceInstance(ctx kapi.Context, id string) (*unversioned.Status, error)
 	// WatchImageStreams watches for new/changed/deleted image streams.
@@ -46,14 +46,17 @@ type Storage interface {
 // storage puts strong typing around storage calls
 type storage struct {
 	Storage
-	status   rest.Updater
-	internal rest.Updater
+	//status   rest.Updater
+	//internal rest.Updater
 }
 
 // NewRegistry returns a new Registry interface for the given Storage. Any mismatched
 // types will panic.
-func NewRegistry(s Storage, status, internal rest.Updater) Registry {
-	return &storage{Storage: s, status: status, internal: internal}
+//func NewRegistry(s Storage, status, internal rest.Updater) Registry {
+//	return &storage{Storage: s, status: status, internal: internal}
+//}
+func NewRegistry(s Storage) Registry {
+	return &storage{Storage: s}
 }
 
 func (s *storage) ListBackingServiceInstances(ctx kapi.Context, label labels.Selector) (*api.BackingServiceInstanceList, error) {
@@ -80,15 +83,15 @@ func (s *storage) CreateBackingServiceInstance(ctx kapi.Context, backingservicei
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) UpdateBackingServiceInstance(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
-	obj, _, err := s.internal.Update(ctx, backingServiceInstance)
-	if err != nil {
-		return nil, err
-	}
-	return obj.(*api.BackingServiceInstance), nil
-}
+//func (s *storage) UpdateBackingServiceInstance(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+//	obj, _, err := s.internal.Update(ctx, backingServiceInstance)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return obj.(*api.BackingServiceInstance), nil
+//}
 
-func (s *storage) UpdateBackingServiceInstanceSpec(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+func (s *storage) UpdateBackingServiceInstance(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
 	obj, _, err := s.Update(ctx, backingServiceInstance)
 	if err != nil {
 		return nil, err
@@ -96,13 +99,21 @@ func (s *storage) UpdateBackingServiceInstanceSpec(ctx kapi.Context, backingServ
 	return obj.(*api.BackingServiceInstance), nil
 }
 
-func (s *storage) UpdateBackingServiceInstanceStatus(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
-	obj, _, err := s.status.Update(ctx, backingServiceInstance)
-	if err != nil {
-		return nil, err
-	}
-	return obj.(*api.BackingServiceInstance), nil
-}
+//func (s *storage) UpdateBackingServiceInstanceSpec(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+//	obj, _, err := s.Update(ctx, backingServiceInstance)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return obj.(*api.BackingServiceInstance), nil
+//}
+
+//func (s *storage) UpdateBackingServiceInstanceStatus(ctx kapi.Context, backingServiceInstance *api.BackingServiceInstance) (*api.BackingServiceInstance, error) {
+//	obj, _, err := s.status.Update(ctx, backingServiceInstance)
+//	if err != nil {
+//		return nil, err
+//	}
+//	return obj.(*api.BackingServiceInstance), nil
+//}
 
 func (s *storage) DeleteBackingServiceInstance(ctx kapi.Context, backingServiceInstanceID string) (*unversioned.Status, error) {
 	obj, err := s.Delete(ctx, backingServiceInstanceID, nil)

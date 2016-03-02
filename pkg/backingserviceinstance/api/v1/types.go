@@ -41,8 +41,8 @@ type BackingServiceInstanceSpec struct {
 }
 */
 type BackingServiceInstanceSpec struct {
-	InstanceProvisioning `json:"provisioning, omitempty"`
-	InstanceBinding      `json:"binding, omitempty"`
+	InstanceProvisioning          `json:"provisioning, omitempty"`
+	InstanceBinding               `json:"binding, omitempty"`
 	Bound                bool     `json:"bound, omitempty"`
 	InstanceID           string   `json:"instance_id, omitempty"`
 	Tags                 []string `json:"tags, omitempty"`
@@ -60,11 +60,7 @@ type InstanceProvisioning struct {
 type InstanceBinding struct {
 	BindUuid             string            `json:"bind_uuid, omitempty"`
 	BindDeploymentConfig string            `json:"bind_deploymentconfig, omitempty"`
-	Credentials          map[string]string `json:"credential, omitempty"`
-}
-
-type InstanceBindDeploymentConfig struct {
-	Parameters map[string]string `json:"parameters, omitempty"`
+	Credentials          map[string]string `json:"credentials, omitempty"`
 }
 
 type BackingServiceInstanceStatus struct {
@@ -82,13 +78,25 @@ const (
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
 
-type BindingRequest struct {
+//=====================================================
+// 
+//=====================================================
+
+const BindKind_DeploymentConfig = "DeploymentConfig"
+
+//type BindingRequest struct {
+//	unversioned.TypeMeta
+//	kapi.ObjectMeta
+//
+//	// the dc
+//	DeploymentConfigName string `json:"deployment_name, omitempty"`
+//}
+
+type BindingRequestOptions struct {
 	unversioned.TypeMeta
-	// TODO: build request should allow name generation via Name and GenerateName, build config
-	// name should be provided as a separate field
 	kapi.ObjectMeta
 
-	// the application to be bound
-	//app *Application
-	ApplicationUuid string `json:"application_uuid, omitempty"`
+	BindKind            string `json:"bindKind, omitempty"`
+	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
+	ResourceName        string `json:"resourceName, omitempty"`
 }

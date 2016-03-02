@@ -4,7 +4,6 @@ import (
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/watch"
-	kapi "k8s.io/kubernetes/pkg/api"
 
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 
@@ -24,7 +23,7 @@ type BackingServiceInstanceInterface interface {
 	List(label labels.Selector, field fields.Selector) (*backingserviceinstanceapi.BackingServiceInstanceList, error)
 	Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error)
 
-	CreateBinding(name string, request *backingserviceinstanceapi.BindingRequest) (err error)
+	CreateBinding(name string, request *backingserviceinstanceapi.BindingRequestOptions) (err error)
 	DeleteBinding(name string) (err error)
 }
 
@@ -116,15 +115,14 @@ func (c *backingserviceinstances) Watch(label labels.Selector, field fields.Sele
 
 // Bind binds a backing service instance on an app
 // and returns an error.
-func (c *backingserviceinstances) CreateBinding(name string, request *backingserviceinstanceapi.BindingRequest) (err error) {
+func (c *backingserviceinstances) CreateBinding(name string, bro *backingserviceinstanceapi.BindingRequestOptions) (err error) {
 	result := &backingserviceinstanceapi.BackingServiceInstance{}
 	err = c.r.Post().
 		Namespace(c.ns).
 		Resource("backingserviceinstances").
 		Name(name).
 		SubResource("binding").
-		VersionedParams(request, kapi.Scheme).
-		Body(request).Do().Into(result)
+		Body(bro).Do().Into(result)
 	return
 }
 
