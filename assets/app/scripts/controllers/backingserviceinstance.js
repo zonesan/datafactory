@@ -26,7 +26,7 @@ angular.module('openshiftConsole')
               function(bsi) {
                 $scope.loaded = true;
                 $scope.backingserviceinstance = bsi;
-                console.log('backingservice', bsi);
+                console.log('backingserviceinstance', bsi);
               },
               // failure
               function(e) {

@@ -1,0 +1,32 @@
+<div class='resource-details'>
+  <div class="row">
+    <div class="col-lg-6">
+      <h3>information</h3>
+      <dl class="dl-horizontal left">
+        <dt>name</dt>
+        <dd>{{backingserviceinstance.meta.name}}</dd>
+        <dt>createTime</dt>
+        <dd>{{backingservice.meta.creationTimestamp}}</dd>
+        <dt>bind_deploymentconfig</dt>
+        <dd>{{backingservice.spec.binding.bind_deploymentconfig}}</dd>
+        <dt>provisioningName</dt>
+        <dd>{{backingservice.spec.provisioning.providerDisplayName}}</dd>
+        <dt>planName</dt>
+        <dd>{{backingservice.spec.provisioning.plan_name}}</dd>
+        <dt>dashboardUrl</dt>
+        <dd>
+          <a ng-href="{{backingservice.spec.provisioning.dashboard_url}}" target="_blank">{{backingservice.spec.provisioning.dashboard_url}}</a>
+        </dd>
+      </dl>
+
+      <h3>Status</h3>
+      <dl class="dl-horizontal left">
+        <dt>status:</dt>
+        <dd>
+          <status-icon status="backingserviceinstance.status.phase"></status-icon>
+          {{backingserviceinstance.status.phase}}
+        </dd>
+      </dl>
+    </div>
+  </div>
+</div>
