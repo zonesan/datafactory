@@ -923,21 +923,14 @@ func deepCopy_v1_BindingRequest(in backingserviceinstanceapiv1.BindingRequest, o
 
 func deepCopy_v1_InstanceBinding(in backingserviceinstanceapiv1.InstanceBinding, out *backingserviceinstanceapiv1.InstanceBinding, c *conversion.Cloner) error {
 	out.BindUuid = in.BindUuid
-	if in.InstanceBindDeploymentConfig != nil {
-		out.InstanceBindDeploymentConfig = make(map[string]string)
-		for key, val := range in.InstanceBindDeploymentConfig {
-			out.InstanceBindDeploymentConfig[key] = val
+	out.BindDeploymentConfig = in.BindDeploymentConfig
+	if in.Credentials != nil {
+		out.Credentials = make(map[string]string)
+		for key, val := range in.Credentials {
+			out.Credentials[key] = val
 		}
 	} else {
-		out.InstanceBindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
+		out.Credentials = nil
 	}
 	return nil
 }

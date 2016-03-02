@@ -1563,21 +1563,14 @@ func autoconvert_api_InstanceBinding_To_v1_InstanceBinding(in *backingserviceins
 		defaulting.(func(*backingserviceinstanceapi.InstanceBinding))(in)
 	}
 	out.BindUuid = in.BindUuid
-	if in.InstanceBindDeploymentConfig != nil {
-		out.InstanceBindDeploymentConfig = make(map[string]string)
-		for key, val := range in.InstanceBindDeploymentConfig {
-			out.InstanceBindDeploymentConfig[key] = val
+	out.BindDeploymentConfig = in.BindDeploymentConfig
+	if in.Credentials != nil {
+		out.Credentials = make(map[string]string)
+		for key, val := range in.Credentials {
+			out.Credentials[key] = val
 		}
 	} else {
-		out.InstanceBindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
+		out.Credentials = nil
 	}
 	return nil
 }
@@ -1722,21 +1715,14 @@ func autoconvert_v1_InstanceBinding_To_api_InstanceBinding(in *backingserviceins
 		defaulting.(func(*backingserviceinstanceapiv1.InstanceBinding))(in)
 	}
 	out.BindUuid = in.BindUuid
-	if in.InstanceBindDeploymentConfig != nil {
-		out.InstanceBindDeploymentConfig = make(map[string]string)
-		for key, val := range in.InstanceBindDeploymentConfig {
-			out.InstanceBindDeploymentConfig[key] = val
+	out.BindDeploymentConfig = in.BindDeploymentConfig
+	if in.Credentials != nil {
+		out.Credentials = make(map[string]string)
+		for key, val := range in.Credentials {
+			out.Credentials[key] = val
 		}
 	} else {
-		out.InstanceBindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
+		out.Credentials = nil
 	}
 	return nil
 }

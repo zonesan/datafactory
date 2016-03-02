@@ -61,9 +61,9 @@ type InstanceProvisioning struct {
 }
 
 type InstanceBinding struct {
-	BindUuid                     string
-	InstanceBindDeploymentConfig map[string]string
-	Credential                   map[string]string
+	BindUuid             string
+	BindDeploymentConfig string
+	Credentials          map[string]string
 }
 
 // ProjectStatus is information about the current status of a Project
@@ -92,4 +92,3 @@ type BindingRequest struct {
 	//app *Application
 	ApplicationUuid string `json:"application_uuid, omitempty"`
 }
-

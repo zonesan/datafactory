@@ -3,13 +3,13 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
-	
+
 	log "github.com/golang/glog"
 )
 
@@ -28,8 +28,8 @@ This command will try to create a backing service instance.
 )
 
 type NewBackingServiceInstanceOptions struct {
-	Name      string
-	
+	Name string
+
 	BackingServiceName     string
 	BackingServicePlanGuid string
 
@@ -67,7 +67,7 @@ func NewCmdNewBackingServiceInstance(fullName string, f *clientcmd.Factory, out 
 	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService GUID")
 	cmd.Flags().StringVar(&options.BackingServicePlanGuid, "planid", "", "BackingService Plan GUID")
 	// todo: dashboard_url
-	
+
 	return cmd
 }
 
@@ -85,26 +85,22 @@ func (o *NewBackingServiceInstanceOptions) complete(cmd *cobra.Command, f *clien
 
 func (o *NewBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	backingServiceInstance := &backingserviceinstanceapi.BackingServiceInstance{}
-	
+
 	namespace, _, err := f.DefaultNamespace()
 	if err != nil {
 		return err
 	}
-	
-	backingServiceInstance.Annotations = make(map[string]string)
+
 	backingServiceInstance.Name = o.Name
 	backingServiceInstance.GenerateName = o.Name
-	
+
 	backingServiceInstance.Spec.BackingServiceName = o.BackingServiceName
 	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
-	backingServiceInstance.Spec.Parameters = make(map[string]string)
-	
-	//backingServiceInstance.Spec.Binding.BindUuid = 
-	backingServiceInstance.Spec.InstanceBindDeploymentConfig = make(map[string]string)
-	backingServiceInstance.Spec.Credential = make(map[string]string)
-	
-	//backingServiceInstance.Status = 
-	
+
+	//backingServiceInstance.Spec.Binding.BindUuid =
+
+	//backingServiceInstance.Status =
+
 	_, err = o.Client.BackingServiceInstances(namespace).Create(backingServiceInstance)
 	if err != nil {
 		return err
@@ -128,8 +124,8 @@ This command will try to edit a backing service instance.
 )
 
 type EditBackingServiceInstanceOptions struct {
-	Name      string
-	
+	Name string
+
 	BackingServicePlanGuid string
 
 	Client client.Interface
@@ -164,7 +160,7 @@ func NewCmdEditBackingServiceInstance(fullName string, f *clientcmd.Factory, out
 	}
 
 	cmd.Flags().StringVar(&options.BackingServicePlanGuid, "planid", "", "BackingService Plan GUID")
-	
+
 	return cmd
 }
 
@@ -185,14 +181,14 @@ func (o *EditBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	if err != nil {
 		return err
 	}
-	
+
 	backingServiceInstance, err := o.Client.BackingServiceInstances(namespace).Get(o.Name)
 	if err != nil {
 		return err
 	}
-	
+
 	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
-	
+
 	_, err = o.Client.BackingServiceInstances(namespace).Update(backingServiceInstance)
 	if err != nil {
 		return err
@@ -249,7 +245,7 @@ func NewCmdBindBackingServiceInstance(fullName string, f *clientcmd.Factory, out
 			}
 		},
 	}
-	
+
 	return cmd
 }
 
@@ -260,7 +256,7 @@ func (o *BindBackingServiceInstanceOptions) complete(cmd *cobra.Command, f *clie
 		return errors.New("must have at least 2 arguments")
 	}
 
-	o.Name                 = args[0]
+	o.Name = args[0]
 	o.DeploymentConfigName = args[1]
 
 	return nil
@@ -271,17 +267,17 @@ func (o *BindBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	if err != nil {
 		return err
 	}
-	
+
 	bsi, err := o.Client.BackingServiceInstances(namespace).Get(o.Name)
 	if err != nil {
 		return err
 	}
-	
+
 	dc, err := o.Client.DeploymentConfigs(namespace).Get(o.DeploymentConfigName)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Infoln("to bind bsi (", bsi.Name, " and (", dc.Name, ")")
 
 	return nil
@@ -335,7 +331,7 @@ func NewCmdUnbindBackingServiceInstance(fullName string, f *clientcmd.Factory, o
 			}
 		},
 	}
-	
+
 	return cmd
 }
 
@@ -346,7 +342,7 @@ func (o *UnbindBackingServiceInstanceOptions) complete(cmd *cobra.Command, f *cl
 		return errors.New("must have at least 2 arguments")
 	}
 
-	o.Name                 = args[0]
+	o.Name = args[0]
 	o.DeploymentConfigName = args[1]
 
 	return nil
@@ -357,20 +353,18 @@ func (o *UnbindBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	if err != nil {
 		return err
 	}
-	
+
 	bsi, err := o.Client.BackingServiceInstances(namespace).Get(o.Name)
 	if err != nil {
 		return err
 	}
-	
+
 	dc, err := o.Client.DeploymentConfigs(namespace).Get(o.DeploymentConfigName)
 	if err != nil {
 		return err
 	}
-	
+
 	log.Infoln("to unbind bsi (", bsi.Name, " and (", dc.Name, ")")
 
 	return nil
 }
-
-
