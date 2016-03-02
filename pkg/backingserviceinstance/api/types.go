@@ -39,10 +39,6 @@ type BackingServiceInstanceSpec struct {
 }
 */
 
-type InstanceBindDeploymentConfig struct {
-	Parameters map[string]string
-}
-
 type BackingServiceInstanceSpec struct {
 	InstanceProvisioning
 	InstanceBinding
@@ -61,9 +57,9 @@ type InstanceProvisioning struct {
 }
 
 type InstanceBinding struct {
-	BindUuid                     string
-	InstanceBindDeploymentConfig map[string]string
-	Credential                   map[string]string
+	BindUuid             string
+	BindDeploymentConfig string
+	Credentials          map[string]string
 }
 
 // ProjectStatus is information about the current status of a Project

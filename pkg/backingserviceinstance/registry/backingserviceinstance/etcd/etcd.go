@@ -12,13 +12,15 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
+	"k8s.io/kubernetes/pkg/util"
 	
 	"github.com/golang/glog"
 	"k8s.io/kubernetes/pkg/api/unversioned"
 
-	"github.com/openshift/origin/pkg/backingserviceinstance/api"
-	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
+	//backingserviceregistry "github.com/openshift/origin/pkg/backingservice/registry"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstanceregistry "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
+	//backingserviceinstancecontroller "github.com/openshift/origin/pkg/backingserviceinstance/controller"
 	deployconfigregistry "github.com/openshift/origin/pkg/deploy/registry/deployconfig"
 )
 
@@ -30,8 +32,8 @@ type REST struct {
 
 func NewREST(s storage.Interface) *REST {
 	store := &etcdgeneric.Etcd{
-		NewFunc:     func() runtime.Object { return &api.BackingServiceInstance{} },
-		NewListFunc: func() runtime.Object { return &api.BackingServiceInstanceList{} },
+		NewFunc:     func() runtime.Object { return &backingserviceinstanceapi.BackingServiceInstance{} },
+		NewListFunc: func() runtime.Object { return &backingserviceinstanceapi.BackingServiceInstanceList{} },
 		KeyRootFunc: func(ctx kapi.Context) string {
 			return etcdgeneric.NamespaceKeyRootFunc(ctx, BackingServiceInstancePath)
 		},
@@ -39,15 +41,15 @@ func NewREST(s storage.Interface) *REST {
 			return etcdgeneric.NamespaceKeyFunc(ctx, BackingServiceInstancePath, id)
 		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) {
-			return obj.(*api.BackingServiceInstance).Name, nil
+			return obj.(*backingserviceinstanceapi.BackingServiceInstance).Name, nil
 		},
 		PredicateFunc: func(label labels.Selector, field fields.Selector) generic.Matcher {
-			return backingserviceinstance.Matcher(label, field)
+			return backingserviceinstanceregistry.Matcher(label, field)
 		},
 		EndpointName: "backingserviceinstance",
 
-		CreateStrategy: backingserviceinstance.BsiStrategy,
-		UpdateStrategy: backingserviceinstance.BsiStrategy,
+		CreateStrategy: backingserviceinstanceregistry.BsiStrategy,
+		UpdateStrategy: backingserviceinstanceregistry.BsiStrategy,
 
 		ReturnDeletedObject: false,
 
@@ -86,12 +88,12 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 	if err != nil {
 		return nil, err
 	}
-	bsi := bsiObj.(*api.BackingServiceInstance)
+	bsi := bsiObj.(*backingserviceinstanceapi.BackingServiceInstance)
 
 	if bsi.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
 		bsi.DeletionTimestamp = &now
-		bsi.Status.Phase = api.BackingServiceInstancePhaseInactive
+		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseInactive
 		result, _, err := r.store.Update(ctx, bsi)
 		return result, err
 	}
@@ -118,28 +120,35 @@ type BindingREST struct {
 }
 
 func (r *BindingREST) New() runtime.Object {
-	return &api.BindingRequestOptions{}
+	return &backingserviceinstanceapi.BindingRequestOptions{}
 }
 
 func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	glog.Infoln("to create a bsi binding.")
 	
-	bro := obj.(*api.BindingRequestOptions)
-	if bro.BindKind != api.BindKind_DeploymentConfig {
+	bro := obj.(*backingserviceinstanceapi.BindingRequestOptions)
+	if bro.BindKind != backingserviceinstanceapi.BindKind_DeploymentConfig {
 		return nil, fmt.Errorf("unsupported bind type: %s", bro.BindKind)
 	}
 	// todo: check bro.BindResourceVersion
-	
-	// modify bsi etcd
 	
 	bsi, err := r.backingServiceInstanceRegistry.GetBackingServiceInstance(ctx, bro.Name)
 	if err != nil {
 		return nil, err
 	}
-	_ = bsi
 	
-	// modify dc etcd
-	// dc.Spec.Template.Spec.Containers[i].Env[j]
+	if bsi.Spec.Bound {
+		return nil, errors.New("back service instance already bound")
+	}
+	
+	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseActive {
+		return nil, errors.New("back service instance is not in active phase")
+	}
+	
+	//bs, err := r.backingServiceRegistry.GetBackingService(ctx, bsi.Spec.BackingServiceName)
+	//if err != nil {
+	//	return nil, err
+	//}
 	
 	dc, err := r.deployConfigRegistry.GetDeploymentConfig(ctx, bro.ResourceName)
 	if err != nil {
@@ -147,25 +156,40 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 	}
 	_ = dc
 	
-	// todo
-	// request := obj.(*api.BindingRequest)
-	// 
-	// return BackingServiceInstance
-
-	return nil, errors.New("not implenmented yet")
+	// update bsi
+	
+	bsi.Spec.BindUuid = string(util.NewUUID())
+	bsi.Spec.BindDeploymentConfig = bro.ResourceName // dc.Name
+	
+	bsi, err = r.backingServiceInstanceRegistry.UpdateBackingServiceInstance(ctx, bsi)
+	if err != nil {
+		return nil, err
+	}
+	
+	// ...
+	
+	return bsi, nil
 }
 
 func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
 	glog.Infoln("to delete a bsi binding")
 	
-	// if bound, modify dc etcd
-	// dc.Spec.Template.Spec.Containers[i].Env[j]
+	bsi, err := r.backingServiceInstanceRegistry.GetBackingServiceInstance(ctx, name)
+	if err != nil {
+		return nil, err
+	}
 	
-	// modify bsi etcd
+	if ! bsi.Spec.Bound {
+		return nil, errors.New("back service instance is not bound yet")
+	}
 	
-	// todo
-	// return BackingServiceInstance
+	bsi.Spec.BindUuid = "" // notify controller to unbind
+	
+	bsi, err = r.backingServiceInstanceRegistry.UpdateBackingServiceInstance(ctx, bsi)
+	if err != nil {
+		return nil, err
+	}
 
-	return nil, errors.New("not implenmented yet")
+	return bsi, nil
 }
 

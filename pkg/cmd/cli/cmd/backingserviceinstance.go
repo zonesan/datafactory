@@ -111,19 +111,15 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	
 	backingServiceInstance := &backingserviceinstanceapi.BackingServiceInstance{}
 	
-	backingServiceInstance.Annotations = make(map[string]string)
 	backingServiceInstance.Name = o.Name
 	backingServiceInstance.GenerateName = o.Name
 	
-	backingServiceInstance.Spec.BackingServiceName = o.BackingServiceName
-	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
-	backingServiceInstance.Spec.Parameters = make(map[string]string)
+	backingServiceInstance.Spec.BackingServiceName = bs.Spec.Name
+	backingServiceInstance.Spec.BackingServiceID = bs.Spec.Id
+	backingServiceInstance.Spec.BackingServicePlanGuid = plan.Id
+	backingServiceInstance.Spec.BackingServicePlanName = plan.Name
 	
-	//backingServiceInstance.Spec.Binding.BindUuid = 
-	backingServiceInstance.Spec.InstanceBindDeploymentConfig = make(map[string]string)
-	backingServiceInstance.Spec.Credential = make(map[string]string)
-	
-	//backingServiceInstance.Status = 
+	//backingServiceInstance.Status = backingserviceinstanceapi.BackingServiceInstancePhaseCreated
 	
 	_, err = client.BackingServiceInstances(namespace).Create(backingServiceInstance)
 	if err != nil {
