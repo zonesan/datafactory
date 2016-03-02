@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/glog"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
@@ -76,13 +77,8 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 			return nil, fmt.Errorf("[http get] status err %s, %d\n", getUrl, resp.StatusCode)
 		}
 	}
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		fmt.Println("=====", err)
-	} else {
-		fmt.Println("-----", string(body))
-	}
-	return body, err
+	glog.Infof("GET %s returns http code %v", getUrl, resp.StatusCode)
+	return ioutil.ReadAll(resp.Body)
 }
 
 func httpPostJson(postUrl string, body []byte, credential ...string) ([]byte, error) {

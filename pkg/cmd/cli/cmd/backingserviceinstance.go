@@ -95,13 +95,13 @@ func (o *NewBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 	backingServiceInstance.Name = o.Name
 	backingServiceInstance.GenerateName = o.Name
 	
-	backingServiceInstance.Spec.Provisioning.BackingServiceName = o.BackingServiceName
-	backingServiceInstance.Spec.Provisioning.BackingServicePlanGuid = o.BackingServicePlanGuid
-	backingServiceInstance.Spec.Provisioning.Parameters = make(map[string]string)
+	backingServiceInstance.Spec.BackingServiceName = o.BackingServiceName
+	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
+	backingServiceInstance.Spec.Parameters = make(map[string]string)
 	
 	//backingServiceInstance.Spec.Binding.BindUuid = 
-	backingServiceInstance.Spec.Binding.InstanceBindDeploymentConfig = make(map[string]string)
-	backingServiceInstance.Spec.Binding.Credential = make(map[string]string)
+	backingServiceInstance.Spec.InstanceBindDeploymentConfig = make(map[string]string)
+	backingServiceInstance.Spec.Credential = make(map[string]string)
 	
 	//backingServiceInstance.Status = 
 	
@@ -191,7 +191,7 @@ func (o *EditBackingServiceInstanceOptions) Run(f *clientcmd.Factory) error {
 		return err
 	}
 	
-	backingServiceInstance.Spec.Provisioning.BackingServicePlanGuid = o.BackingServicePlanGuid
+	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
 	
 	_, err = o.Client.BackingServiceInstances(namespace).Update(backingServiceInstance)
 	if err != nil {

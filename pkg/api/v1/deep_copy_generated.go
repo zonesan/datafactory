@@ -882,11 +882,21 @@ func deepCopy_v1_BackingServiceInstanceList(in backingserviceinstanceapiv1.Backi
 }
 
 func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.BackingServiceInstanceSpec, out *backingserviceinstanceapiv1.BackingServiceInstanceSpec, c *conversion.Cloner) error {
-	if err := deepCopy_v1_InstanceProvisioning(in.Provisioning, &out.Provisioning, c); err != nil {
+	if err := deepCopy_v1_InstanceProvisioning(in.InstanceProvisioning, &out.InstanceProvisioning, c); err != nil {
 		return err
 	}
-	if err := deepCopy_v1_InstanceBinding(in.Binding, &out.Binding, c); err != nil {
+	if err := deepCopy_v1_InstanceBinding(in.InstanceBinding, &out.InstanceBinding, c); err != nil {
 		return err
+	}
+	out.Bound = in.Bound
+	out.InstanceID = in.InstanceID
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
 	}
 	return nil
 }
@@ -935,6 +945,7 @@ func deepCopy_v1_InstanceBinding(in backingserviceinstanceapiv1.InstanceBinding,
 func deepCopy_v1_InstanceProvisioning(in backingserviceinstanceapiv1.InstanceProvisioning, out *backingserviceinstanceapiv1.InstanceProvisioning, c *conversion.Cloner) error {
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
