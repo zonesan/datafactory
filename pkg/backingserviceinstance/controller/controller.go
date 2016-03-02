@@ -41,6 +41,12 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		return nil
 	}
 
+	if bsi.Status.Phase == backingserviceinstanceapi.BackingServiceInstancePhaseInactive {
+		glog.Infoln("deleting ",bsi.Name)
+		return c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
+
+	}
+
 	ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
 	if !ok {
 		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
@@ -58,9 +64,17 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	bsInstanceID := string(util.NewUUID())
 	bsi.Spec.BackingServiceName = bs.Spec.Name
 	bsi.Spec.BackingServiceID = bs.Spec.Id
+
 	bsi.Spec.InstanceID = bsInstanceID
 	bsi.Spec.Parameters = make(map[string]string)
 	bsi.Spec.Parameters["instance_id"] = bsInstanceID
+
+	for _, plan := range bs.Spec.Plans{
+		if bsi.Spec.BackingServicePlanGuid == plan.Id{
+			bsi.Spec.BackingServicePlanName = plan.Name
+			break
+		}
+	}
 
 	sbi := &ServiceInstance{}
 	sbi.ServiceId = bs.Spec.Id

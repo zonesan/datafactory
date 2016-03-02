@@ -882,6 +882,21 @@ func deepCopy_api_BackingServiceInstanceStatus(in backingserviceinstanceapi.Back
 	return nil
 }
 
+func deepCopy_api_BindingRequest(in backingserviceinstanceapi.BindingRequest, out *backingserviceinstanceapi.BindingRequest, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
+	}
+	out.ApplicationUuid = in.ApplicationUuid
+	return nil
+}
+
 func deepCopy_api_InstanceBinding(in backingserviceinstanceapi.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, c *conversion.Cloner) error {
 	out.BindUuid = in.BindUuid
 	if in.InstanceBindDeploymentConfig != nil {
@@ -908,6 +923,7 @@ func deepCopy_api_InstanceProvisioning(in backingserviceinstanceapi.InstanceProv
 	out.BackingServiceName = in.BackingServiceName
 	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {
@@ -3269,6 +3285,7 @@ func init() {
 		deepCopy_api_BackingServiceInstanceList,
 		deepCopy_api_BackingServiceInstanceSpec,
 		deepCopy_api_BackingServiceInstanceStatus,
+		deepCopy_api_BindingRequest,
 		deepCopy_api_InstanceBinding,
 		deepCopy_api_InstanceProvisioning,
 		deepCopy_api_BinaryBuildRequestOptions,

@@ -22,7 +22,7 @@ func BackingServiceInstanceName(name string, prefix bool) (bool, string) {
 // ValidateBackingServiceInstance tests required fields for a BackingServiceInstance.
 func ValidateBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance) fielderrors.ValidationErrorList {
 	allErrs := fielderrors.ValidationErrorList{}
-	allErrs = append(allErrs, validation.ValidateObjectMeta(&bsi.ObjectMeta, false, BackingServiceInstanceName).Prefix("metadata")...)
+	allErrs = append(allErrs, validation.ValidateObjectMeta(&bsi.ObjectMeta, true, BackingServiceInstanceName).Prefix("metadata")...)
 	//allErrs = append(allErrs, validateBuildSpec(&build.Spec).Prefix("spec")...)
 	return allErrs
 }
@@ -38,5 +38,13 @@ func ValidateBackingServiceInstanceUpdate(bsi *backingserviceinstanceapi.Backing
 	//if older.Status != bsi.Status {
 	//	allErrs = append(allErrs, fielderrors.NewFieldInvalid("Status", bsi.Status.Phase, "status cannot be updated from a terminal state"))
 	//}
+	return allErrs
+}
+
+//==========================================
+
+func ValidateBackingServiceInstanceBindingRequest(bi *BindingRequest) fielderrors.ValidationErrorList {
+	allErrs := fielderrors.ValidationErrorList{}
+	// todo
 	return allErrs
 }

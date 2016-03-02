@@ -53,6 +53,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	BackingServicePlanName string 		 `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 
@@ -80,3 +81,14 @@ const (
 	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
+
+type BindingRequest struct {
+	unversioned.TypeMeta
+	// TODO: build request should allow name generation via Name and GenerateName, build config
+	// name should be provided as a separate field
+	kapi.ObjectMeta
+
+	// the application to be bound
+	//app *Application
+	ApplicationUuid string `json:"application_uuid, omitempty"`
+}
