@@ -102,6 +102,14 @@ angular
           return '/project/' + encodeURIComponent(params.project) + "/overview";
         }
       })
+      .when('/backingservices', {
+        templateUrl: 'views/backingservices.html',
+        controller: 'BackingservicesController'
+      })
+      .when('/backingservices/:backingservice', {
+        templateUrl: 'views/backingservice.html',
+        controller: 'BackingserviceController'
+      })
       .when('/project/:project/overview', {
         templateUrl: 'views/project.html',
         controller: 'OverviewController'

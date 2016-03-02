@@ -16214,6 +16214,7 @@
      "backingservice_name",
      "backingservice_id",
      "backingservice_plan_guid",
+     "backingservice_plan_name",
      "parameters"
     ],
     "properties": {
@@ -16227,6 +16228,9 @@
       "type": "string"
      },
      "backingservice_plan_guid": {
+      "type": "string"
+     },
+     "backingservice_plan_name": {
       "type": "string"
      },
      "parameters": {

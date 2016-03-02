@@ -2,21 +2,22 @@ package etcd
 
 import (
 	"errors"
-	
+
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/registry/generic"
 	etcdgeneric "k8s.io/kubernetes/pkg/registry/generic/etcd"
+	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
-	"k8s.io/kubernetes/pkg/runtime"
-	
+
 	"github.com/golang/glog"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 
 	"github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
-	
+	//backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/api"
 )
 
 type BackingServiceInstanceStorage struct {
@@ -56,7 +57,7 @@ func NewREST(s storage.Interface) BackingServiceInstanceStorage {
 		Storage: s,
 	}
 
-	return BackingServiceInstanceStorage {
+	return BackingServiceInstanceStorage{
 		BackingServiceInstance: &REST{store: store},
 		Binding:                NewBindingREST(),
 	}
@@ -87,6 +88,20 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 }
 
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+	bsiObj, err := r.Get(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	bsi := bsiObj.(*api.BackingServiceInstance)
+
+	if bsi.DeletionTimestamp.IsZero() {
+		now := unversioned.Now()
+		bsi.DeletionTimestamp = &now
+		bsi.Status.Phase = api.BackingServiceInstancePhaseInactive
+		result, _, err := r.store.Update(ctx, bsi)
+		return result, err
+	}
+
 	return r.store.Delete(ctx, name, options)
 }
 
@@ -97,7 +112,7 @@ func (r *REST) Watch(ctx kapi.Context, label labels.Selector, field fields.Selec
 //============================================
 
 type BindingREST struct {
-	// todo: 
+	// todo:
 }
 
 func NewBindingREST() *BindingREST {
@@ -110,10 +125,10 @@ func (r *BindingREST) New() runtime.Object {
 
 func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	glog.Infoln("to create a bsi binding.")
-	
+
 	// todo
 	// request := obj.(*api.BindingRequest)
-	// 
+	//
 	// return BackingServiceInstance
 
 	return nil, errors.New("not implenmented yet")
@@ -121,8 +136,8 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 
 func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
 	glog.Infoln("to delete a bsi binding")
-	
+
 	// return BackingServiceInstance
-	
+
 	return nil, errors.New("not implenmented yet")
 }

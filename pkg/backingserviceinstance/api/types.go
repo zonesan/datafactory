@@ -56,6 +56,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string
 	BackingServiceID       string
 	BackingServicePlanGuid string
+	BackingServicePlanName string
 	Parameters             map[string]string
 }
 
