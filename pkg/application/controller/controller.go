@@ -869,7 +869,7 @@ func getApplicationLabels(label map[string]string) []string {
 
 	if label != nil {
 		for key := range label {
-			if strings.Contains(key, ".Application.") {
+			if strings.Contains(key, ".application.") {
 				arr = append(arr, key)
 			}
 		}
