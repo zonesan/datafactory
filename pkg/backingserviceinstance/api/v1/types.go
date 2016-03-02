@@ -53,14 +53,14 @@ type InstanceProvisioning struct {
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
-	BackingServicePlanName string 		 `json:"backingservice_plan_name, omitempty"`
+	BackingServicePlanName string            `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 
 type InstanceBinding struct {
-	BindUuid                     string            `json:"bind_uuid, omitempty"`
-	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
-	Credential                   map[string]string `json:"credential, omitempty"`
+	BindUuid             string            `json:"bind_uuid, omitempty"`
+	BindDeploymentConfig string            `json:"bind_deploymentconfig, omitempty"`
+	Credentials          map[string]string `json:"credential, omitempty"`
 }
 
 type InstanceBindDeploymentConfig struct {
