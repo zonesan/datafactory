@@ -191,21 +191,25 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bsi.ObjectMeta)
 		formatString(out, "Status", bsi.Status.Phase)
-		formatString(out, "DashboardUrl", bsi.Spec.Provisioning.DashboardUrl)
-		formatString(out, "BackingServiceName", bsi.Spec.Provisioning.BackingServiceName)
-		formatString(out, "BackingServicePlanGuid", bsi.Spec.Provisioning.BackingServicePlanGuid)
+		formatString(out, "DashboardUrl", bsi.Spec.DashboardUrl)
+		formatString(out, "BackingServiceName", bsi.Spec.BackingServiceName)
+		formatString(out, "BackingServicePlanName", bsi.Spec.BackingServicePlanName)
+		formatString(out, "BackingServicePlanGuid", bsi.Spec.BackingServicePlanGuid)
 		fmt.Fprintf(out, "Parameters:\n")
-		for k, v := range bsi.Spec.Provisioning.Parameters {
+		for k, v := range bsi.Spec.Parameters {
 			formatString(out, k, v)
 		}
-		formatString(out, "BindUuid", bsi.Spec.Binding.BindUuid)
-		fmt.Fprintf(out, "DeploymentConfig:\n")
-		for k, v := range bsi.Spec.Binding.InstanceBindDeploymentConfig {
-			formatString(out, k, v)
-		}
-		fmt.Fprintf(out, "Credential:\n")
-		for k, v := range bsi.Spec.Binding.Credential {
-			formatString(out, k, v)
+		formatString(out, "Bound", bsi.Spec.Bound)
+		if bsi.Spec.Bound {
+			formatString(out, "BindUuid", bsi.Spec.BindUuid)
+			fmt.Fprintf(out, "DeploymentConfig:\n")
+			for k, v := range bsi.Spec.InstanceBindDeploymentConfig {
+				formatString(out, k, v)
+			}
+			fmt.Fprintf(out, "Credential:\n")
+			for k, v := range bsi.Spec.Credential {
+				formatString(out, k, v)
+			}
 		}
 		return nil
 	})

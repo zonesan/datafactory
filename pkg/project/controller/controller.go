@@ -9,6 +9,7 @@ import (
 
 	osclient "github.com/openshift/origin/pkg/client"
 	projectutil "github.com/openshift/origin/pkg/project/util"
+	"github.com/golang/glog"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -28,6 +29,7 @@ func (e fatalError) Error() string { return "fatal error handling namespace: " +
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *NamespaceController) Handle(namespace *kapi.Namespace) (err error) {
+	glog.Info("project handler called.")
 	// if namespace is not terminating, ignore it
 	if namespace.Status.Phase != kapi.NamespaceTerminating {
 		return nil

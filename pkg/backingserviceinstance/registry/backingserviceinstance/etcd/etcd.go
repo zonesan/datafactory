@@ -9,11 +9,12 @@ import (
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/registry/generic"
 	etcdgeneric "k8s.io/kubernetes/pkg/registry/generic/etcd"
+	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
-	"k8s.io/kubernetes/pkg/runtime"
 	
 	"github.com/golang/glog"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 
 	"github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
@@ -56,17 +57,14 @@ func NewREST(s storage.Interface) *REST {
 	return &REST{store: store}
 }
 
-/// New returns a new object
 func (r *REST) New() runtime.Object {
 	return r.store.NewFunc()
 }
 
-// NewList returns a new list object
 func (r *REST) NewList() runtime.Object {
 	return r.store.NewListFunc()
 }
 
-// Get gets a specific image specified by its ID.
 func (r *REST) Get(ctx kapi.Context, name string) (runtime.Object, error) {
 	return r.store.Get(ctx, name)
 }
@@ -75,18 +73,29 @@ func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Select
 	return r.store.List(ctx, label, field)
 }
 
-// Create creates an image based on a specification.
 func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	return r.store.Create(ctx, obj)
 }
 
-// Update alters an existing image.
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
 	return r.store.Update(ctx, obj)
 }
 
-// Delete deletes an existing image specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+	bsiObj, err := r.Get(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	bsi := bsiObj.(*api.BackingServiceInstance)
+
+	if bsi.DeletionTimestamp.IsZero() {
+		now := unversioned.Now()
+		bsi.DeletionTimestamp = &now
+		bsi.Status.Phase = api.BackingServiceInstancePhaseInactive
+		result, _, err := r.store.Update(ctx, bsi)
+		return result, err
+	}
+
 	return r.store.Delete(ctx, name, options)
 }
 
@@ -127,7 +136,7 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 	if err != nil {
 		return nil, err
 	}
-	bsi.
+	_ = bsi
 	
 	// modify dc etcd
 	// dc.Spec.Template.Spec.Containers[i].Env[j]
@@ -139,7 +148,10 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 	_ = dc
 	
 	// todo
+	// request := obj.(*api.BindingRequest)
+	// 
 	// return BackingServiceInstance
+
 	return nil, errors.New("not implenmented yet")
 }
 
@@ -153,6 +165,7 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 	
 	// todo
 	// return BackingServiceInstance
+
 	return nil, errors.New("not implenmented yet")
 }
 

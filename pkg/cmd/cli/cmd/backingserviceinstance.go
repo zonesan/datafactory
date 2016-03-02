@@ -115,13 +115,13 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	backingServiceInstance.Name = o.Name
 	backingServiceInstance.GenerateName = o.Name
 	
-	backingServiceInstance.Spec.Provisioning.BackingServiceName = o.BackingServiceName
-	backingServiceInstance.Spec.Provisioning.BackingServicePlanGuid = o.BackingServicePlanGuid
-	backingServiceInstance.Spec.Provisioning.Parameters = make(map[string]string)
+	backingServiceInstance.Spec.BackingServiceName = o.BackingServiceName
+	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
+	backingServiceInstance.Spec.Parameters = make(map[string]string)
 	
 	//backingServiceInstance.Spec.Binding.BindUuid = 
-	backingServiceInstance.Spec.Binding.InstanceBindDeploymentConfig = make(map[string]string)
-	backingServiceInstance.Spec.Binding.Credential = make(map[string]string)
+	backingServiceInstance.Spec.InstanceBindDeploymentConfig = make(map[string]string)
+	backingServiceInstance.Spec.Credential = make(map[string]string)
 	
 	//backingServiceInstance.Status = 
 	
@@ -209,7 +209,7 @@ func (o *EditBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 	}
 	
 	//>> todo: maybe better do this is in Update
-	bs, err := client.BackingServices().Get(backingServiceInstance.Spec.Provisioning.BackingServiceName)
+	bs, err := client.BackingServices().Get(backingServiceInstance.Spec.BackingServiceName)
 	if err != nil {
 		return err
 	}
@@ -220,7 +220,7 @@ func (o *EditBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 	}
 	//<<
 	
-	backingServiceInstance.Spec.Provisioning.BackingServicePlanGuid = o.BackingServicePlanGuid
+	backingServiceInstance.Spec.BackingServicePlanGuid = o.BackingServicePlanGuid
 	
 	_, err = client.BackingServiceInstances(namespace).Update(backingServiceInstance)
 	if err != nil {
