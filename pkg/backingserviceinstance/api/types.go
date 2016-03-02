@@ -110,4 +110,3 @@ func NewBindingRequestOptions (kind, version, name string) *BindingRequestOption
 		ResourceName: name,
 	}
 }
-
