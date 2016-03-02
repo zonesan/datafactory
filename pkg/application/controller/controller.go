@@ -72,7 +72,7 @@ func (c *ApplicationController) Handle(application *applicationapi.Application) 
 
 func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) error {
 	errs := []error{}
-	applicationSelector := fmt.Sprintf("%s/Application", app.Namespace)
+	applicationSelector := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "Build":
@@ -91,7 +91,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if b.Labels == nil {
 					b.Labels = make(map[string]string)
 				}
@@ -123,7 +123,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if bc.Labels == nil {
 					bc.Labels = make(map[string]string)
 				}
@@ -155,7 +155,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if dc.Labels == nil {
 					dc.Labels = make(map[string]string)
 				}
@@ -186,7 +186,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if is.Labels == nil {
 					is.Labels = make(map[string]string)
 				}
@@ -231,7 +231,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if e.Labels == nil {
 					e.Labels = make(map[string]string)
 				}
@@ -262,7 +262,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if n.Labels == nil {
 					n.Labels = make(map[string]string)
 				}
@@ -295,7 +295,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if p.Labels == nil {
 					p.Labels = make(map[string]string)
 				}
@@ -326,7 +326,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if rc.Labels == nil {
 					rc.Labels = make(map[string]string)
 				}
@@ -357,7 +357,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if s.Labels == nil {
 					s.Labels = make(map[string]string)
 				}
@@ -388,7 +388,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if pv.Labels == nil {
 					pv.Labels = make(map[string]string)
 				}
@@ -419,7 +419,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if pvc.Labels == nil {
 					pvc.Labels = make(map[string]string)
 				}
@@ -450,7 +450,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if sb.Labels == nil {
 					sb.Labels = make(map[string]string)
 				}
@@ -481,7 +481,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if bs.Labels == nil {
 					bs.Labels = make(map[string]string)
 				}
@@ -512,7 +512,7 @@ func (c *ApplicationController) UpsertHandle(app *applicationapi.Application) er
 					whetherUpdate = true
 				}
 
-			default:
+			case applicationapi.ApplicationNew:
 				if bsi.Labels == nil {
 					bsi.Labels = make(map[string]string)
 				}
@@ -556,8 +556,7 @@ func (c *ApplicationController) DeleteHandle(app *applicationapi.Application) er
 func deleteAllContent(c osclient.Interface, kc kclient.Interface, app *applicationapi.Application) error {
 	errs := []error{}
 	for _, item := range app.Spec.Items {
-		labelString := fmt.Sprintf("%s/Application=%s", app.Namespace, item.Name)
-
+		labelString := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 		switch item.Kind {
 		case "Build":
 			itemResource, err := c.Builds(app.Namespace).Get(item.Name)
@@ -702,9 +701,9 @@ func getApplicationLabels(label map[string]string) []string {
 	arr := []string{}
 
 	if label != nil {
-		for k, v := range label {
-			if strings.HasSuffix(k, "/Application") {
-				arr = append(arr, fmt.Sprintf("%s/Application=%s", k, v))
+		for key := range label {
+			if strings.Contains(key, ".Application.") {
+				arr = append(arr, key)
 			}
 		}
 	}
