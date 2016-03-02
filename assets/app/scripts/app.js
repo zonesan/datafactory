@@ -49,7 +49,7 @@ angular
     var pluginName = "openshiftConsole";
     var tab = builder.create()
      .id(builder.join(pluginName, "overview"))
-     .title(function () { return "Overview"; })
+     .title(function () { return "概况"; })
      .template(template)
      .href(projectHref("overview"))
      .page(function () { return builder.join(templatePath, 'project.html'); })
@@ -60,7 +60,7 @@ angular
 
     tab = builder.create()
       .id(builder.join(pluginName, "browse"))
-      .title(function () { return "Browse"; })
+      .title(function () { return "浏览"; })
       .template(template)
       .href(projectHref("browse"))
       .subPath("Builds", "builds", builder.join(templatePath, 'builds.html'))
@@ -78,7 +78,7 @@ angular
 
     tab = builder.create()
      .id(builder.join(pluginName, "settings"))
-     .title(function () { return "Settings"; })
+     .title(function () { return "设置"; })
      .template(template)
      .href(projectHref("settings"))
      .page(function () { return builder.join(templatePath, 'settings.html'); })
