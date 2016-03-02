@@ -49,6 +49,11 @@ func (Strategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
+// CheckGracefulDelete allows a backingserviceinstance to be gracefully deleted.
+func (Strategy) CheckGracefulDelete(obj runtime.Object, options *kapi.DeleteOptions) bool {
+	return false
+}
+
 // ValidateUpdate is the default update validation for a HostSubnet
 func (Strategy) ValidateUpdate(ctx kapi.Context, obj, old runtime.Object) fielderrors.ValidationErrorList {
 	return fielderrors.ValidationErrorList{}

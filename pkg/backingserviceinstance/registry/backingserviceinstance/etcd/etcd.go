@@ -9,10 +9,11 @@ import (
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
 	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 
 	"github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
-	
+	//backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/api"
 )
 
 const BackingServiceInstancePath = "/backingserviceinstances"
@@ -82,6 +83,20 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 
 // Delete deletes an existing image specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+	bsiObj,err:=r.Get(ctx,name)
+	if err!=nil{
+		return nil,err
+	}
+	bsi:=bsiObj.(*api.BackingServiceInstance)
+
+	if bsi.DeletionTimestamp.IsZero() {
+		now := unversioned.Now()
+		bsi.DeletionTimestamp = &now
+		bsi.Status.Phase = api.BackingServiceInstancePhaseInactive
+		result, _, err := r.store.Update(ctx, bsi)
+		return result, err
+	}
+
 	return r.store.Delete(ctx, name, options)
 }
 
