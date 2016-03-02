@@ -4,18 +4,18 @@
       <h3>information</h3>
       <dl class="dl-horizontal left">
         <dt>name</dt>
-        <dd>{{backingserviceinstance.meta.name}}</dd>
+        <dd>{{backingserviceinstance.metadata.name}}</dd>
         <dt>createTime</dt>
-        <dd>{{backingservice.meta.creationTimestamp}}</dd>
+        <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>
         <dt>bind_deploymentconfig</dt>
-        <dd>{{backingservice.spec.binding.bind_deploymentconfig}}</dd>
+        <dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>
         <dt>provisioningName</dt>
-        <dd>{{backingservice.spec.provisioning.providerDisplayName}}</dd>
+        <dd>{{backingserviceinstance.spec.provisioning.backingservice_name}}</dd>
         <dt>planName</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd>
+        <dd>{{backingserviceinstance.spec.provisioning.backingservice_plan_name}}</dd>
         <dt>dashboardUrl</dt>
         <dd>
-          <a ng-href="{{backingservice.spec.provisioning.dashboard_url}}" target="_blank">{{backingservice.spec.provisioning.dashboard_url}}</a>
+          <a ng-href="{{backingserviceinstance.spec.provisioning.dashboard_url}}" target="_blank">{{backingserviceinstance.spec.provisioning.dashboard_url}}</a>
         </dd>
       </dl>
 

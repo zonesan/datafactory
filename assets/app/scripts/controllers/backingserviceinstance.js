@@ -15,6 +15,17 @@ angular.module('openshiftConsole')
       loadbsi();
     });
 
+    $scope.breadcrumbs = [
+      {
+        title: "Backing Service Instances",
+        link: "project/" + $routeParams.project + "/browse/backingserviceinstances"
+      }
+    ];
+
+    $scope.breadcrumbs.push({
+      title: $routeParams.backingservice
+    });
+
     var loadbsi = function(){
       ProjectsService
       .get($routeParams.project)
