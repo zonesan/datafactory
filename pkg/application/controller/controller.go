@@ -63,7 +63,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Build":
 			build := c.Client.Builds(app.Namespace)
 			b, err := build.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -95,7 +95,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "BuildConfig":
 			buildConfig := c.Client.BuildConfigs(app.Namespace)
 			bc, err := buildConfig.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -127,7 +127,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "DeploymentConfig":
 			deploymentConfig := c.Client.DeploymentConfigs(app.Namespace)
 			dc, err := deploymentConfig.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -158,7 +158,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "ImageStream":
 			imageStream := c.Client.ImageStreams(app.Namespace)
 			is, err := imageStream.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -203,7 +203,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Event":
 			event := c.KubeClient.Events(app.Namespace)
 			e, err := event.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -234,7 +234,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Node":
 			node := c.KubeClient.Nodes()
 			n, err := node.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -267,7 +267,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Pod":
 			pod := c.KubeClient.Pods(app.Namespace)
 			p, err := pod.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -298,7 +298,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "ReplicationController":
 			replicationController := c.KubeClient.ReplicationControllers(app.Namespace)
 			rc, err := replicationController.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -329,7 +329,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "Service":
 			servce := c.KubeClient.Services(app.Namespace)
 			s, err := servce.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -360,7 +360,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "PersistentVolume":
 			persistentVolume := c.KubeClient.PersistentVolumes()
 			pv, err := persistentVolume.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -391,7 +391,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "PersistentVolumeClaim":
 			persistentVolumeClaim := c.KubeClient.PersistentVolumeClaims(app.Namespace)
 			pvc, err := persistentVolumeClaim.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -422,7 +422,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "ServiceBroker":
 			serviceBroker := c.Client.ServiceBrokers()
 			sb, err := serviceBroker.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -453,7 +453,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "BackingService":
 			backingService := c.Client.BackingServices()
 			bs, err := backingService.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}
@@ -484,7 +484,7 @@ func (c *ApplicationController) HandleAppItems(app *applicationapi.Application) 
 		case "BackingServiceInstance":
 			backingServiceInstance := c.Client.BackingServiceInstances(app.Namespace)
 			bsi, err := backingServiceInstance.Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 				continue
 			}

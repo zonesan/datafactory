@@ -114,25 +114,25 @@ func deleteAllContent(c client.Interface, kc kclient.Interface, app *application
 		switch item.Kind {
 		case "Build":
 			err := c.Builds(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "BuildConfig":
 			err := c.BuildConfigs(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "DeploymentConfig":
 			err := c.DeploymentConfigs(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "ImageStream":
 			err := c.ImageStreams(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
@@ -142,13 +142,13 @@ func deleteAllContent(c client.Interface, kc kclient.Interface, app *application
 
 		case "Event":
 			err := kc.Events(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "Node":
 			err := kc.Nodes().Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
@@ -157,49 +157,49 @@ func deleteAllContent(c client.Interface, kc kclient.Interface, app *application
 		case "Pod":
 			// todo make sure deleteOption
 			err := kc.Pods(app.Namespace).Delete(item.Name, nil)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "ReplicationController":
 			err := kc.ReplicationControllers(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "Service":
 			err := kc.Services(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "PersistentVolume":
 			err := kc.PersistentVolumes().Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "PersistentVolumeClaim":
 			err := kc.PersistentVolumeClaims(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "ServiceBroker":
 			err := c.ServiceBrokers().Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "BackingService":
 			err := c.BackingServices().Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
 		case "BackingServiceInstance":
 			err := c.BackingServiceInstances(app.Namespace).Delete(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
+			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
 			}
 
