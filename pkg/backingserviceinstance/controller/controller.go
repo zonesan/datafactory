@@ -48,7 +48,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
 		}
 		return err
-	}else{
+	} else {
 		bsi.Spec.BackingServiceName = bs.Name
 	}
 
@@ -71,8 +71,6 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		}
 
 	}
-
-
 
 	bsInstanceID := string(util.NewUUID())
 	bsi.Spec.BackingServiceName = bs.Spec.Name
@@ -204,7 +202,6 @@ func servicebroker_create_instance(param *ServiceInstance, instance_guid string,
 
 	resp, err := commToServiceBroker("PUT", "http://"+sb.Url+"/v2/service_instances/"+instance_guid, jsonData, header)
 	if err != nil {
-
 		glog.Error(err)
 		return nil, err
 	}
@@ -219,8 +216,8 @@ func servicebroker_create_instance(param *ServiceInstance, instance_guid string,
 	}
 	svcinstance := &CreateServiceInstanceResponse{}
 
-	glog.Infof("%v,%+v\n", string(body), svcinstance)
-	if resp.StatusCode == http.StatusOK {
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated ||
+		resp.StatusCode == http.StatusAccepted {
 		if len(body) > 0 {
 			err = json.Unmarshal(body, svcinstance)
 
@@ -230,7 +227,7 @@ func servicebroker_create_instance(param *ServiceInstance, instance_guid string,
 			}
 		}
 	}
-
+	glog.Infof("%v,%+v\n", string(body), svcinstance)
 	return svcinstance, nil
 }
 
