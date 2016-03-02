@@ -1540,6 +1540,24 @@ func convert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus
 	return autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus(in, out, s)
 }
 
+func autoconvert_api_BindingRequest_To_v1_BindingRequest(in *backingserviceinstanceapi.BindingRequest, out *backingserviceinstanceapiv1.BindingRequest, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapi.BindingRequest))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_api_ObjectMeta_To_v1_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	out.ApplicationUuid = in.ApplicationUuid
+	return nil
+}
+
+func convert_api_BindingRequest_To_v1_BindingRequest(in *backingserviceinstanceapi.BindingRequest, out *backingserviceinstanceapiv1.BindingRequest, s conversion.Scope) error {
+	return autoconvert_api_BindingRequest_To_v1_BindingRequest(in, out, s)
+}
+
 func autoconvert_api_InstanceBinding_To_v1_InstanceBinding(in *backingserviceinstanceapi.InstanceBinding, out *backingserviceinstanceapiv1.InstanceBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapi.InstanceBinding))(in)
@@ -1678,6 +1696,24 @@ func autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceSt
 
 func convert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus(in *backingserviceinstanceapiv1.BackingServiceInstanceStatus, out *backingserviceinstanceapi.BackingServiceInstanceStatus, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus(in, out, s)
+}
+
+func autoconvert_v1_BindingRequest_To_api_BindingRequest(in *backingserviceinstanceapiv1.BindingRequest, out *backingserviceinstanceapi.BindingRequest, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapiv1.BindingRequest))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_v1_ObjectMeta_To_api_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	out.ApplicationUuid = in.ApplicationUuid
+	return nil
+}
+
+func convert_v1_BindingRequest_To_api_BindingRequest(in *backingserviceinstanceapiv1.BindingRequest, out *backingserviceinstanceapi.BindingRequest, s conversion.Scope) error {
+	return autoconvert_v1_BindingRequest_To_api_BindingRequest(in, out, s)
 }
 
 func autoconvert_v1_InstanceBinding_To_api_InstanceBinding(in *backingserviceinstanceapiv1.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, s conversion.Scope) error {
@@ -8699,6 +8735,7 @@ func init() {
 		autoconvert_api_BackingService_To_v1_BackingService,
 		autoconvert_api_BinaryBuildRequestOptions_To_v1_BinaryBuildRequestOptions,
 		autoconvert_api_BinaryBuildSource_To_v1_BinaryBuildSource,
+		autoconvert_api_BindingRequest_To_v1_BindingRequest,
 		autoconvert_api_BuildConfigList_To_v1_BuildConfigList,
 		autoconvert_api_BuildConfigSpec_To_v1_BuildConfigSpec,
 		autoconvert_api_BuildConfigStatus_To_v1_BuildConfigStatus,
@@ -8873,6 +8910,7 @@ func init() {
 		autoconvert_v1_BackingService_To_api_BackingService,
 		autoconvert_v1_BinaryBuildRequestOptions_To_api_BinaryBuildRequestOptions,
 		autoconvert_v1_BinaryBuildSource_To_api_BinaryBuildSource,
+		autoconvert_v1_BindingRequest_To_api_BindingRequest,
 		autoconvert_v1_BuildConfigList_To_api_BuildConfigList,
 		autoconvert_v1_BuildConfigSpec_To_api_BuildConfigSpec,
 		autoconvert_v1_BuildConfigStatus_To_api_BuildConfigStatus,

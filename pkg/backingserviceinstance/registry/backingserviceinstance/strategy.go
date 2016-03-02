@@ -1,6 +1,8 @@
 package backingserviceinstance
 
 import (
+	"fmt"
+	
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
@@ -9,6 +11,7 @@ import (
 	"k8s.io/kubernetes/pkg/util/fielderrors"
 
 	"github.com/openshift/origin/pkg/backingserviceinstance/api"
+	//"github.com/openshift/origin/pkg/backingserviceinstance/api/validation"
 )
 
 // sdnStrategy implements behavior for HostSubnets
@@ -38,6 +41,9 @@ func (Strategy) PrepareForCreate(obj runtime.Object) {
 // Validate validates a new sdn
 func (Strategy) Validate(ctx kapi.Context, obj runtime.Object) fielderrors.ValidationErrorList {
 	return fielderrors.ValidationErrorList{}
+	// todo
+	// bsi := obj.(*api.BackingServiceInstance)
+	// return validation.ValidateBackingServiceInstance(bsi)
 }
 
 // AllowCreateOnUpdate is false for sdns
@@ -52,6 +58,10 @@ func (Strategy) AllowUnconditionalUpdate() bool {
 // ValidateUpdate is the default update validation for a HostSubnet
 func (Strategy) ValidateUpdate(ctx kapi.Context, obj, old runtime.Object) fielderrors.ValidationErrorList {
 	return fielderrors.ValidationErrorList{}
+	// todo
+	// ldBsi := old.(*api.BackingServiceInstance)
+	// objBsi := obj.(*api.BackingServiceInstance)
+	// return validation.ValidateBackingServiceInstance(objBsi, ldBsi)
 }
 
 // Matcher returns a generic matcher for a given label and field selector.
@@ -60,6 +70,9 @@ func Matcher(label labels.Selector, field fields.Selector) generic.Matcher {
 }
 
 func getAttrs(obj runtime.Object) (objLabels labels.Set, objFields fields.Set, err error) {
-	bsi := obj.(*api.BackingServiceInstance)
+	bsi, ok := obj.(*api.BackingServiceInstance)
+	if !ok {
+		return nil, nil, fmt.Errorf("not a BackingServiceInstance")
+	}
 	return labels.Set(bsi.Labels), api.BackingServiceInstanceToSelectableFields(bsi), nil
 }

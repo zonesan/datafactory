@@ -87,4 +87,5 @@ func init() {
 	Validator.Register(&servicebrokerapi.ServiceBroker{}, servicebrokervalidation.ValidateServiceBroker, servicebrokervalidation.ValidateServiceBrokerUpdate)
 	Validator.Register(&backingserviceapi.BackingService{}, backingservicevalidation.ValidateBackingService, backingservicevalidation.ValidateBackingServiceUpdate)
 	Validator.Register(&backingserviceinstanceapi.BackingServiceInstance{}, backingserviceinstancevalidation.ValidateBackingServiceInstance, backingserviceinstancevalidation.ValidateBackingServiceInstanceUpdate)
+	Validator.Register(&backingserviceinstanceapi.BindingRequest{}, backingserviceinstancevalidation.ValidateBackingServiceInstanceBindingRequest, nil)
 }
