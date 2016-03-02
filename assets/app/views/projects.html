@@ -1,8 +1,8 @@
 <div ng-if="!showGetStarted" class="container">
-  <div ng-if="(projects | hashSize) === 0" class="text-muted">Loading...</div>
+  <div ng-if="(projects | hashSize) === 0" class="text-muted">加载中...</div>
   <div ng-if="(projects | hashSize) !== 0">
     <h1 style="display: inline-block;">Projects</h1>
-    <a ng-if="canCreate" href="createProject" style="margin-top: 10px;" class="btn btn-lg btn-primary pull-right">New Project</a>
+    <a ng-if="canCreate" href="createProject" style="margin-top: 10px;" class="btn btn-lg btn-primary pull-right">新建 Project</a>
     <alerts alerts="alerts"></alerts>
     <div ng-repeat="project in projects | orderByDisplayName">
       <div row flex cross-axis="center" class="tile tile-project tile-click tile-flex">
@@ -48,9 +48,9 @@
     <span ng-if="canCreate">Create a project for your application.</span>
   </p>
 
-  <a ng-if="canCreate" href="createProject" class="btn btn-lg btn-primary">New Project</a>
+  <a ng-if="canCreate" href="createProject" class="btn btn-lg btn-primary">新建 Project</a>
 
-  <p>To learn more, visit the OpenShift <a ng-href="{{'' | helpLink}}">documentation</a>.</p>
+  <p>了解更多, 请访问 OpenShift <a ng-href="{{'' | helpLink}}">文档</a>.</p>
 
   <p ng-if="canCreate === false">
     <span ng-if="!newProjectMessage">A cluster admin can create a project for you by running the command<br>

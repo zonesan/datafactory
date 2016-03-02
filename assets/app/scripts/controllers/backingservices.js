@@ -10,7 +10,7 @@
 angular.module('openshiftConsole')
   .controller('BackingservicesController', function ($scope, AuthService, DataService) {
 
-    $scope.emptyMessage = 'No backing services to show';
+    $scope.emptyMessage = '现在没有数据...';
 
     AuthService.withUser().then(function() {
       loadBackingServices();
