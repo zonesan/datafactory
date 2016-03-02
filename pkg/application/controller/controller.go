@@ -597,15 +597,43 @@ func deleteAllContent(c osclient.Interface, kc kclient.Interface, app *applicati
 			}
 
 		case "DeploymentConfig":
-			err := c.DeploymentConfigs(app.Namespace).Delete(item.Name)
+
+			itemResource, err := c.DeploymentConfigs(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.DeploymentConfigs(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.DeploymentConfigs(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "ImageStream":
-			err := c.ImageStreams(app.Namespace).Delete(item.Name)
+
+			itemResource, err := c.ImageStreams(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.ImageStreams(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.ImageStreams(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "ImageStreamTag":
@@ -613,66 +641,205 @@ func deleteAllContent(c osclient.Interface, kc kclient.Interface, app *applicati
 		case "ImageStreamImage":
 
 		case "Event":
-			err := kc.Events(app.Namespace).Delete(item.Name)
+
+			itemResource, err := kc.Events(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.Events(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.Events(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "Node":
-			err := kc.Nodes().Delete(item.Name)
+
+			itemResource, err := kc.Nodes().Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.Nodes().Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.Nodes().Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "Job":
 
 		case "Pod":
-			// todo make sure deleteOption
-			err := kc.Pods(app.Namespace).Delete(item.Name, nil)
+
+			itemResource, err := kc.Pods(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.Pods(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.Pods(app.Namespace).Delete(item.Name, nil)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "ReplicationController":
-			err := kc.ReplicationControllers(app.Namespace).Delete(item.Name)
+
+			itemResource, err := kc.ReplicationControllers(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.ReplicationControllers(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.ReplicationControllers(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "Service":
-			err := kc.Services(app.Namespace).Delete(item.Name)
+
+			itemResource, err := kc.Services(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.Services(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.Services(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "PersistentVolume":
-			err := kc.PersistentVolumes().Delete(item.Name)
+
+			itemResource, err := kc.PersistentVolumes().Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.PersistentVolumes().Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.PersistentVolumes().Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "PersistentVolumeClaim":
-			err := kc.PersistentVolumeClaims(app.Namespace).Delete(item.Name)
+
+			itemResource, err := kc.PersistentVolumeClaims(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := kc.PersistentVolumeClaims(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := kc.PersistentVolumeClaims(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "ServiceBroker":
-			err := c.ServiceBrokers().Delete(item.Name)
+
+			itemResource, err := c.ServiceBrokers().Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.ServiceBrokers().Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.ServiceBrokers().Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "BackingService":
-			err := c.BackingServices().Delete(item.Name)
+
+			itemResource, err := c.BackingServices().Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.BackingServices().Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.BackingServices().Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		case "BackingServiceInstance":
-			err := c.BackingServiceInstances(app.Namespace).Delete(item.Name)
+
+			itemResource, err := c.BackingServiceInstances(app.Namespace).Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
 				errs = append(errs, err)
+				continue
+			}
+
+			if containsOtherApplicationLabel(itemResource.Labels, labelString) {
+				delete(itemResource.Labels, labelString)
+				if _, err := c.BackingServiceInstances(app.Namespace).Update(itemResource); err != nil {
+					errs = append(errs, err)
+				}
+			} else {
+				err := c.BackingServiceInstances(app.Namespace).Delete(item.Name)
+				if err != nil && !kerrors.IsNotFound(err) {
+					errs = append(errs, err)
+				}
 			}
 
 		default:
