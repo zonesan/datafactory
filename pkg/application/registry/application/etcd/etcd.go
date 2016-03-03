@@ -78,15 +78,20 @@ func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, err
 
 // Update alters an existing image.
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
-	app, ok := obj.(*api.Application)
+	newApp, ok := obj.(*api.Application)
 	if ok {
-		if app.Spec.Destory == true {
-			app.Status.Phase = api.ApplicationTerminating
+		if newApp.Spec.Destory == true {
+			newApp.Status.Phase = api.ApplicationTerminating
 		}
 
-		if app.Status.Phase == api.ApplicationActive {
-			app.Status.Phase = api.ApplicationActiveUpdate
+		oldApp := r.store.Get(ctx, newApp.Name)
+		if oldApp.Status.Phase == api.ApplicationActiveUpdate {
+			newApp.Status.Phase = ApplicationActive
 		}
+		if oldApp.Status.Phase == api.ApplicationActive {
+			newApp.Status.Phase = ApplicationActiveUpdate
+		}
+
 	}
 	return r.store.Update(ctx, obj)
 }
