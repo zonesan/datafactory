@@ -218,6 +218,7 @@ func servicebroker_create_instance(param *ServiceInstance, instance_guid string,
 
 	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated ||
 		resp.StatusCode == http.StatusAccepted {
+
 		if len(body) > 0 {
 			err = json.Unmarshal(body, svcinstance)
 

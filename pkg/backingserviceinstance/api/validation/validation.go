@@ -43,8 +43,16 @@ func ValidateBackingServiceInstanceUpdate(bsi *backingserviceinstanceapi.Backing
 
 //==========================================
 
-func ValidateBackingServiceInstanceBindingRequest(bi *BindingRequest) fielderrors.ValidationErrorList {
+//func ValidateBackingServiceInstanceBindingRequest(bi *BindingRequest) fielderrors.ValidationErrorList {
+//	allErrs := fielderrors.ValidationErrorList{}
+//	// todo
+//	return allErrs
+//}
+
+func ValidateBackingServiceInstanceBindingRequestOptions(o *BindingRequestOptions) fielderrors.ValidationErrorList {
 	allErrs := fielderrors.ValidationErrorList{}
 	// todo
 	return allErrs
 }
+
+

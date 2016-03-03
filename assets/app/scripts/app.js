@@ -49,7 +49,7 @@ angular
     var pluginName = "openshiftConsole";
     var tab = builder.create()
      .id(builder.join(pluginName, "overview"))
-     .title(function () { return "Overview"; })
+     .title(function () { return "概况"; })
      .template(template)
      .href(projectHref("overview"))
      .page(function () { return builder.join(templatePath, 'project.html'); })
@@ -60,7 +60,7 @@ angular
 
     tab = builder.create()
       .id(builder.join(pluginName, "browse"))
-      .title(function () { return "Browse"; })
+      .title(function () { return "浏览"; })
       .template(template)
       .href(projectHref("browse"))
       .subPath("Builds", "builds", builder.join(templatePath, 'builds.html'))
@@ -71,6 +71,7 @@ angular
       .subPath("Routes", "routes", builder.join(templatePath, 'browse/routes.html'))
       .subPath("Services", "services", builder.join(templatePath, 'services.html'))
       .subPath("Storage", "storage", builder.join(templatePath, 'storage.html'))
+      .subPath("My Backing Services", "backingserviceinstances", builder.join(templatePath, 'backingservicesinstances.html'))
       .build();
     tab.icon = "sitemap";
     tabs.push(tab);
@@ -78,7 +79,7 @@ angular
 
     tab = builder.create()
      .id(builder.join(pluginName, "settings"))
-     .title(function () { return "Settings"; })
+     .title(function () { return "设置"; })
      .template(template)
      .href(projectHref("settings"))
      .page(function () { return builder.join(templatePath, 'settings.html'); })
@@ -106,9 +107,20 @@ angular
         templateUrl: 'views/backingservices.html',
         controller: 'BackingservicesController'
       })
+
       .when('/backingservices/:backingservice', {
         templateUrl: 'views/backingservice.html',
         controller: 'BackingserviceController'
+
+      })
+
+      .when('/project/:project/browse/backingserviceinstances', {
+        templateUrl: 'views/backingservicesinstances.html',
+        controller: 'BackingServiceInstancesController'
+      })
+      .when('/project/:project/browse/backingserviceinstances/:backingserviceinstance', {
+        templateUrl: 'views/browse/backingserviceinstance.html',
+        controller: 'BackingServiceInstanceController'
       })
       .when('/project/:project/overview', {
         templateUrl: 'views/project.html',
