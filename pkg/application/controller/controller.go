@@ -7,6 +7,8 @@ import (
 	osclient "github.com/openshift/origin/pkg/client"
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	"k8s.io/kubernetes/pkg/fields"
+	"k8s.io/kubernetes/pkg/labels"
 	errutil "k8s.io/kubernetes/pkg/util/errors"
 	"strings"
 )
@@ -29,40 +31,127 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *ApplicationController) Handle(application *api.Application) (err error) {
 
-	if err := c.itemsHandler(application); err != nil {
-		application.Status.Phase = api.ApplicationInActive
+	if err := c.deleteOldLabel(application); err != nil {
 		return err
 	}
 
-	switch application.Status.Phase {
+	if err := c.handleLabel(application); err != nil {
+		return err
+	}
 
-	case api.ApplicationNew:
+	application.Status.Phase = api.ApplicationActive
+	c.Client.Applications(application.Namespace).Update(application)
 
-		application.Status.Phase = api.ApplicationActive
-		fallthrough
+	return nil
+}
 
-	case api.ApplicationInActive:
+func labelServiceBrokers(client osclient.Interface, application *api.Application) error {
 
-		fallthrough
+	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
+	selector, err := labels.Parse(selectorStr)
+	if err != nil {
+		return err
+	}
 
-	case api.ApplicationActive:
+	items, _ := client.ServiceBrokers().List(selector, fields.Everything())
 
-		c.Client.Applications(application.Namespace).Update(application)
-
-	case api.ApplicationTerminatingLabel:
-
-		fallthrough
-
-	case api.ApplicationTerminating:
-
-		c.Client.Applications(application.Namespace).Delete(application.Name)
-
+	for _, oldItem := range items.Items {
+		if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
+			delete(oldItem.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
+			if _, err := client.ServiceBrokers().Update(&oldItem); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
 }
 
-func (c *ApplicationController) itemsHandler(app *api.Application) error {
+func (c *ApplicationController) deleteOldLabel(application *api.Application) error {
+	errs := []error{}
+
+	if err := deleteLabelServiceBrokers(c.Client, application); err != nil {
+		errs = append(errs, err)
+	}
+
+	return errutil.NewAggregate(errs)
+}
+
+func deleteLabelServiceBrokers(client osclient.Interface, application *api.Application) error {
+
+	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
+	selector, err := labels.Parse(selectorStr)
+	if err != nil {
+		return err
+	}
+
+	items, _ := client.ServiceBrokers().List(selector, fields.Everything())
+	errs := []error{}
+	for _, oldItem := range items.Items {
+		if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
+			delete(oldItem.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
+			if _, err := client.ServiceBrokers().Update(&oldItem); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func (c *ApplicationController) handleLabel(app *api.Application) error {
+	errs := []error{}
+	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
+
+	for i, item := range app.Spec.Items {
+		switch item.Kind {
+		case "ServiceBroker":
+
+			client := c.Client.ServiceBrokers()
+
+			//销毁资源
+			if app.Spec.Destory == true {
+				if err := client.Delete(item.Name); err != nil {
+					errs = append(errs, err)
+				}
+			}
+			continue
+
+			resource, err := client.Get(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+				continue
+			}
+
+			switch app.Status.Phase {
+			case api.ApplicationActive://运行检查,用户删除label做status标记
+				if _, exists := resource.Labels[labelSelectorStr]; !exists {
+					app.Spec.Items[i].Status = "user deleted"
+					continue
+				}
+
+			case api.ApplicationTerminatingLabel: //运行检查, 删除所有标签
+				delete(resource.Labels, app.Name)
+				if _, err := client.Update(resource); err != nil {
+					errs = append(errs, err)
+				}
+				continue
+			}
+
+			resource.Labels[labelSelectorStr] = app.Name //创建 更新
+			if _, err := client.Update(resource); err != nil {
+				errs = append(errs, err)
+			}
+
+		default:
+			errs = append(errs, errors.New("unknown resource "+item.Kind+"="+item.Name))
+		}
+	}
+
+	return errutil.NewAggregate(errs)
+}
+
+func (c *ApplicationController) deleteAllContentLabel(app *api.Application) error {
 	errs := []error{}
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
@@ -77,697 +166,25 @@ func (c *ApplicationController) itemsHandler(app *api.Application) error {
 				continue
 			}
 
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
+			if app.Status.Phase == api.ApplicationActive { //Post New
+				if _, exists := resource.Labels[labelSelectorStr]; !exists {
+					app.Spec.Items[i].Status = "user deleted"
 				}
 			}
 
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
+			resource.Labels[labelSelectorStr] = app.Name
 
-		case "BackingService":
-
-			client := c.Client.BackingServices()
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
+			if _, err := client.Update(resource); err != nil {
 				errs = append(errs, err)
-				continue
 			}
+			return nil
 
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "BackingServiceInstance":
-
-			client := c.Client.BackingServiceInstances(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "Build":
-
-			client := c.Client.Builds(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-		case "BuildConfig":
-
-			client := c.Client.BuildConfigs(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-		case "DeploymentConfig":
-
-			client := c.Client.DeploymentConfigs(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "ReplicationController":
-
-			client := c.KubeClient.ReplicationControllers(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "Node":
-
-			client := c.KubeClient.Nodes()
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "Pod":
-
-			client := c.KubeClient.Pods(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name, nil); err != nil {
-					errs = append(errs, err)
-				}
-			}
-
-		case "Service":
-
-			client := c.KubeClient.Services(app.Namespace)
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			toDeleteResource, toUpdateResource := false, false
-			toUpdateItemOK := false
-			switch app.Status.Phase {
-
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, app.Name)
-				toUpdateItemOK = true
-
-			case api.ApplicationTerminatingLabel:
-				if resource.Labels != nil {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource, toUpdateItemOK = true, true
-
-				}
-
-			case api.ApplicationTerminating:
-				if containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
-					delete(resource.Labels, labelSelectorStr)
-					toUpdateResource = true
-				} else {
-					toDeleteResource = true
-				}
-
-			case api.ApplicationInActive:
-				fallthrough
-			case api.ApplicationActive:
-				toUpdateResource = optLabelByItemStatus(resource.Labels, item.Status, labelSelectorStr, item.Name)
-				toUpdateItemOK = true
-
-			}
-
-			if toUpdateResource {
-				_, err := client.Update(resource)
-				if err != nil {
-					app.Spec.Items[i].Status = api.ApplicationItemStatusErr
-					errs = append(errs, err)
-				}
-
-				if err == nil && toUpdateItemOK {
-					switch app.Spec.Items[i].Status {
-					case api.ApplicationItemStatusAdd:
-						app.Spec.Items[i].Status = api.ApplicationItemStatusOk
-					case api.ApplicationItemStatusDelete:
-						app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-					}
-				}
-			}
-
-			if toDeleteResource {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
 		default:
 			errs = append(errs, errors.New("unknown resource "+item.Kind+"="+item.Name))
 		}
 	}
 
 	return errutil.NewAggregate(errs)
-}
-
-func optLabelByItemStatus(label map[string]string, status, labelKey, labelValue string) bool {
-
-	switch status {
-	case api.ApplicationItemStatusAdd:
-		label[labelKey] = labelValue
-		return true
-	case api.ApplicationItemStatusDelete:
-		delete(label, labelKey)
-		return true
-	}
-
-	return false
-}
-
-func containsOtherApplicationLabel(label map[string]string, labelStr string) bool {
-	list := getApplicationLabels(label)
-	if len(list) > 1 {
-		for _, v := range list {
-			if v == labelStr {
-				return true
-			}
-		}
-	}
-
-	return false
 }
 
 func getApplicationLabels(label map[string]string) []string {
@@ -782,4 +199,14 @@ func getApplicationLabels(label map[string]string) []string {
 	}
 
 	return arr
+}
+
+func hasItem(items api.ItemList, item api.Item) bool {
+	for i := range items {
+		if items[i].Kind == item.Kind && items[i].Name == item.Name {
+			return true
+		}
+	}
+
+	return false
 }

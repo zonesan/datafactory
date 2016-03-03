@@ -64,6 +64,8 @@ type ApplicationSpec struct {
 	//ImageUrl    string
 	Items ItemList
 
+	Destory bool
+
 	Finalizers []kapi.FinalizerName
 }
 

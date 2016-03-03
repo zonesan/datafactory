@@ -3,7 +3,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	applicationapi "github.com/openshift/origin/pkg/application/api"
 	"github.com/openshift/origin/pkg/client"
 	"github.com/openshift/origin/pkg/cmd/util/clientcmd"
 	"github.com/spf13/cobra"
@@ -94,7 +93,7 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 		return nil
 	}
 
-	app.Status.Phase = applicationapi.ApplicationTerminating
+	app.Spec.Destory = true
 	if _, err := o.Client.Applications(namespace).Update(app); err != nil {
 		return err
 	}

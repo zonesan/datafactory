@@ -66,6 +66,8 @@ type ApplicationSpec struct {
 	//Description string   `json:"description" description:"description defines the description of a Application"`
 	//ImageUrl    string   `json:"imageUrl" description:"imageUrl defines the image url of a Application"`
 	Items ItemList `json:"items" description:"items defines the resources to be labeled in a Application"`
+
+	Destoryn bool `json:"destoryOption" description:"items defines the resources to be removed in a Application"`
 	// Finalizers is an opaque list of values that must be empty to permanently remove object from storage
 	Finalizers []kapi.FinalizerName `json:"finalizers,omitempty" description:"an opaque list of values that must be empty to permanently remove object from storage"`
 }

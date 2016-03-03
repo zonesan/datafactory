@@ -98,7 +98,6 @@ func (o *NewApplicationOptions) Run(f *clientcmd.Factory) error {
 	application.Labels = map[string]string{}
 	application.Name = o.Name
 	application.GenerateName = o.Name
-	application.Status.Phase = applicationapi.ApplicationNew
 
 	if _, err = o.Client.Applications(namespace).Create(application); err != nil {
 		return err
