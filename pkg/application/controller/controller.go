@@ -109,6 +109,10 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				}
 				fallthrough
 			case api.ApplicationNew:
+				if resource.Labels == nil {
+					resource.Labels == make(map[string]string)
+				}
+
 				resource.Labels[labelSelectorStr] = app.Name
 				if _, err := client.Update(resource); err != nil {
 					errs = append(errs, err)
