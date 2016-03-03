@@ -2,7 +2,8 @@ package api
 
 // AUTO-GENERATED FUNCTIONS START HERE
 import (
-	api "github.com/openshift/origin/pkg/authorization/api"
+	api "github.com/openshift/origin/pkg/application/api"
+	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
@@ -23,7 +24,87 @@ import (
 	sets "k8s.io/kubernetes/pkg/util/sets"
 )
 
-func deepCopy_api_AuthorizationAttributes(in api.AuthorizationAttributes, out *api.AuthorizationAttributes, c *conversion.Cloner) error {
+func deepCopy_api_Application(in api.Application, out *api.Application, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ObjectMeta); err != nil {
+		return err
+	} else {
+		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
+	}
+	if err := deepCopy_api_ApplicationSpec(in.Spec, &out.Spec, c); err != nil {
+		return err
+	}
+	if err := deepCopy_api_ApplicationStatus(in.Status, &out.Status, c); err != nil {
+		return err
+	}
+	return nil
+}
+
+func deepCopy_api_ApplicationList(in api.ApplicationList, out *api.ApplicationList, c *conversion.Cloner) error {
+	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
+		return err
+	} else {
+		out.TypeMeta = newVal.(unversioned.TypeMeta)
+	}
+	if newVal, err := c.DeepCopy(in.ListMeta); err != nil {
+		return err
+	} else {
+		out.ListMeta = newVal.(unversioned.ListMeta)
+	}
+	if in.Items != nil {
+		out.Items = make([]api.Application, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_api_Application(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func deepCopy_api_ApplicationSpec(in api.ApplicationSpec, out *api.ApplicationSpec, c *conversion.Cloner) error {
+	out.Name = in.Name
+	if in.Items != nil {
+		out.Items = make([]api.Item, len(in.Items))
+		for i := range in.Items {
+			if err := deepCopy_api_Item(in.Items[i], &out.Items[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	out.Destory = in.Destory
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapi.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = in.Finalizers[i]
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func deepCopy_api_ApplicationStatus(in api.ApplicationStatus, out *api.ApplicationStatus, c *conversion.Cloner) error {
+	out.Phase = in.Phase
+	return nil
+}
+
+func deepCopy_api_Item(in api.Item, out *api.Item, c *conversion.Cloner) error {
+	out.Kind = in.Kind
+	out.Name = in.Name
+	out.Status = in.Status
+	return nil
+}
+
+func deepCopy_api_AuthorizationAttributes(in authorizationapi.AuthorizationAttributes, out *authorizationapi.AuthorizationAttributes, c *conversion.Cloner) error {
 	out.Namespace = in.Namespace
 	out.Verb = in.Verb
 	out.Resource = in.Resource
@@ -36,7 +117,7 @@ func deepCopy_api_AuthorizationAttributes(in api.AuthorizationAttributes, out *a
 	return nil
 }
 
-func deepCopy_api_ClusterPolicy(in api.ClusterPolicy, out *api.ClusterPolicy, c *conversion.Cloner) error {
+func deepCopy_api_ClusterPolicy(in authorizationapi.ClusterPolicy, out *authorizationapi.ClusterPolicy, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -53,12 +134,12 @@ func deepCopy_api_ClusterPolicy(in api.ClusterPolicy, out *api.ClusterPolicy, c 
 		out.LastModified = newVal.(unversioned.Time)
 	}
 	if in.Roles != nil {
-		out.Roles = make(map[string]*api.ClusterRole)
+		out.Roles = make(map[string]*authorizationapi.ClusterRole)
 		for key, val := range in.Roles {
 			if newVal, err := c.DeepCopy(val); err != nil {
 				return err
 			} else {
-				out.Roles[key] = newVal.(*api.ClusterRole)
+				out.Roles[key] = newVal.(*authorizationapi.ClusterRole)
 			}
 		}
 	} else {
@@ -67,7 +148,7 @@ func deepCopy_api_ClusterPolicy(in api.ClusterPolicy, out *api.ClusterPolicy, c 
 	return nil
 }
 
-func deepCopy_api_ClusterPolicyBinding(in api.ClusterPolicyBinding, out *api.ClusterPolicyBinding, c *conversion.Cloner) error {
+func deepCopy_api_ClusterPolicyBinding(in authorizationapi.ClusterPolicyBinding, out *authorizationapi.ClusterPolicyBinding, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -89,12 +170,12 @@ func deepCopy_api_ClusterPolicyBinding(in api.ClusterPolicyBinding, out *api.Clu
 		out.PolicyRef = newVal.(pkgapi.ObjectReference)
 	}
 	if in.RoleBindings != nil {
-		out.RoleBindings = make(map[string]*api.ClusterRoleBinding)
+		out.RoleBindings = make(map[string]*authorizationapi.ClusterRoleBinding)
 		for key, val := range in.RoleBindings {
 			if newVal, err := c.DeepCopy(val); err != nil {
 				return err
 			} else {
-				out.RoleBindings[key] = newVal.(*api.ClusterRoleBinding)
+				out.RoleBindings[key] = newVal.(*authorizationapi.ClusterRoleBinding)
 			}
 		}
 	} else {
@@ -103,7 +184,7 @@ func deepCopy_api_ClusterPolicyBinding(in api.ClusterPolicyBinding, out *api.Clu
 	return nil
 }
 
-func deepCopy_api_ClusterPolicyBindingList(in api.ClusterPolicyBindingList, out *api.ClusterPolicyBindingList, c *conversion.Cloner) error {
+func deepCopy_api_ClusterPolicyBindingList(in authorizationapi.ClusterPolicyBindingList, out *authorizationapi.ClusterPolicyBindingList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -115,7 +196,7 @@ func deepCopy_api_ClusterPolicyBindingList(in api.ClusterPolicyBindingList, out 
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterPolicyBinding, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterPolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_ClusterPolicyBinding(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -127,7 +208,7 @@ func deepCopy_api_ClusterPolicyBindingList(in api.ClusterPolicyBindingList, out 
 	return nil
 }
 
-func deepCopy_api_ClusterPolicyList(in api.ClusterPolicyList, out *api.ClusterPolicyList, c *conversion.Cloner) error {
+func deepCopy_api_ClusterPolicyList(in authorizationapi.ClusterPolicyList, out *authorizationapi.ClusterPolicyList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -139,7 +220,7 @@ func deepCopy_api_ClusterPolicyList(in api.ClusterPolicyList, out *api.ClusterPo
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterPolicy, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterPolicy, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_ClusterPolicy(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -151,7 +232,7 @@ func deepCopy_api_ClusterPolicyList(in api.ClusterPolicyList, out *api.ClusterPo
 	return nil
 }
 
-func deepCopy_api_ClusterRole(in api.ClusterRole, out *api.ClusterRole, c *conversion.Cloner) error {
+func deepCopy_api_ClusterRole(in authorizationapi.ClusterRole, out *authorizationapi.ClusterRole, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -163,7 +244,7 @@ func deepCopy_api_ClusterRole(in api.ClusterRole, out *api.ClusterRole, c *conve
 		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
 	}
 	if in.Rules != nil {
-		out.Rules = make([]api.PolicyRule, len(in.Rules))
+		out.Rules = make([]authorizationapi.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := deepCopy_api_PolicyRule(in.Rules[i], &out.Rules[i], c); err != nil {
 				return err
@@ -175,7 +256,7 @@ func deepCopy_api_ClusterRole(in api.ClusterRole, out *api.ClusterRole, c *conve
 	return nil
 }
 
-func deepCopy_api_ClusterRoleBinding(in api.ClusterRoleBinding, out *api.ClusterRoleBinding, c *conversion.Cloner) error {
+func deepCopy_api_ClusterRoleBinding(in authorizationapi.ClusterRoleBinding, out *authorizationapi.ClusterRoleBinding, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -206,7 +287,7 @@ func deepCopy_api_ClusterRoleBinding(in api.ClusterRoleBinding, out *api.Cluster
 	return nil
 }
 
-func deepCopy_api_ClusterRoleBindingList(in api.ClusterRoleBindingList, out *api.ClusterRoleBindingList, c *conversion.Cloner) error {
+func deepCopy_api_ClusterRoleBindingList(in authorizationapi.ClusterRoleBindingList, out *authorizationapi.ClusterRoleBindingList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -218,7 +299,7 @@ func deepCopy_api_ClusterRoleBindingList(in api.ClusterRoleBindingList, out *api
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterRoleBinding, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterRoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_ClusterRoleBinding(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -230,7 +311,7 @@ func deepCopy_api_ClusterRoleBindingList(in api.ClusterRoleBindingList, out *api
 	return nil
 }
 
-func deepCopy_api_ClusterRoleList(in api.ClusterRoleList, out *api.ClusterRoleList, c *conversion.Cloner) error {
+func deepCopy_api_ClusterRoleList(in authorizationapi.ClusterRoleList, out *authorizationapi.ClusterRoleList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -242,7 +323,7 @@ func deepCopy_api_ClusterRoleList(in api.ClusterRoleList, out *api.ClusterRoleLi
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterRole, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterRole, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_ClusterRole(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -254,7 +335,7 @@ func deepCopy_api_ClusterRoleList(in api.ClusterRoleList, out *api.ClusterRoleLi
 	return nil
 }
 
-func deepCopy_api_IsPersonalSubjectAccessReview(in api.IsPersonalSubjectAccessReview, out *api.IsPersonalSubjectAccessReview, c *conversion.Cloner) error {
+func deepCopy_api_IsPersonalSubjectAccessReview(in authorizationapi.IsPersonalSubjectAccessReview, out *authorizationapi.IsPersonalSubjectAccessReview, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -263,7 +344,7 @@ func deepCopy_api_IsPersonalSubjectAccessReview(in api.IsPersonalSubjectAccessRe
 	return nil
 }
 
-func deepCopy_api_LocalResourceAccessReview(in api.LocalResourceAccessReview, out *api.LocalResourceAccessReview, c *conversion.Cloner) error {
+func deepCopy_api_LocalResourceAccessReview(in authorizationapi.LocalResourceAccessReview, out *authorizationapi.LocalResourceAccessReview, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -275,7 +356,7 @@ func deepCopy_api_LocalResourceAccessReview(in api.LocalResourceAccessReview, ou
 	return nil
 }
 
-func deepCopy_api_LocalSubjectAccessReview(in api.LocalSubjectAccessReview, out *api.LocalSubjectAccessReview, c *conversion.Cloner) error {
+func deepCopy_api_LocalSubjectAccessReview(in authorizationapi.LocalSubjectAccessReview, out *authorizationapi.LocalSubjectAccessReview, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -300,7 +381,7 @@ func deepCopy_api_LocalSubjectAccessReview(in api.LocalSubjectAccessReview, out 
 	return nil
 }
 
-func deepCopy_api_Policy(in api.Policy, out *api.Policy, c *conversion.Cloner) error {
+func deepCopy_api_Policy(in authorizationapi.Policy, out *authorizationapi.Policy, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -317,12 +398,12 @@ func deepCopy_api_Policy(in api.Policy, out *api.Policy, c *conversion.Cloner) e
 		out.LastModified = newVal.(unversioned.Time)
 	}
 	if in.Roles != nil {
-		out.Roles = make(map[string]*api.Role)
+		out.Roles = make(map[string]*authorizationapi.Role)
 		for key, val := range in.Roles {
 			if newVal, err := c.DeepCopy(val); err != nil {
 				return err
 			} else {
-				out.Roles[key] = newVal.(*api.Role)
+				out.Roles[key] = newVal.(*authorizationapi.Role)
 			}
 		}
 	} else {
@@ -331,7 +412,7 @@ func deepCopy_api_Policy(in api.Policy, out *api.Policy, c *conversion.Cloner) e
 	return nil
 }
 
-func deepCopy_api_PolicyBinding(in api.PolicyBinding, out *api.PolicyBinding, c *conversion.Cloner) error {
+func deepCopy_api_PolicyBinding(in authorizationapi.PolicyBinding, out *authorizationapi.PolicyBinding, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -353,12 +434,12 @@ func deepCopy_api_PolicyBinding(in api.PolicyBinding, out *api.PolicyBinding, c 
 		out.PolicyRef = newVal.(pkgapi.ObjectReference)
 	}
 	if in.RoleBindings != nil {
-		out.RoleBindings = make(map[string]*api.RoleBinding)
+		out.RoleBindings = make(map[string]*authorizationapi.RoleBinding)
 		for key, val := range in.RoleBindings {
 			if newVal, err := c.DeepCopy(val); err != nil {
 				return err
 			} else {
-				out.RoleBindings[key] = newVal.(*api.RoleBinding)
+				out.RoleBindings[key] = newVal.(*authorizationapi.RoleBinding)
 			}
 		}
 	} else {
@@ -367,7 +448,7 @@ func deepCopy_api_PolicyBinding(in api.PolicyBinding, out *api.PolicyBinding, c 
 	return nil
 }
 
-func deepCopy_api_PolicyBindingList(in api.PolicyBindingList, out *api.PolicyBindingList, c *conversion.Cloner) error {
+func deepCopy_api_PolicyBindingList(in authorizationapi.PolicyBindingList, out *authorizationapi.PolicyBindingList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -379,7 +460,7 @@ func deepCopy_api_PolicyBindingList(in api.PolicyBindingList, out *api.PolicyBin
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.PolicyBinding, len(in.Items))
+		out.Items = make([]authorizationapi.PolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_PolicyBinding(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -391,7 +472,7 @@ func deepCopy_api_PolicyBindingList(in api.PolicyBindingList, out *api.PolicyBin
 	return nil
 }
 
-func deepCopy_api_PolicyList(in api.PolicyList, out *api.PolicyList, c *conversion.Cloner) error {
+func deepCopy_api_PolicyList(in authorizationapi.PolicyList, out *authorizationapi.PolicyList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -403,7 +484,7 @@ func deepCopy_api_PolicyList(in api.PolicyList, out *api.PolicyList, c *conversi
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.Policy, len(in.Items))
+		out.Items = make([]authorizationapi.Policy, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_Policy(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -415,7 +496,7 @@ func deepCopy_api_PolicyList(in api.PolicyList, out *api.PolicyList, c *conversi
 	return nil
 }
 
-func deepCopy_api_PolicyRule(in api.PolicyRule, out *api.PolicyRule, c *conversion.Cloner) error {
+func deepCopy_api_PolicyRule(in authorizationapi.PolicyRule, out *authorizationapi.PolicyRule, c *conversion.Cloner) error {
 	if in.Verbs != nil {
 		out.Verbs = make(sets.String)
 		for key, val := range in.Verbs {
@@ -480,7 +561,7 @@ func deepCopy_api_PolicyRule(in api.PolicyRule, out *api.PolicyRule, c *conversi
 	return nil
 }
 
-func deepCopy_api_ResourceAccessReview(in api.ResourceAccessReview, out *api.ResourceAccessReview, c *conversion.Cloner) error {
+func deepCopy_api_ResourceAccessReview(in authorizationapi.ResourceAccessReview, out *authorizationapi.ResourceAccessReview, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -492,7 +573,7 @@ func deepCopy_api_ResourceAccessReview(in api.ResourceAccessReview, out *api.Res
 	return nil
 }
 
-func deepCopy_api_ResourceAccessReviewResponse(in api.ResourceAccessReviewResponse, out *api.ResourceAccessReviewResponse, c *conversion.Cloner) error {
+func deepCopy_api_ResourceAccessReviewResponse(in authorizationapi.ResourceAccessReviewResponse, out *authorizationapi.ResourceAccessReviewResponse, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -526,7 +607,7 @@ func deepCopy_api_ResourceAccessReviewResponse(in api.ResourceAccessReviewRespon
 	return nil
 }
 
-func deepCopy_api_Role(in api.Role, out *api.Role, c *conversion.Cloner) error {
+func deepCopy_api_Role(in authorizationapi.Role, out *authorizationapi.Role, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -538,7 +619,7 @@ func deepCopy_api_Role(in api.Role, out *api.Role, c *conversion.Cloner) error {
 		out.ObjectMeta = newVal.(pkgapi.ObjectMeta)
 	}
 	if in.Rules != nil {
-		out.Rules = make([]api.PolicyRule, len(in.Rules))
+		out.Rules = make([]authorizationapi.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := deepCopy_api_PolicyRule(in.Rules[i], &out.Rules[i], c); err != nil {
 				return err
@@ -550,7 +631,7 @@ func deepCopy_api_Role(in api.Role, out *api.Role, c *conversion.Cloner) error {
 	return nil
 }
 
-func deepCopy_api_RoleBinding(in api.RoleBinding, out *api.RoleBinding, c *conversion.Cloner) error {
+func deepCopy_api_RoleBinding(in authorizationapi.RoleBinding, out *authorizationapi.RoleBinding, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -581,7 +662,7 @@ func deepCopy_api_RoleBinding(in api.RoleBinding, out *api.RoleBinding, c *conve
 	return nil
 }
 
-func deepCopy_api_RoleBindingList(in api.RoleBindingList, out *api.RoleBindingList, c *conversion.Cloner) error {
+func deepCopy_api_RoleBindingList(in authorizationapi.RoleBindingList, out *authorizationapi.RoleBindingList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -593,7 +674,7 @@ func deepCopy_api_RoleBindingList(in api.RoleBindingList, out *api.RoleBindingLi
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.RoleBinding, len(in.Items))
+		out.Items = make([]authorizationapi.RoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_RoleBinding(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -605,7 +686,7 @@ func deepCopy_api_RoleBindingList(in api.RoleBindingList, out *api.RoleBindingLi
 	return nil
 }
 
-func deepCopy_api_RoleList(in api.RoleList, out *api.RoleList, c *conversion.Cloner) error {
+func deepCopy_api_RoleList(in authorizationapi.RoleList, out *authorizationapi.RoleList, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -617,7 +698,7 @@ func deepCopy_api_RoleList(in api.RoleList, out *api.RoleList, c *conversion.Clo
 		out.ListMeta = newVal.(unversioned.ListMeta)
 	}
 	if in.Items != nil {
-		out.Items = make([]api.Role, len(in.Items))
+		out.Items = make([]authorizationapi.Role, len(in.Items))
 		for i := range in.Items {
 			if err := deepCopy_api_Role(in.Items[i], &out.Items[i], c); err != nil {
 				return err
@@ -629,7 +710,7 @@ func deepCopy_api_RoleList(in api.RoleList, out *api.RoleList, c *conversion.Clo
 	return nil
 }
 
-func deepCopy_api_SubjectAccessReview(in api.SubjectAccessReview, out *api.SubjectAccessReview, c *conversion.Cloner) error {
+func deepCopy_api_SubjectAccessReview(in authorizationapi.SubjectAccessReview, out *authorizationapi.SubjectAccessReview, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -654,7 +735,7 @@ func deepCopy_api_SubjectAccessReview(in api.SubjectAccessReview, out *api.Subje
 	return nil
 }
 
-func deepCopy_api_SubjectAccessReviewResponse(in api.SubjectAccessReviewResponse, out *api.SubjectAccessReviewResponse, c *conversion.Cloner) error {
+func deepCopy_api_SubjectAccessReviewResponse(in authorizationapi.SubjectAccessReviewResponse, out *authorizationapi.SubjectAccessReviewResponse, c *conversion.Cloner) error {
 	if newVal, err := c.DeepCopy(in.TypeMeta); err != nil {
 		return err
 	} else {
@@ -3222,6 +3303,11 @@ func deepCopy_api_UserList(in userapi.UserList, out *userapi.UserList, c *conver
 
 func init() {
 	err := pkgapi.Scheme.AddGeneratedDeepCopyFuncs(
+		deepCopy_api_Application,
+		deepCopy_api_ApplicationList,
+		deepCopy_api_ApplicationSpec,
+		deepCopy_api_ApplicationStatus,
+		deepCopy_api_Item,
 		deepCopy_api_AuthorizationAttributes,
 		deepCopy_api_ClusterPolicy,
 		deepCopy_api_ClusterPolicyBinding,
