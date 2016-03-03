@@ -87,9 +87,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
@@ -97,19 +97,19 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			_, err = servicebroker_unbinding(bsi, servicebroker)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
 			
-			err = deploymentconfig_clear_envs(bsi.Spec.BindDeploymentConfig, bsi.Name)
+			err = deploymentconfig_clear_envs(c.Client, bsi.Spec.BindDeploymentConfig, bsi.Name)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
@@ -133,9 +133,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
@@ -143,24 +143,25 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			glog.Infoln("deleting ", bsi.Name)
 			if _, err = servicebroker_deprovisioning(bsi, servicebroker); err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			} else {
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDestroyed
-				changed = true
 				err = c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
 				
 				if err != nil {
 					glog.Error(err)
-					bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-					
-					changed = true
+					//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+					//
+					//changed = true
 					result = err
 					break
 				}
+				
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDestroyed
+				changed = true
 			}
 		}
 		
@@ -169,9 +170,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
@@ -184,9 +185,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			svcinstance, err := servicebroker_create_instance(serviceinstance, bsi.Spec.InstanceID, servicebroker)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			} else {
@@ -206,19 +207,19 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			bindingresponse, err := servicebroker_binding(servicebinding, bsi.Spec.BindUuid, servicebroker)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
 			
-			err = deploymentconfig_inject_envs(bsi.Spec.BindDeploymentConfig, bsi.Name, bindingresponse)
+			err = deploymentconfig_inject_envs(c.Client, bsi.Spec.BindDeploymentConfig, bsi.Name, bindingresponse)
 			if err != nil {
 				glog.Error(err)
-				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-				
-				changed = true
+				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				//
+				//changed = true
 				result = err
 				break
 			}
@@ -333,25 +334,6 @@ type Credential struct {
 	Port     string `json:"port"`
 	Vhost    string `json:"vhost"`
 	//Database string `json:"database"`
-}
-
-var InvalidCharFinder = regexp.MustCompile("[^a-zA-Z0-9]")
-
-func deploymentconfig_env_prefix(bsiName string) string {
-	return fmt.Sprintf("BSI_%s_", InvalidCharFinder.ReplaceAllLiteralString(bsiName, ""))
-}
-
-func deploymentconfig_env_name(prefix string, envName string) string {
-	return fmt.Sprintf("%s%s", prefix, InvalidCharFinder.ReplaceAllLiteralString(envName, "_"))
-}
-
-func deploymentconfig_inject_envs(dcName string, bsiName string, bindingResponse *ServiceBindingResponse) error {
-	return nil
-}
-// ENVs
-//    BSI_XXXX_password=xxxxx
-func deploymentconfig_clear_envs(dcName string, bsiName string) error {
-	return nil
 }
 
 func servicebroker_create_instance(param *ServiceInstance, instance_guid string, sb *ServiceBroker) (*CreateServiceInstanceResponse, error) {
@@ -520,4 +502,30 @@ func basicAuthStr(username, password string) string {
 	auth := username + ":" + password
 	authstr := base64.StdEncoding.EncodeToString([]byte(auth))
 	return "Basic " + authstr
+}
+
+
+
+
+var InvalidCharFinder = regexp.MustCompile("[^a-zA-Z0-9]")
+
+func deploymentconfig_env_prefix(bsiName string) string {
+	return fmt.Sprintf("BSI_%s_", InvalidCharFinder.ReplaceAllLiteralString(bsiName, ""))
+}
+
+func deploymentconfig_env_name(prefix string, envName string) string {
+	return fmt.Sprintf("%s%s", prefix, InvalidCharFinder.ReplaceAllLiteralString(envName, "_"))
+}
+
+func deploymentconfig_inject_envs(c osclient.Interface, dcName string, bsiName string, bindingResponse *ServiceBindingResponse) error {
+
+	
+		
+	return nil
+}
+// ENVs
+//    BSI_XXXX_password=xxxxx
+func deploymentconfig_clear_envs(c osclient.Interface, dcName string, bsiName string) error {
+	
+	return nil
 }

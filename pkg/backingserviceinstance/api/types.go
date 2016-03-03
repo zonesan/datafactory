@@ -57,6 +57,7 @@ type InstanceProvisioning struct {
 }
 
 type InstanceBinding struct {
+	BoundTime            *unversioned.Time
 	BindUuid             string
 	BindDeploymentConfig string
 	Credentials          map[string]string

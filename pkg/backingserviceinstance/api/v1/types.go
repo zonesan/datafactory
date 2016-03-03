@@ -58,6 +58,7 @@ type InstanceProvisioning struct {
 }
 
 type InstanceBinding struct {
+	BoundTime            *unversioned.Time `json:"bound_time,omitempty"`
 	BindUuid             string            `json:"bind_uuid, omitempty"`
 	BindDeploymentConfig string            `json:"bind_deploymentconfig, omitempty"`
 	Credentials          map[string]string `json:"credentials, omitempty"`
@@ -70,12 +71,13 @@ type BackingServiceInstanceStatus struct {
 type BackingServiceInstancePhase string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
+	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" // not inited
+	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	BackingServiceInstancePhaseDestroyed BackingServiceInstancePhase = "Destroyed"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
 )
 
 //=====================================================
