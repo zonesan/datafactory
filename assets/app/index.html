@@ -27,7 +27,13 @@
     <!-- endbuild -->
     <link rel="stylesheet" type="text/css" href="styles/extensions.css">
      <style type="text/css">
-
+       @media (min-width: 768px) {
+         .console-os .wrap .sidebar-left .navbar-sidebar .fa {
+           margin: 0 auto!important;
+           padding: 0;
+           display: block!important;
+         }
+       }
 
     </style>
   </head>
@@ -55,7 +61,7 @@
           
           <li>
             <a href="http://docs.openshift.org/latest/welcome/index.html">
-            <span class="fa fa-files-o fa-fw"></span> Documentation</a>
+            <span class="fa fa-files-o fa-fw"></span> 文档</a>
           </li>
           <li uib-dropdown ng-cloak ng-if="user">
             <a href="" uib-dropdown-toggle id="user-dropdown">
@@ -73,7 +79,7 @@
               <li class="divider"></li>
               -->
               <li>
-                <a href="logout">Log out</a>
+                <a href="logout">退出</a>
               </li>
             </ul>
           </li>
