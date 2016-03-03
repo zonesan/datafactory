@@ -3,26 +3,16 @@
     <div class="col-lg-6">
       <h3>Binding Application</h3>
       <dl class="dl-horizontal left">
-      	<dt>myMySQL</dt>
-        <dd>{{backingserviceinstance.meta.name}}</dd>
-        <dt>bindingService</dt>
-        <dd>{{backingservice.meta.creationTimestamp}}</dd>
+      	<dt>mySQL</dt>
+        <dd>{{backingserviceinstance.spec.provisioning.backingservice_name}}</dd>
         <dt>serviceName</dt>
-        <dd>{{backingservice.spec.binding.bind_deploymentconfig}}</dd>
-        <dt>runningStatus</dt>
-        <dd>{{backingservice.spec.provisioning.providerDisplayName}}</dd>
+        <dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>
+        <!-- <dt>runningStatus</dt>
+        <dd>{{deploymentconfig.status}}</dd> -->
         <dt>runningTime</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd>   
-        <dt>runningTime</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
-        <dt>binding Status</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd>
-        <dt>serviceCreateTime</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
+        <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>    
         <dt>bindingTime</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
-        <dt>restartService</dt>
-        <dd>{{backingservice.spec.provisioning.plan_name}}</dd>
+        <dd>N.A.</dd> 
       </dl>
     </div> 
   </div> 

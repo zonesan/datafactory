@@ -17,7 +17,8 @@
       </tbody>
       <tbody ng-repeat="bsi in backingserviceinstances | orderObjectsByDate : true">
       <tr>
-        <td data-title="Backing Service Name"><a ng-href="{{bsi | navigateResourceURL}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
+        <td data-title="Backing Service Name">
+        <a ng-href="backingservices/{{bsi.bsName}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
         <td data-title="Instance Name">
         <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
         <td data-title="Created Time">

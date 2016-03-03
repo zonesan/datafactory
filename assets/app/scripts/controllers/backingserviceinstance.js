@@ -8,7 +8,7 @@
  * Controller of the openshiftConsole
  */
 angular.module('openshiftConsole')
-  .controller('backingserviceinstancecontroller', function ($scope, $routeParams, $filter, AuthService, DataService,ProjectsService) { 
+  .controller('BackingServiceInstanceController', function ($scope, $routeParams, $filter, AuthService, DataService,ProjectsService) { 
     $scope.emptyMessage = 'No instances to show';
     $scope.alerts = {};
     AuthService.withUser().then(function() {
@@ -23,7 +23,7 @@ angular.module('openshiftConsole')
     ];
 
     $scope.breadcrumbs.push({
-      title: $routeParams.backingservice
+      title: $routeParams.backingserviceinstance
     });
 
     var loadbsi = function(){
@@ -38,6 +38,15 @@ angular.module('openshiftConsole')
                 $scope.loaded = true;
                 $scope.backingserviceinstance = bsi;
                 console.log('backingserviceinstance', bsi);
+
+                // if (bsi.spec.binding.bind_deploymentconfig){
+                //   DataService.get("deploymentconfigs", bsi.spec.binding.bind_deploymentconfig, context).then(
+                //     function(dc){ 
+                //       $scope.deploymentconfig = dc;
+                //       console.log("deploymentconfigs", dc)
+                //     }
+                //   );
+                // }
               },
               // failure
               function(e) {
@@ -49,6 +58,8 @@ angular.module('openshiftConsole')
                 };
               }
             );
+
+            
          })   
         );   
       };

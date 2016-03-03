@@ -116,11 +116,11 @@ angular
 
       .when('/project/:project/browse/backingserviceinstances', {
         templateUrl: 'views/backingservicesinstances.html',
-        controller: 'BackingserviceInstancesController'
+        controller: 'BackingServiceInstancesController'
       })
       .when('/project/:project/browse/backingserviceinstances/:backingserviceinstance', {
         templateUrl: 'views/browse/backingserviceinstance.html',
-        controller: 'backingserviceinstancecontroller'
+        controller: 'BackingServiceInstanceController'
       })
       .when('/project/:project/overview', {
         templateUrl: 'views/project.html',
