@@ -71,6 +71,7 @@ angular
       .subPath("Routes", "routes", builder.join(templatePath, 'browse/routes.html'))
       .subPath("Services", "services", builder.join(templatePath, 'services.html'))
       .subPath("Storage", "storage", builder.join(templatePath, 'storage.html'))
+      .subPath("Applications", "applications", builder.join(templatePath, 'applications.html'))
       .build();
     tab.icon = "sitemap";
     tabs.push(tab);
@@ -219,6 +220,14 @@ angular
       .when('/project/:project/browse/routes/:route', {
         templateUrl: 'views/browse/route.html',
         controller: 'RouteController'
+      })
+      .when('/project/:project/browse/applications', {
+        templateUrl: 'views/applications.html',
+        controller: 'ApplicationsController'
+      })
+      .when('/project/:project/browse/applications/:application', {
+        templateUrl: 'views/browse/application.html',
+        controller: 'ApplicationController'
       })
       .when('/project/:project/createRoute', {
         templateUrl: 'views/createRoute.html',
