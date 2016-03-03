@@ -2,7 +2,7 @@ package controller
 
 import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
-
+	"errors"
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
@@ -17,6 +17,7 @@ import (
 	"k8s.io/kubernetes/pkg/util"
 	"net/http"
 	"strings"
+	"regexp"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -35,74 +36,218 @@ func (e fatalError) Error() string {
 }
 
 // Handle processes a namespace and deletes content in origin if its terminating
-func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (err error) {
+func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
 	glog.Infoln("bsi handler called.", bsi.Name)
-	if bsi.Status.Phase == backingserviceinstanceapi.BackingServiceInstancePhaseReady {
+	
+	changed := false
+
+	switch bsi.Status.Phase {
+	default:
+		return errors.New("unknown phase")
+	case backingserviceinstanceapi.BackingServiceInstancePhaseError:
+		return errors.New("error")
+	case backingserviceinstanceapi.BackingServiceInstancePhaseDestroyed:
 		return nil
-	}
-
-	ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
-	if !ok {
-		if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseError {
+	case "", backingserviceinstanceapi.BackingServiceInstancePhaseCreated:
+		ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
+		if !ok {
 			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-			c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
+			
+			changed = true
+			result =  err
+			break
+		//} else {
+		//	bsi.Spec.BackingServiceName = bs.Name
 		}
-		return err
-	} else {
-		bsi.Spec.BackingServiceName = bs.Name
+		
+		bsi.Spec.BackingServiceName = bs.Spec.Name
+		bsi.Spec.BackingServiceID = bs.Spec.Id
+		
+		for _, plan := range bs.Spec.Plans {
+			if bsi.Spec.BackingServicePlanGuid == plan.Id {
+				bsi.Spec.BackingServicePlanName = plan.Name
+				break
+			}
+		}
+		
+		// 
+		bsInstanceID := string(util.NewUUID())
+		bsi.Spec.InstanceID = bsInstanceID
+		bsi.Spec.Parameters = make(map[string]string)
+		bsi.Spec.Parameters["instance_id"] = bsInstanceID
+		
+		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseActive
+		changed = true
+		
+	case backingserviceinstanceapi.BackingServiceInstancePhaseActive:
+	
+	UNBIND:
+		// unbind
+		if bsi.Spec.Bound && bsi.Spec.BindUuid == "" {
+			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			_, err = servicebroker_unbinding(bsi, servicebroker)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			err = deploymentconfig_clear_envs(bsi.Spec.BindDeploymentConfig, bsi.Name)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseActive
+			bsi.Spec.Bound = false
+			//bsi.Spec.BindUuid = ""
+			bsi.Spec.BindDeploymentConfig = ""
+			bsi.Spec.Credentials = nil
+			
+			changed = true
+		}
+		
+		// delete
+		if bsi.Spec.InstanceID == "" {
+			if bsi.Spec.Bound && bsi.Spec.BindUuid != "" {
+				bsi.Spec.BindUuid = ""
+				goto UNBIND
+			}
+			
+			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			glog.Infoln("deleting ", bsi.Name)
+			if _, err = servicebroker_deprovisioning(bsi, servicebroker); err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			} else {
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDestroyed
+				changed = true
+				err = c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
+				
+				if err != nil {
+					glog.Error(err)
+					bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+					
+					changed = true
+					result = err
+					break
+				}
+			}
+		}
+		
+		// bind
+		if bsi.Spec.Bound == false && bsi.Spec.BindUuid != "" && bsi.Spec.BindDeploymentConfig != "" {
+			servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			serviceinstance := &ServiceInstance{}
+			serviceinstance.ServiceId = bsi.Spec.BackingServiceID
+			serviceinstance.PlanId = bsi.Spec.BackingServicePlanGuid
+			serviceinstance.OrganizationGuid = bsi.Namespace
+			
+			svcinstance, err := servicebroker_create_instance(serviceinstance, bsi.Spec.InstanceID, servicebroker)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			} else {
+				bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
+				glog.Infoln("create instance successfully.", svcinstance)
+			}
+			
+			servicebinding := &ServiceBinding{
+				ServiceId:      bsi.Spec.BackingServiceID,
+				PlanId:         bsi.Spec.BackingServicePlanGuid,
+				AppGuid:        bsi.Namespace,
+				//BindResource: ,
+				//Parameters: ,
+				svc_instance_id: bsi.Spec.InstanceID,
+			}
+			
+			bindingresponse, err := servicebroker_binding(servicebinding, bsi.Spec.BindUuid, servicebroker)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			err = deploymentconfig_inject_envs(bsi.Spec.BindDeploymentConfig, bsi.Name, bindingresponse)
+			if err != nil {
+				glog.Error(err)
+				bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
+				
+				changed = true
+				result = err
+				break
+			}
+			
+			bsi.Spec.Bound = true
+			
+			changed = true
+		}
 	}
+	
+	// ...
 
+	if changed {
+		c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
+	}
+	
+	return result
+}
+
+func servicebroker_load(c osclient.Interface, name string) (*ServiceBroker, error){
 	servicebroker := &ServiceBroker{}
-	if sb, err := c.Client.ServiceBrokers().Get(bsi.Spec.BackingServiceName); err != nil {
-		return err
+	if sb, err := c.ServiceBrokers().Get(name); err != nil {
+		return nil, err
 	} else {
 		servicebroker.Url = sb.Spec.Url
 		servicebroker.UserName = sb.Spec.UserName
 		servicebroker.Password = sb.Spec.Password
+		return servicebroker, nil
 	}
-
-	if bsi.Status.Phase == backingserviceinstanceapi.BackingServiceInstancePhaseInactive {
-		glog.Infoln("deleting ", bsi.Name)
-		if _, err := servicebroker_deprovisioning(bsi, servicebroker); err != nil {
-			glog.Error(err)
-			return err
-		} else {
-			return c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
-		}
-
-	}
-
-	bsInstanceID := string(util.NewUUID())
-	bsi.Spec.BackingServiceName = bs.Spec.Name
-	bsi.Spec.BackingServiceID = bs.Spec.Id
-
-	bsi.Spec.InstanceID = bsInstanceID
-	bsi.Spec.Parameters = make(map[string]string)
-	bsi.Spec.Parameters["instance_id"] = bsInstanceID
-
-	for _, plan := range bs.Spec.Plans {
-		if bsi.Spec.BackingServicePlanGuid == plan.Id {
-			bsi.Spec.BackingServicePlanName = plan.Name
-			break
-		}
-	}
-
-	serviceinstance := &ServiceInstance{}
-	serviceinstance.ServiceId = bs.Spec.Id
-	serviceinstance.PlanId = bsi.Spec.BackingServicePlanGuid
-	serviceinstance.OrganizationGuid = bsi.Namespace
-
-	if svcinstance, err := servicebroker_create_instance(serviceinstance, bsInstanceID, servicebroker); err != nil {
-		glog.Errorln(err)
-		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
-	} else {
-		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
-		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseReady
-		glog.Infoln("create instance successfully.", svcinstance)
-	}
-
-	c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
-	return nil
 }
 
 func checkIfPlanidExist(client osclient.Interface, planId string) (bool, *backingserviceapi.BackingService, error) {
@@ -188,6 +333,25 @@ type Credential struct {
 	Port     string `json:"port"`
 	Vhost    string `json:"vhost"`
 	//Database string `json:"database"`
+}
+
+var InvalidCharFinder = regexp.MustCompile("[^a-zA-Z0-9]")
+
+func deploymentconfig_env_prefix(bsiName string) string {
+	return fmt.Sprintf("BSI_%s_", InvalidCharFinder.ReplaceAllLiteralString(bsiName, ""))
+}
+
+func deploymentconfig_env_name(prefix string, envName string) string {
+	return fmt.Sprintf("%s%s", prefix, InvalidCharFinder.ReplaceAllLiteralString(envName, "_"))
+}
+
+func deploymentconfig_inject_envs(dcName string, bsiName string, bindingResponse *ServiceBindingResponse) error {
+	return nil
+}
+// ENVs
+//    BSI_XXXX_password=xxxxx
+func deploymentconfig_clear_envs(dcName string, bsiName string) error {
+	return nil
 }
 
 func servicebroker_create_instance(param *ServiceInstance, instance_guid string, sb *ServiceBroker) (*CreateServiceInstanceResponse, error) {

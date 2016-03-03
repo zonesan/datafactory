@@ -70,12 +70,13 @@ type BackingServiceInstanceStatus struct {
 type BackingServiceInstancePhase string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
+	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" // not inited
+	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	BackingServiceInstancePhaseDestroyed BackingServiceInstancePhase = "Destroyed"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
 )
 
 //=====================================================

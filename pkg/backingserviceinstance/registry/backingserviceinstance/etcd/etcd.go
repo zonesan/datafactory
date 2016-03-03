@@ -93,7 +93,8 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 	if bsi.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
 		bsi.DeletionTimestamp = &now
-		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseInactive
+		//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseInactive
+		bsi.Spec.InstanceID = "" // notify controller to delete
 		result, _, err := r.store.Update(ctx, bsi)
 		return result, err
 	}
@@ -137,12 +138,12 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 		return nil, err
 	}
 	
-	if bsi.Spec.Bound {
-		return nil, errors.New("back service instance already bound")
-	}
-	
 	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseActive {
 		return nil, errors.New("back service instance is not in active phase")
+	}
+	
+	if bsi.Spec.Bound {
+		return nil, errors.New("back service instance already bound")
 	}
 	
 	//bs, err := r.backingServiceRegistry.GetBackingService(ctx, bsi.Spec.BackingServiceName)
@@ -177,10 +178,6 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 	bsi, err := r.backingServiceInstanceRegistry.GetBackingServiceInstance(ctx, name)
 	if err != nil {
 		return nil, err
-	}
-	
-	if ! bsi.Spec.Bound {
-		return nil, errors.New("back service instance is not bound yet")
 	}
 	
 	bsi.Spec.BindUuid = "" // notify controller to unbind

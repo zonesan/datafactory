@@ -67,7 +67,7 @@ func NewCmdNewBackingServiceInstance(fullName string, f *clientcmd.Factory, out 
 		},
 	}
 
-	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService GUID")
+	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService Name")
 	cmd.Flags().StringVar(&options.BackingServicePlanGuid, "planid", "", "BackingService Plan GUID")
 	// todo: dashboard_url
 	
