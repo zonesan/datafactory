@@ -1,0 +1,19 @@
+<div class='resource-details'>
+  <div class="row">
+    <div class="col-lg-6">
+      <h3>Binding Application</h3>
+      <dl class="dl-horizontal left">
+      	<dt>mySQL</dt>
+        <dd>{{backingserviceinstance.spec.provisioning.backingservice_name}}</dd>
+        <dt>serviceName</dt>
+        <dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>
+        <!-- <dt>runningStatus</dt>
+        <dd>{{deploymentconfig.status}}</dd> -->
+        <dt>runningTime</dt>
+        <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>    
+        <dt>bindingTime</dt>
+        <dd>N.A.</dd> 
+      </dl>
+    </div> 
+  </div> 
+</div>  
