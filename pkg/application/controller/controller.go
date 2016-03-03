@@ -90,7 +90,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 	errs := []error{}
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
-	for _, item := range app.Spec.Items {
+	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
 
@@ -123,10 +123,18 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 					errs = append(errs, err)
 				}
 
+				//if i + 1 == len(app.Spec.Items) {
+				//	c.Client.Applications(app.Namespace).Delete(app.Name)
+				//}
+
 			case api.ApplicationTerminatingLabel:
 				delete(resource.Labels, labelSelectorStr)
 				if _, err := client.Update(resource); err != nil {
 					errs = append(errs, err)
+				}
+
+				if len(resource.Labels) == 0 {
+					c.Client.Applications(app.Namespace).Delete(app.Name)
 				}
 			}
 
