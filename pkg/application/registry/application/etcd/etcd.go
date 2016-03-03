@@ -82,6 +82,7 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 	if ok {
 		if newApp.Spec.Destory == true {
 			newApp.Status.Phase = api.ApplicationTerminating
+			return r.store.Update(ctx, obj)
 		}
 
 		oldObj, _ := r.store.Get(ctx, newApp.Name)
@@ -96,6 +97,7 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 		}
 
 	}
+
 	return r.store.Update(ctx, obj)
 }
 
