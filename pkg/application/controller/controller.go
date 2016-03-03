@@ -124,7 +124,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				}
 
 			case api.ApplicationTerminatingLabel:
-				delete(resource.Labels, app.Name)
+				delete(resource.Labels, labelSelectorStr)
 				if _, err := client.Update(resource); err != nil {
 					errs = append(errs, err)
 				}
