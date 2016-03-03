@@ -84,12 +84,15 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 			newApp.Status.Phase = api.ApplicationTerminating
 		}
 
-		oldApp := r.store.Get(ctx, newApp.Name)
+		oldObj, _ := r.store.Get(ctx, newApp.Name)
+		oldApp := oldObj.(*api.Application)
+
 		if oldApp.Status.Phase == api.ApplicationActiveUpdate {
-			newApp.Status.Phase = ApplicationActive
+			newApp.Status.Phase = api.ApplicationActive
 		}
+
 		if oldApp.Status.Phase == api.ApplicationActive {
-			newApp.Status.Phase = ApplicationActiveUpdate
+			newApp.Status.Phase = api.ApplicationActiveUpdate
 		}
 
 	}
