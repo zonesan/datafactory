@@ -13,8 +13,8 @@ const (
 	ApplicationNew ApplicationPhase = "New"
 
 	// ApplicationRunning indicates that Application service working well.
-	ApplicationActive ApplicationPhase = "Active"
-
+	ApplicationActive       ApplicationPhase = "Active"
+	ApplicationActiveUpdate ApplicationPhase = "ActiveUpdate"
 	// ApplicationRunning indicates that Application service Inactive.
 	ApplicationInActive ApplicationPhase = "InActive"
 

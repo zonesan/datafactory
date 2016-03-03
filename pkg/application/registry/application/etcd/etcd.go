@@ -39,9 +39,8 @@ func NewREST(s storage.Interface) *REST {
 		},
 		EndpointName: "application",
 
-		CreateStrategy: application.AppStrategy,
-		UpdateStrategy: application.AppStrategy,
-
+		CreateStrategy:      application.AppStrategy,
+		UpdateStrategy:      application.AppStrategy,
 		ReturnDeletedObject: false,
 
 		Storage: s,
@@ -70,11 +69,25 @@ func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Select
 
 // Create creates an image based on a specification.
 func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
+	app, ok := obj.(*api.Application)
+	if ok {
+		app.Status.Phase = api.ApplicationNew
+	}
 	return r.store.Create(ctx, obj)
 }
 
 // Update alters an existing image.
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
+	app, ok := obj.(*api.Application)
+	if ok {
+		if app.Spec.Destory == true {
+			app.Status.Phase = api.ApplicationTerminating
+		}
+
+		if app.Status.Phase == api.ApplicationActive {
+			app.Status.Phase = api.ApplicationActiveUpdate
+		}
+	}
 	return r.store.Update(ctx, obj)
 }
 

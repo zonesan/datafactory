@@ -31,37 +31,24 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *ApplicationController) Handle(application *api.Application) (err error) {
 
-	if err := c.deleteOldLabel(application); err != nil {
-		return err
-	}
-
-	if err := c.handleLabel(application); err != nil {
-		return err
-	}
-
-	application.Status.Phase = api.ApplicationActive
-	c.Client.Applications(application.Namespace).Update(application)
-
-	return nil
-}
-
-func labelServiceBrokers(client osclient.Interface, application *api.Application) error {
-
-	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
-	selector, err := labels.Parse(selectorStr)
-	if err != nil {
-		return err
-	}
-
-	items, _ := client.ServiceBrokers().List(selector, fields.Everything())
-
-	for _, oldItem := range items.Items {
-		if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
-			delete(oldItem.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
-			if _, err := client.ServiceBrokers().Update(&oldItem); err != nil {
-				return err
-			}
+	switch application.Status.Phase {
+	case api.ApplicationActive:
+		return nil
+	case api.ApplicationActiveUpdate:
+		if err := c.deleteOldLabel(application); err != nil {
+			return err
 		}
+
+		fallthrough
+	default:
+		if err := c.handleLabel(application); err != nil {
+
+			return err
+		}
+
+		application.Status.Phase = api.ApplicationActive
+		c.Client.Applications(application.Namespace).Update(application)
+
 	}
 
 	return nil
@@ -103,19 +90,11 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 	errs := []error{}
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
-	for i, item := range app.Spec.Items {
+	for _, item := range app.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
 
 			client := c.Client.ServiceBrokers()
-
-			//销毁资源
-			if app.Spec.Destory == true {
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
-				}
-			}
-			continue
 
 			resource, err := client.Get(item.Name)
 			if err != nil && !kerrors.IsNotFound(err) {
@@ -124,23 +103,27 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 			}
 
 			switch app.Status.Phase {
-			case api.ApplicationActive://运行检查,用户删除label做status标记
-				if _, exists := resource.Labels[labelSelectorStr]; !exists {
-					app.Spec.Items[i].Status = "user deleted"
+			case api.ApplicationActiveUpdate:
+				if _, exists := resource.Labels[labelSelectorStr]; exists { //Active正常状态,当有新的更新时,如果这个label不存在,则新建
 					continue
 				}
+				fallthrough
+			case api.ApplicationNew:
+				resource.Labels[labelSelectorStr] = app.Name
+				if _, err := client.Update(resource); err != nil {
+					errs = append(errs, err)
+				}
 
-			case api.ApplicationTerminatingLabel: //运行检查, 删除所有标签
+			case api.ApplicationTerminating:
+				if err := client.Delete(item.Name); err != nil {
+					errs = append(errs, err)
+				}
+
+			case api.ApplicationTerminatingLabel:
 				delete(resource.Labels, app.Name)
 				if _, err := client.Update(resource); err != nil {
 					errs = append(errs, err)
 				}
-				continue
-			}
-
-			resource.Labels[labelSelectorStr] = app.Name //创建 更新
-			if _, err := client.Update(resource); err != nil {
-				errs = append(errs, err)
 			}
 
 		default:
