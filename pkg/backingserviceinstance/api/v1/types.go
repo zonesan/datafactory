@@ -73,10 +73,9 @@ type BackingServiceInstancePhase string
 const (
 	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" // not inited
 	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseDestroyed BackingServiceInstancePhase = "Destroyed"
-	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
 )
 

@@ -11,7 +11,7 @@ type BackingServiceInstance struct {
 
 	// Spec defines the behavior of the Namespace.
 	Spec BackingServiceInstanceSpec
-
+	
 	// Status describes the current status of a Namespace
 	Status BackingServiceInstanceStatus
 }
@@ -43,8 +43,9 @@ type BackingServiceInstanceSpec struct {
 	InstanceProvisioning
 	InstanceBinding
 	Bound      bool
-	InstanceID string
 	Tags       []string
+	InstanceID string
+	// InstanceID is blank means to delete (when len(Parameters) > 0)
 }
 
 type InstanceProvisioning struct {
@@ -54,11 +55,14 @@ type InstanceProvisioning struct {
 	BackingServicePlanGuid string
 	BackingServicePlanName string
 	Parameters             map[string]string
+	// len(Parameters) == 0 means not inited
 }
 
 type InstanceBinding struct {
-	BoundTime            *unversioned.Time
+	// BindUuid is blank for not bound (Bound=false) or to unbind (Bound=true)
+	// BindUuid != "" and Bound=false means to bind
 	BindUuid             string
+	BoundTime            *unversioned.Time
 	BindDeploymentConfig string
 	Credentials          map[string]string
 }
@@ -71,12 +75,11 @@ type BackingServiceInstanceStatus struct {
 type BackingServiceInstancePhase string
 
 const (
-	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" // not inited
+	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" 
 	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseDestroyed BackingServiceInstancePhase = "Destroyed"
-	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
 )
 
