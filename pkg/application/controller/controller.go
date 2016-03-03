@@ -32,20 +32,24 @@ func (e fatalError) Error() string {
 func (c *ApplicationController) Handle(application *api.Application) (err error) {
 
 	switch application.Status.Phase {
+	case api.ApplicationTerminating:
+		fallthrough
+	case api.ApplicationTerminatingLabel:
+		if err := c.handleLabel(application); err != nil {
+			return err
+		}
+
 	case api.ApplicationActive:
 		return nil
 	case api.ApplicationActiveUpdate:
 		if err := c.deleteOldLabel(application); err != nil {
 			return err
 		}
-
 		fallthrough
 	default:
 		if err := c.handleLabel(application); err != nil {
-
 			return err
 		}
-
 		application.Status.Phase = api.ApplicationActive
 		c.Client.Applications(application.Namespace).Update(application)
 
@@ -90,7 +94,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 	errs := []error{}
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
-	for i, item := range app.Spec.Items {
+	for _, item := range app.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
 
