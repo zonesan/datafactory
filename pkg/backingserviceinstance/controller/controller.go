@@ -15,6 +15,8 @@ import (
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util"
+	"k8s.io/kubernetes/pkg/api/unversioned"
+	kapi "k8s.io/kubernetes/pkg/api"
 	"net/http"
 	"strings"
 	"regexp"
@@ -104,7 +106,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 				break
 			}
 			
-			err = deploymentconfig_clear_envs(c.Client, bsi.Spec.BindDeploymentConfig, bsi.Name)
+			err = c.deploymentconfig_clear_envs(bsi)
 			if err != nil {
 				glog.Error(err)
 				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
@@ -214,7 +216,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 				break
 			}
 			
-			err = deploymentconfig_inject_envs(c.Client, bsi.Spec.BindDeploymentConfig, bsi.Name, bindingresponse)
+			err = c.deploymentconfig_inject_envs(bsi, bindingresponse)
 			if err != nil {
 				glog.Error(err)
 				//bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseError
@@ -225,6 +227,8 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			}
 			
 			bsi.Spec.Bound = true
+			now := unversioned.Now()
+			bsi.Spec.BoundTime = &now
 			
 			changed = true
 		}
@@ -517,15 +521,95 @@ func deploymentconfig_env_name(prefix string, envName string) string {
 	return fmt.Sprintf("%s%s", prefix, InvalidCharFinder.ReplaceAllLiteralString(envName, "_"))
 }
 
-func deploymentconfig_inject_envs(c osclient.Interface, dcName string, bsiName string, bindingResponse *ServiceBindingResponse) error {
-
-	
-		
-	return nil
+func (c *BackingServiceInstanceController) deploymentconfig_inject_envs(bsi *backingserviceinstanceapi.BackingServiceInstance, bindingResponse *ServiceBindingResponse) error {
+	return c.deploymentconfig_modify_envs(bsi, bindingResponse)
 }
-// ENVs
-//    BSI_XXXX_password=xxxxx
-func deploymentconfig_clear_envs(c osclient.Interface, dcName string, bsiName string) error {
+
+func (c *BackingServiceInstanceController) deploymentconfig_clear_envs(bsi *backingserviceinstanceapi.BackingServiceInstance) error {
+	return c.deploymentconfig_modify_envs(bsi, nil)
+}
+
+// return overritten or not
+func env_set(envs []kapi.EnvVar, envName, envValue string) (bool, []kapi.EnvVar) {
+	if envs == nil {
+		envs = []kapi.EnvVar{}
+	}
 	
+	for i := len(envs) - 1; i >= 0; i -- {
+		if envs[i].Name == envValue {
+			envs[i] = kapi.EnvVar{Name: envName, Value: envValue}
+			return true, envs
+		}
+	}
+	
+	envs = append(envs, kapi.EnvVar{Name: envName, Value: envValue})
+	return false, envs
+}
+
+// return unset or not
+func env_unset(envs []kapi.EnvVar, envName string) (bool, []kapi.EnvVar) {
+	if envs == nil {
+		return false, nil
+	}
+	
+	n := len(envs)
+	index := 0
+	for i := 0; i < n; i ++ {
+		if envs[i].Name != envName {
+			if index < i {
+				envs[index] = envs[i]
+			}
+			index ++
+		}
+	}
+	
+	return index < n, envs[:index]
+}
+
+func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(bsi *backingserviceinstanceapi.BackingServiceInstance, bindingResponse *ServiceBindingResponse) error {
+	dc, err := c.Client.DeploymentConfigs(bsi.Namespace).Get(bsi.Spec.BindDeploymentConfig)
+	if err != nil {
+		return err
+	}
+	
+	if dc.Spec.Template == nil {
+		return nil
+	}
+	
+	pod_tempalte, err := c.KubeClient.PodTemplates(bsi.Namespace).Get(dc.Spec.Template.Name)
+	if err != nil {
+		return err
+	}
+	
+	env_prefix := deploymentconfig_env_prefix(bsi.Name)
+	containers := pod_tempalte.Template.Spec.Containers
+	
+	if bindingResponse != nil { // to inject
+		credentials := bindingResponse.Credentials
+		for _, c := range containers {
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Uri"), credentials.Uri)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Name"), credentials.Name)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Username"), credentials.Username)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Password"), credentials.Password)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Host"), credentials.Host)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Port"), credentials.Port)
+			_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, "Vhost"), credentials.Vhost)
+		}
+	} else {
+		for _, c := range containers {
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Uri"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Name"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Username"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Password"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Host"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Port"))
+			_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, "Vhost"))
+		}
+	}
+
+	if _, err := c.KubeClient.PodTemplates(bsi.Namespace).Update(pod_tempalte); err != nil {
+		return err
+	}
+		
 	return nil
 }
