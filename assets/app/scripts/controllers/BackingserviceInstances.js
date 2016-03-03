@@ -18,7 +18,7 @@ angular.module('openshiftConsole')
       DataService.list("backingserviceinstances", $scope, function(backingserviceinstances){
         $scope.backingserviceinstances = backingserviceinstances.by("metadata.name");
         console.log("backingserviceinstances", $scope.backingserviceinstances);
-        
+
         if ($scope.backingserviceinstances) {
           loadBackingServices($scope.backingserviceinstances);
         }
@@ -29,17 +29,17 @@ angular.module('openshiftConsole')
       for(var key in bss){
         var plans = bss[key].spec.plans;
         for(var k in plans){
-          if (plans[k].id == guid) {
+          if (plans[k].id === guid) {
             return key;
           }
         }
       }
       return null;
-    }
+    };
 
     var loadBackingServices = function(bsis) {
       DataService.list("backingservices", {}, function(bss){
-        var bss = bss.by("metadata.name");
+        bss = bss.by("metadata.name");
         console.log("bss", bss, "bsis", bsis);
 
         for(var key in bsis) {
