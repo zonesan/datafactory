@@ -114,6 +114,13 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 
 	application := appObj.(*api.Application)
 
+	if application == api.ApplicationTerminating {
+		return r.store.Delete(ctx, name, options)
+	}
+	if application == api.ApplicationTerminatingLabel {
+		return r.store.Delete(ctx, name, options)
+	}
+
 	if application.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
 		application.DeletionTimestamp = &now
