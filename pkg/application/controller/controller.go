@@ -147,8 +147,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 					errs = append(errs, err)
 				}
 
-
-				if len(resource.Labels) == 0 {
+				if len(app.Spec.Items) == 0 {
 					c.Client.Applications(app.Namespace).Delete(app.Name)
 				}
 			}
