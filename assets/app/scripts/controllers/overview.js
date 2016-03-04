@@ -66,7 +66,7 @@ angular.module('openshiftConsole')
 
     $scope.labelSuggestions = {};
     $scope.alerts = $scope.alerts || {};
-    $scope.emptyMessage = "Loading...";
+    $scope.emptyMessage = "加载中...";
     $scope.renderOptions = $scope.renderOptions || {};
     $scope.renderOptions.showSidebarRight = false;
     $scope.overviewMode = 'tiles';
