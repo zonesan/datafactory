@@ -58,7 +58,7 @@ func (r *REST) NewList() runtime.Object {
 	return r.store.NewListFunc()
 }
 
-// Get gets a specific image specified by its ID.
+// Get gets a specific application specified by its ID.
 func (r *REST) Get(ctx kapi.Context, name string) (runtime.Object, error) {
 	return r.store.Get(ctx, name)
 }
@@ -67,7 +67,7 @@ func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Select
 	return r.store.List(ctx, label, field)
 }
 
-// Create creates an image based on a specification.
+// Create creates an application based on a specification.
 func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	app, ok := obj.(*api.Application)
 	if ok {
@@ -76,11 +76,16 @@ func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, err
 	return r.store.Create(ctx, obj)
 }
 
-// Update alters an existing image.
+// Update alters an existing application.
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
 	newApp, ok := obj.(*api.Application)
 	if ok {
-		if newApp.Status.Phase == api.ApplicationTerminating {
+
+		switch newApp.Status.Phase {
+		case api.ApplicationTerminating:
+			return r.store.Update(ctx, obj)
+		case api.ApplicationChecking:
+			newApp.Status.Phase = api.ApplicationActive
 			return r.store.Update(ctx, obj)
 		}
 
@@ -90,22 +95,20 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 		}
 
 		oldObj, _ := r.store.Get(ctx, newApp.Name)
-		oldApp := oldObj.(*api.Application)
-
-		if oldApp.Status.Phase == api.ApplicationActiveUpdate {
-			newApp.Status.Phase = api.ApplicationActive
+		if oldApp, ok := oldObj.(*api.Application); ok {
+			switch oldApp.Status.Phase {
+			case api.ApplicationActiveUpdate:
+				newApp.Status.Phase = api.ApplicationActive
+			case api.ApplicationActive:
+				newApp.Status.Phase = api.ApplicationActiveUpdate
+			}
 		}
-
-		if oldApp.Status.Phase == api.ApplicationActive {
-			newApp.Status.Phase = api.ApplicationActiveUpdate
-		}
-
 	}
 
 	return r.store.Update(ctx, obj)
 }
 
-// Delete deletes an existing image specified by its ID.
+// Delete deletes an existing application specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
 	appObj, err := r.Get(ctx, name)
 	if err != nil {
