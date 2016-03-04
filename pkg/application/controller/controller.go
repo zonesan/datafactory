@@ -134,6 +134,9 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 					}
 				}
 
+				app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
+				c.Client.Applications(app.Namespace).Update(app)
+
 				if i + 1 == len(app.Spec.Items) {
 					c.Client.Applications(app.Namespace).Delete(app.Name)
 				}
@@ -143,6 +146,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				if _, err := client.Update(resource); err != nil {
 					errs = append(errs, err)
 				}
+
 
 				if len(resource.Labels) == 0 {
 					c.Client.Applications(app.Namespace).Delete(app.Name)

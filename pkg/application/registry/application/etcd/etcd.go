@@ -80,6 +80,10 @@ func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, err
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
 	newApp, ok := obj.(*api.Application)
 	if ok {
+		if newApp.Status.Phase == api.ApplicationTerminating {
+			return r.store.Update(ctx, obj)
+		}
+
 		if newApp.Spec.Destory == true {
 			newApp.Status.Phase = api.ApplicationTerminating
 			return r.store.Update(ctx, obj)
