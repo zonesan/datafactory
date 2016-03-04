@@ -924,6 +924,15 @@ func deepCopy_v1_BindingRequestOptions(in backingserviceinstanceapiv1.BindingReq
 }
 
 func deepCopy_v1_InstanceBinding(in backingserviceinstanceapiv1.InstanceBinding, out *backingserviceinstanceapiv1.InstanceBinding, c *conversion.Cloner) error {
+	if in.BoundTime != nil {
+		if newVal, err := c.DeepCopy(in.BoundTime); err != nil {
+			return err
+		} else {
+			out.BoundTime = newVal.(*unversioned.Time)
+		}
+	} else {
+		out.BoundTime = nil
+	}
 	out.BindUuid = in.BindUuid
 	out.BindDeploymentConfig = in.BindDeploymentConfig
 	if in.Credentials != nil {

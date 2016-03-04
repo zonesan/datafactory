@@ -47,6 +47,8 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	
 	// init
 	if len(bsi.Spec.Parameters) == 0 {
+		glog.Infoln("to init bsi ", bsi.Name)
+		
 		ok, bs, err := checkIfPlanidExist(c.Client, bsi.Spec.BackingServicePlanGuid)
 		if !ok {
 			result = err
@@ -65,6 +67,8 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			}
 		}
 		
+		glog.Infoln("deletbsi inited. ", bsi.Name)
+		
 		// 
 		bsInstanceID := string(util.NewUUID())
 		bsi.Spec.InstanceID = bsInstanceID
@@ -81,11 +85,15 @@ UNBIND:
 
 	// unbind
 	if bsi.Spec.Bound && binduuid == "" {
+		glog.Infoln("bsi to unbind ", bsi.Name)
+		
 		servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
 		if err != nil {
 			result = err
 			goto ERROR
 		}
+		
+		glog.Infoln("servicebroker_unbinding")
 		
 		_, err = servicebroker_unbinding(bsi, servicebroker)
 		if err != nil {
@@ -93,11 +101,15 @@ UNBIND:
 			goto ERROR
 		}
 		
+		glog.Infoln("deploymentconfig_clear_envs")
+		
 		err = c.deploymentconfig_clear_envs(bsi)
 		if err != nil {
 			result = err
 			goto ERROR
 		}
+		
+		glog.Infoln("bsi unbound ", bsi.Name)
 		
 		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseActive
 		bsi.Spec.Bound = false
@@ -112,6 +124,8 @@ UNBIND:
 	
 	// delete
 	if bsi.Spec.InstanceID == "" {
+		glog.Infoln("bsi to delete ", bsi.Name)
+		
 		if bsi.Spec.Bound && binduuid != "" {
 			//bsi.Spec.InstanceID = "" // bug
 			binduuid = ""
@@ -130,6 +144,8 @@ UNBIND:
 			goto ERROR
 		}
 		
+		glog.Infoln("bsi deleted ", bsi.Name)
+		
 		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseInactive
 		changed = true
 	}
@@ -144,12 +160,16 @@ UNBIND:
 		//	goto ERROR
 		//}
 		
+		glog.Infoln("bsi delete etcd ", bsi.Name, ", error: ", err)
+		
 		result = err
 		goto END
 	}
 	
 	// bind
 	if bsi.Spec.Bound == false && bsi.Spec.BindUuid != "" && bsi.Spec.BindDeploymentConfig != "" {
+		glog.Infoln("bsi to bind ", bsi.Name, " and ", bsi.Spec.BindDeploymentConfig)
+		
 		servicebroker, err := servicebroker_load(c.Client, bsi.Spec.BackingServiceName)
 		if err != nil {
 			result = err
@@ -160,6 +180,8 @@ UNBIND:
 		serviceinstance.ServiceId = bsi.Spec.BackingServiceID
 		serviceinstance.PlanId = bsi.Spec.BackingServicePlanGuid
 		serviceinstance.OrganizationGuid = bsi.Namespace
+		
+		glog.Infoln("servicebroker_create_instance")
 		
 		svcinstance, err := servicebroker_create_instance(serviceinstance, bsi.Spec.InstanceID, servicebroker)
 		if err != nil {
@@ -179,17 +201,23 @@ UNBIND:
 			svc_instance_id: bsi.Spec.InstanceID,
 		}
 		
+		glog.Infoln("servicebroker_binding")
+		
 		bindingresponse, err := servicebroker_binding(servicebinding, bsi.Spec.BindUuid, servicebroker)
 		if err != nil {
 			result = err
 			goto ERROR
 		}
 		
+		glog.Infoln("deploymentconfig_inject_envs")
+		
 		err = c.deploymentconfig_inject_envs(bsi, bindingresponse)
 		if err != nil {
 			result = err
 			goto ERROR
 		}
+		
+		glog.Infoln("bsi bound. ", bsi.Name)
 		
 		bsi.Spec.Bound = true
 		now := unversioned.Now()
@@ -211,6 +239,8 @@ ERROR:
 END:
 
 	if changed {
+		glog.Infoln("bsi etc changed and update. ")
+		
 		c.Client.BackingServiceInstances(bsi.Namespace).Update(bsi)
 	}
 	

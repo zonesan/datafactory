@@ -1512,7 +1512,6 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 		return err
 	}
 	out.Bound = in.Bound
-	out.InstanceID = in.InstanceID
 	if in.Tags != nil {
 		out.Tags = make([]string, len(in.Tags))
 		for i := range in.Tags {
@@ -1521,6 +1520,7 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	} else {
 		out.Tags = nil
 	}
+	out.InstanceID = in.InstanceID
 	return nil
 }
 
@@ -1565,6 +1565,13 @@ func autoconvert_api_InstanceBinding_To_v1_InstanceBinding(in *backingserviceins
 		defaulting.(func(*backingserviceinstanceapi.InstanceBinding))(in)
 	}
 	out.BindUuid = in.BindUuid
+	if in.BoundTime != nil {
+		if err := s.Convert(&in.BoundTime, &out.BoundTime, 0); err != nil {
+			return err
+		}
+	} else {
+		out.BoundTime = nil
+	}
 	out.BindDeploymentConfig = in.BindDeploymentConfig
 	if in.Credentials != nil {
 		out.Credentials = make(map[string]string)
@@ -1717,6 +1724,13 @@ func convert_v1_BindingRequestOptions_To_api_BindingRequestOptions(in *backingse
 func autoconvert_v1_InstanceBinding_To_api_InstanceBinding(in *backingserviceinstanceapiv1.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapiv1.InstanceBinding))(in)
+	}
+	if in.BoundTime != nil {
+		if err := s.Convert(&in.BoundTime, &out.BoundTime, 0); err != nil {
+			return err
+		}
+	} else {
+		out.BoundTime = nil
 	}
 	out.BindUuid = in.BindUuid
 	out.BindDeploymentConfig = in.BindDeploymentConfig

@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	
+	//"k8s.io/kubernetes/pkg/api/rest"
+	
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
@@ -127,19 +129,21 @@ func (r *BindingREST) New() runtime.Object {
 func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	glog.Infoln("to create a bsi binding.")
 	
-	bro := obj.(*backingserviceinstanceapi.BindingRequestOptions)
-	if bro.BindKind != backingserviceinstanceapi.BindKind_DeploymentConfig {
+	//if err := rest.BeforeCreate(backingserviceinstanceregistry.BsiStrategy, ctx, obj); err != nil {
+	//	return nil, err
+	//}
+	
+	bro, ok := obj.(*backingserviceinstanceapi.BindingRequestOptions)
+	if !ok || bro.BindKind != backingserviceinstanceapi.BindKind_DeploymentConfig {
 		return nil, fmt.Errorf("unsupported bind type: %s", bro.BindKind)
 	}
 	// todo: check bro.BindResourceVersion
 	
+	//kapi.FillObjectMetaSystemFields(ctx, &bro.ObjectMeta)
+	
 	bsi, err := r.backingServiceInstanceRegistry.GetBackingServiceInstance(ctx, bro.Name)
 	if err != nil {
 		return nil, err
-	}
-	
-	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseActive {
-		return nil, errors.New("back service instance is not in active phase")
 	}
 	
 	if bsi.Spec.Bound {
@@ -189,4 +193,5 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 
 	return bsi, nil
 }
+
 

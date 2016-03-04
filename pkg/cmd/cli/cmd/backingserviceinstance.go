@@ -313,6 +313,8 @@ func (o *BindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 		backingserviceinstanceapi.BindKind_DeploymentConfig, 
 		latestapi.Version, 
 		o.DeploymentConfigName)
+	bro.Name = o.Name 
+	bro.Namespace = namespace
 	
 	err = client.BackingServiceInstances(namespace).CreateBinding(o.Name, bro)
 	if err != nil {

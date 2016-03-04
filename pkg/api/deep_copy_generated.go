@@ -865,7 +865,6 @@ func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.Backin
 		return err
 	}
 	out.Bound = in.Bound
-	out.InstanceID = in.InstanceID
 	if in.Tags != nil {
 		out.Tags = make([]string, len(in.Tags))
 		for i := range in.Tags {
@@ -874,6 +873,7 @@ func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.Backin
 	} else {
 		out.Tags = nil
 	}
+	out.InstanceID = in.InstanceID
 	return nil
 }
 
@@ -901,6 +901,15 @@ func deepCopy_api_BindingRequestOptions(in backingserviceinstanceapi.BindingRequ
 
 func deepCopy_api_InstanceBinding(in backingserviceinstanceapi.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, c *conversion.Cloner) error {
 	out.BindUuid = in.BindUuid
+	if in.BoundTime != nil {
+		if newVal, err := c.DeepCopy(in.BoundTime); err != nil {
+			return err
+		} else {
+			out.BoundTime = newVal.(*unversioned.Time)
+		}
+	} else {
+		out.BoundTime = nil
+	}
 	out.BindDeploymentConfig = in.BindDeploymentConfig
 	if in.Credentials != nil {
 		out.Credentials = make(map[string]string)
