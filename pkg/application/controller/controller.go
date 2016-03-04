@@ -94,7 +94,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 	errs := []error{}
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
-	for _, item := range app.Spec.Items {
+	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
 
@@ -123,13 +123,20 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				}
 
 			case api.ApplicationTerminating:
-				if err := client.Delete(item.Name); err != nil {
-					errs = append(errs, err)
+				if !containsOtherApplicationLabel(resource.Labels, labelSelectorStr) {
+					if err := client.Delete(item.Name); err != nil {
+						errs = append(errs, err)
+					}
+				} else {
+					delete(resource.Labels, labelSelectorStr)
+					if _, err := client.Update(resource); err != nil {
+						errs = append(errs, err)
+					}
 				}
 
-				//if i + 1 == len(app.Spec.Items) {
-				//	c.Client.Applications(app.Namespace).Delete(app.Name)
-				//}
+				if i + 1 == len(app.Spec.Items) {
+					c.Client.Applications(app.Namespace).Delete(app.Name)
+				}
 
 			case api.ApplicationTerminatingLabel:
 				delete(resource.Labels, labelSelectorStr)
@@ -184,6 +191,18 @@ func (c *ApplicationController) deleteAllContentLabel(app *api.Application) erro
 	}
 
 	return errutil.NewAggregate(errs)
+}
+func containsOtherApplicationLabel(label map[string]string, labelStr string) bool {
+	list := getApplicationLabels(label)
+	if len(list) > 1 {
+		for _, v := range list {
+			if v == labelStr {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func getApplicationLabels(label map[string]string) []string {
