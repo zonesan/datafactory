@@ -40,10 +40,9 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 		}
 
 	case api.ApplicationActive:
-		c.deleteAppItem(application)
 		return nil
 	case api.ApplicationActiveUpdate:
-		if err := c.deleteItemLabel(application); err != nil {
+		if err := c.deleteOldLabel(application); err != nil {
 			return err
 		}
 		fallthrough
@@ -59,55 +58,17 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 	return nil
 }
 
-func (c *ApplicationController) deleteAppItem(application *api.Application) {
-	if len(application.Spec.Items) == 0 {
-		return
-	}
-
-	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
-	selector, _ := labels.Parse(selectorStr)
-
-	for i, item := range application.Spec.Items {
-		switch item.Kind {
-		case "ServiceBroker":
-
-			//资源被用户删除
-			_, err := c.Client.ServiceBrokers().Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
-				application.Spec.Items = append(application.Spec.Items[:i], application.Spec.Items[i + 1:]...)
-				application.Status.Phase = api.ApplicationChecking
-				continue
-			}
-
-			//资源的label被用户删除
-			items, _ := c.Client.ServiceBrokers().List(selector, fields.Everything())
-			for _, oldItem := range items.Items {
-				if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
-					application.Spec.Items = append(application.Spec.Items[:i], application.Spec.Items[i + 1:]...)
-					application.Status.Phase = api.ApplicationChecking
-					continue
-				}
-			}
-
-		}
-	}
-
-	if application.Status.Phase == api.ApplicationChecking {
-		c.Client.Applications(application.Namespace).Update(application)
-	}
-}
-
-func (c *ApplicationController) deleteItemLabel(application *api.Application) error {
+func (c *ApplicationController) deleteOldLabel(application *api.Application) error {
 	errs := []error{}
 
-	if err := deleteItemServiceBrokersLabel(c.Client, application); err != nil {
+	if err := deleteLabelServiceBrokers(c.Client, application); err != nil {
 		errs = append(errs, err)
 	}
 
 	return errutil.NewAggregate(errs)
 }
 
-func deleteItemServiceBrokersLabel(client osclient.Interface, application *api.Application) error {
+func deleteLabelServiceBrokers(client osclient.Interface, application *api.Application) error {
 
 	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
 	selector, err := labels.Parse(selectorStr)
@@ -200,6 +161,42 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 	return errutil.NewAggregate(errs)
 }
 
+func (c *ApplicationController) deleteAllContentLabel(app *api.Application) error {
+	errs := []error{}
+	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
+
+	for i, item := range app.Spec.Items {
+		switch item.Kind {
+		case "ServiceBroker":
+
+			client := c.Client.ServiceBrokers()
+			resource, err := client.Get(item.Name)
+			if err != nil && !kerrors.IsNotFound(err) {
+				errs = append(errs, err)
+				continue
+			}
+
+			if app.Status.Phase == api.ApplicationActive {
+				//Post New
+				if _, exists := resource.Labels[labelSelectorStr]; !exists {
+					app.Spec.Items[i].Status = "user deleted"
+				}
+			}
+
+			resource.Labels[labelSelectorStr] = app.Name
+
+			if _, err := client.Update(resource); err != nil {
+				errs = append(errs, err)
+			}
+			return nil
+
+		default:
+			errs = append(errs, errors.New("unknown resource " + item.Kind + "=" + item.Name))
+		}
+	}
+
+	return errutil.NewAggregate(errs)
+}
 func containsOtherApplicationLabel(label map[string]string, labelStr string) bool {
 	list := getApplicationLabels(label)
 	if len(list) > 1 {
