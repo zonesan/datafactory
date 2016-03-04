@@ -60,26 +60,41 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 }
 
 func (c *ApplicationController) deleteAppItem(application *api.Application) {
+	if len(application.Spec.Items) == 0 {
+		return
+	}
+
 	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
 	selector, _ := labels.Parse(selectorStr)
 
 	for i, item := range application.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
+
+			//资源被用户删除
+			_, err := c.Client.ServiceBrokers().Get(item.Name)
+			if err != nil && kerrors.IsNotFound(err) {
+				application.Spec.Items = append(application.Spec.Items[:i], application.Spec.Items[i + 1:]...)
+				application.Status.Phase = api.ApplicationChecking
+				continue
+			}
+
+			//资源的label被用户删除
 			items, _ := c.Client.ServiceBrokers().List(selector, fields.Everything())
 			for _, oldItem := range items.Items {
 				if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
 					application.Spec.Items = append(application.Spec.Items[:i], application.Spec.Items[i + 1:]...)
 					application.Status.Phase = api.ApplicationChecking
+					continue
 				}
 			}
+
 		}
 	}
 
 	if application.Status.Phase == api.ApplicationChecking {
 		c.Client.Applications(application.Namespace).Update(application)
 	}
-
 }
 
 func (c *ApplicationController) deleteItemLabel(application *api.Application) error {
