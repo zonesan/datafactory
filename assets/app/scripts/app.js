@@ -305,6 +305,35 @@ angular
       LabelFilter.setLabelSelector(new LabelSelector({}, true), true);
     });
   })
+  .run(function(AuthService){
+
+    if(AuthService.isLoggedIn()){
+      AuthService.withUser().then(function(user) {
+        //daoVoice
+        daovoice('init', {
+          app_id: "b31d2fb1",
+          user_id: "user.metadata.uid", // 必填: 该用户在您系统上的唯一ID
+          //email: "daovoice@example.com", // 选填:  该用户在您系统上的主邮箱
+          name: user.metadata.name, // 选填: 用户名
+          signed_up: parseInt((new Date(user.metadata.creationTimestamp)).getTime() / 1000) // 选填: 用户的注册时间，用Unix时间戳表示
+        });
+        daovoice('update');
+      }, function(){
+        //daoVoice
+        daovoice('init', {
+          app_id: "b31d2fb1"
+        });
+        daovoice('update');
+      });
+    } else {
+      //daoVoice
+      daovoice('init', {
+        app_id: "b31d2fb1"
+      });
+      daovoice('update');
+    }
+
+  })
   .run(function(dateRelativeFilter, durationFilter) {
     // Use setInterval instead of $interval because we're directly manipulating the DOM and don't want scope.$apply overhead
     setInterval(function() {
