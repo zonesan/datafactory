@@ -137,7 +137,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
 				c.Client.Applications(app.Namespace).Update(app)
 
-				if i + 1 == len(app.Spec.Items) {
+				if len(app.Spec.Items) == 0 {
 					c.Client.Applications(app.Namespace).Delete(app.Name)
 				}
 
