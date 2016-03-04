@@ -60,7 +60,7 @@
                 {{plan.metadata.displayName}}
               </td>
               <td data-title="Costs">
-                {{plan.metadata.costs}}
+                <span ng-bind-html="plan.metadata.costs | costsFilter"></span>
               </td>
               <td data-title="Description">
                 {{plan.description}}
