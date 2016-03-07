@@ -26,6 +26,8 @@ const (
 	ApplicationChecking ApplicationPhase = "Checking"
 
 	ApplicationItemDelete string = "Resource Not Found"
+
+	ApplicationItemLabelDelete string = "Resource Label Not Found"
 )
 
 var ApplicationItemSupportKinds = []string{

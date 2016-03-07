@@ -27,9 +27,8 @@ func Parse(items string) (applicationapi.ItemList, error) {
 		}
 
 		list = append(list, applicationapi.Item{
-			Kind:   item[0],
-			Name:   item[1],
-			Status: applicationapi.ApplicationItemStatusAdd,
+			Kind: item[0],
+			Name: item[1],
 		})
 	}
 
