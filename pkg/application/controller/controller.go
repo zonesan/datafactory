@@ -155,7 +155,7 @@ func (c *ApplicationController) handleLabel(app *api.Application) error {
 				}
 
 			case api.ApplicationTerminating:
-				if !containsLabel(resource.Labels, labelSelectorStr) {
+				if !containsOtherLabel(resource.Labels, labelSelectorStr) {
 					if err := client.Delete(item.Name); err != nil {
 						errs = append(errs, err)
 					}
@@ -230,13 +230,24 @@ func (c *ApplicationController) deleteAllContentLabel(app *api.Application) erro
 	return errutil.NewAggregate(errs)
 }
 
-func containsLabel(label map[string]string, labelStr string) bool {
+func containsOtherLabel(label map[string]string, labelStr string) bool {
 	list := getApplicationLabels(label)
 	if len(list) > 1 {
 		for _, v := range list {
 			if v == labelStr {
 				return true
 			}
+		}
+	}
+
+	return false
+}
+
+func containsLabel(label map[string]string, labelStr string) bool {
+	list := getApplicationLabels(label)
+	for _, v := range list {
+		if v == labelStr {
+			return true
 		}
 	}
 
