@@ -48,12 +48,23 @@ type BackingServiceInstanceSpec struct {
 	// InstanceID is blank means to delete (when len(Parameters) > 0)
 }
 
+/*
 type InstanceProvisioning struct {
 	DashboardUrl           string
 	BackingServiceName     string
 	BackingServiceID       string
 	BackingServicePlanGuid string
 	BackingServicePlanName string
+	Parameters             map[string]string
+	// len(Parameters) == 0 means not inited
+}
+*/
+
+type InstanceProvisioning struct {
+	DashboardUrl           string
+	BackingServiceName     string
+	BackingServiceSpecID   string
+	BackingServicePlanGuid string
 	Parameters             map[string]string
 	// len(Parameters) == 0 means not inited
 }

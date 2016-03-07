@@ -184,6 +184,10 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 		return nil, err
 	}
 	
+	if ! bsi.Spec.Bound {
+		return nil, errors.New("back service instance is not bound yet")
+	}
+	
 	bsi.Spec.BindUuid = "" // notify controller to unbind
 	
 	bsi, err = r.backingServiceInstanceRegistry.UpdateBackingServiceInstance(ctx, bsi)

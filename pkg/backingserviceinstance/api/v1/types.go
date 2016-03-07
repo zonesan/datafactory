@@ -48,12 +48,23 @@ type BackingServiceInstanceSpec struct {
 	Tags                 []string `json:"tags, omitempty"`
 }
 
+/*
 type InstanceProvisioning struct {
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingService         string            `json:"backingservice, omitempty"`
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	BackingServicePlanName string            `json:"backingservice_plan_name, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+}
+*/
+
+type InstanceProvisioning struct {
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceSpecID   string            `json:"backingservice_spec_id, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 

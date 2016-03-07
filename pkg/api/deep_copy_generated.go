@@ -925,9 +925,8 @@ func deepCopy_api_InstanceBinding(in backingserviceinstanceapi.InstanceBinding, 
 func deepCopy_api_InstanceProvisioning(in backingserviceinstanceapi.InstanceProvisioning, out *backingserviceinstanceapi.InstanceProvisioning, c *conversion.Cloner) error {
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
-	out.BackingServiceID = in.BackingServiceID
+	out.BackingServiceSpecID = in.BackingServiceSpecID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
-	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {

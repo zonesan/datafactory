@@ -112,12 +112,12 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	backingServiceInstance := &backingserviceinstanceapi.BackingServiceInstance{}
 	
 	backingServiceInstance.Name = o.Name
-	backingServiceInstance.GenerateName = o.Name
+	//backingServiceInstance.GenerateName = o.Name
 	
-	backingServiceInstance.Spec.BackingServiceName = bs.Spec.Name
-	backingServiceInstance.Spec.BackingServiceID = bs.Spec.Id
-	backingServiceInstance.Spec.BackingServicePlanGuid = plan.Id
-	backingServiceInstance.Spec.BackingServicePlanName = plan.Name
+	backingServiceInstance.Spec.BackingServiceName = bs.Name // o.BackingServiceName
+	//backingServiceInstance.Spec.BackingServiceID = bs.Spec.Id
+	backingServiceInstance.Spec.BackingServicePlanGuid = plan.Id // o.BackingServicePlanGuid
+	//backingServiceInstance.Spec.BackingServicePlanName = plan.Name
 	
 	//backingServiceInstance.Status = backingserviceinstanceapi.BackingServiceInstancePhaseCreated
 	
