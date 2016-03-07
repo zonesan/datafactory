@@ -24,6 +24,8 @@ const (
 
 	// ApplicationFailed indicates that Application is checking
 	ApplicationChecking ApplicationPhase = "Checking"
+
+	ApplicationItemDelete string = "resource deleted"
 )
 
 var ApplicationItemSupportKinds = []string{

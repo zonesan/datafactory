@@ -64,11 +64,13 @@ func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Appl
 	for i, item := range application.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
-			_, err := c.Client.ServiceBrokers().Get(item.Name)
-			if err != nil && kerrors.IsNotFound(err) {
-				application.Spec.Items[i].Status = "resource deleted"
-				application.Status.Phase = api.ApplicationChecking
-				continue
+			if item.Status != api.ApplicationItemDelete {
+				_, err := c.Client.ServiceBrokers().Get(item.Name)
+				if err != nil && kerrors.IsNotFound(err) {
+					application.Spec.Items[i].Status = api.ApplicationItemDelete
+					application.Status.Phase = api.ApplicationChecking
+					continue
+				}
 			}
 		}
 	}
