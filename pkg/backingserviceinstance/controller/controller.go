@@ -617,17 +617,28 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(bsi *bac
 	
 	env_prefix := deploymentconfig_env_prefix(bsi.Name)
 	containers := dc.Spec.Template.Spec.Containers
+	num_containers := len(containers)
 	
 	if toInject {
-		for _, c := range containers {
+		//for _, c := range containers {
+		//	for k, v := range bsi.Spec.Credentials {
+		//		_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, k), v)
+		//	}
+		//}
+		for i := 0; i < num_containers; i++ {
 			for k, v := range bsi.Spec.Credentials {
-				_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, k), v)
+				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
 			}
 		}
 	} else {
-		for _, c := range containers {
+		//for _, c := range containers {
+		//	for k, _ := range bsi.Spec.Credentials {
+		//		_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, k))
+		//	}
+		//}
+		for i := 0; i < num_containers; i++ {
 			for k, _ := range bsi.Spec.Credentials {
-				_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, k))
+				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
 			}
 		}
 	}
