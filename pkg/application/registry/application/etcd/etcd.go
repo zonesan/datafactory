@@ -80,6 +80,11 @@ func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, err
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
 	newApp, ok := obj.(*api.Application)
 	if ok {
+		if newApp.Status.Phase == api.ApplicationChecking {
+			newApp.Status.Phase = api.ApplicationActive
+			return r.store.Update(ctx, obj)
+		}
+
 		if newApp.Status.Phase == api.ApplicationTerminating {
 			return r.store.Update(ctx, obj)
 		}
@@ -90,16 +95,14 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 		}
 
 		oldObj, _ := r.store.Get(ctx, newApp.Name)
-		oldApp := oldObj.(*api.Application)
-
-		if oldApp.Status.Phase == api.ApplicationActiveUpdate {
-			newApp.Status.Phase = api.ApplicationActive
+		if oldApp, ok := oldObj.(*api.Application); ok {
+			switch oldApp.Status.Phase {
+			case api.ApplicationActiveUpdate:
+				newApp.Status.Phase = api.ApplicationActive
+			case api.ApplicationActive:
+				newApp.Status.Phase = api.ApplicationActiveUpdate
+			}
 		}
-
-		if oldApp.Status.Phase == api.ApplicationActive {
-			newApp.Status.Phase = api.ApplicationActiveUpdate
-		}
-
 	}
 
 	return r.store.Update(ctx, obj)

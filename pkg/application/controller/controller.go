@@ -40,6 +40,7 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 		}
 
 	case api.ApplicationActive:
+		c.checkResourceDeletedDeamon(application)
 		return nil
 	case api.ApplicationActiveUpdate:
 		if err := c.deleteOldLabel(application); err != nil {
@@ -57,6 +58,26 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 
 	return nil
 }
+
+func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Application) {
+
+	for i, item := range application.Spec.Items {
+		switch item.Kind {
+		case "ServiceBroker":
+			_, err := c.Client.ServiceBrokers().Get(item.Name)
+			if err != nil && kerrors.IsNotFound(err) {
+				application.Spec.Items[i].Status = "resource deleted"
+				application.Status.Phase = api.ApplicationChecking
+				continue
+			}
+		}
+	}
+
+	if application.Status.Phase == api.ApplicationChecking {
+		c.Client.Applications(application.Namespace).Update(application)
+	}
+}
+
 
 func (c *ApplicationController) deleteOldLabel(application *api.Application) error {
 	errs := []error{}
