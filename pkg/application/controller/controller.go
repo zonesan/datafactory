@@ -60,7 +60,7 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 }
 
 func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Application) {
-	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
+	selectorKey := fmt.Sprintf("%s.application.%s", application.Namespace, application.Name)
 
 	for i, item := range application.Spec.Items {
 		switch item.Kind {
@@ -76,7 +76,7 @@ func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Appl
 				}
 			} else {
 				// 用户将item的label删除
-				if !containsLabel(sb.Labels, selectorStr) {
+				if !containsLabelKey(sb.Labels, selectorKey) {
 					application.Spec.Items[i].Status = api.ApplicationItemLabelDelete
 					application.Status.Phase = api.ApplicationChecking
 					continue
@@ -231,7 +231,7 @@ func (c *ApplicationController) deleteAllContentLabel(app *api.Application) erro
 }
 
 func containsOtherLabel(label map[string]string, labelStr string) bool {
-	list := getApplicationLabels(label)
+	list := getApplicationLabelKeyList(label)
 	if len(list) > 1 {
 		for _, v := range list {
 			if v == labelStr {
@@ -243,8 +243,8 @@ func containsOtherLabel(label map[string]string, labelStr string) bool {
 	return false
 }
 
-func containsLabel(label map[string]string, labelStr string) bool {
-	list := getApplicationLabels(label)
+func containsLabelKey(label map[string]string, labelStr string) bool {
+	list := getApplicationLabelKeyList(label)
 	for _, v := range list {
 		if v == labelStr {
 			return true
@@ -254,7 +254,7 @@ func containsLabel(label map[string]string, labelStr string) bool {
 	return false
 }
 
-func getApplicationLabels(label map[string]string) []string {
+func getApplicationLabelKeyList(label map[string]string) []string {
 	arr := []string{}
 
 	if label != nil {
