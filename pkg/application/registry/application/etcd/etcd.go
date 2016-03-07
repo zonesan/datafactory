@@ -80,12 +80,11 @@ func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, err
 func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, bool, error) {
 	newApp, ok := obj.(*api.Application)
 	if ok {
-		if newApp.Status.Phase == api.ApplicationChecking {
+		switch newApp.Status.Phase {
+		case api.ApplicationChecking:
 			newApp.Status.Phase = api.ApplicationActive
 			return r.store.Update(ctx, obj)
-		}
-
-		if newApp.Status.Phase == api.ApplicationTerminating {
+		case api.ApplicationTerminating:
 			return r.store.Update(ctx, obj)
 		}
 

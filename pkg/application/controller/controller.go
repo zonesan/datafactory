@@ -2,15 +2,10 @@ package controller
 
 import (
 	"errors"
-	"fmt"
 	api "github.com/openshift/origin/pkg/application/api"
 	osclient "github.com/openshift/origin/pkg/client"
-	kerrors "k8s.io/kubernetes/pkg/api/errors"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-	"k8s.io/kubernetes/pkg/fields"
-	"k8s.io/kubernetes/pkg/labels"
 	errutil "k8s.io/kubernetes/pkg/util/errors"
-	"strings"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -34,23 +29,28 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 	switch application.Status.Phase {
 	case api.ApplicationTerminating:
 		fallthrough
+
 	case api.ApplicationTerminatingLabel:
-		if err := c.handleLabel(application); err != nil {
+		if err := c.handleAllLabel(application); err != nil {
 			return err
 		}
 
 	case api.ApplicationActive:
-		c.checkResourceDeletedDeamon(application)
+		c.unifyDaemon(application)
 		return nil
+
 	case api.ApplicationActiveUpdate:
-		if err := c.unSetItemLabel(application); err != nil {
+		if err := c.preHandleAllLabel(application); err != nil {
 			return err
 		}
+
 		fallthrough
+
 	default:
-		if err := c.handleLabel(application); err != nil {
+		if err := c.handleAllLabel(application); err != nil {
 			return err
 		}
+
 		application.Status.Phase = api.ApplicationActive
 		c.Client.Applications(application.Namespace).Update(application)
 
@@ -59,29 +59,48 @@ func (c *ApplicationController) Handle(application *api.Application) (err error)
 	return nil
 }
 
-func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Application) {
-	selectorKey := fmt.Sprintf("%s.application.%s", application.Namespace, application.Name)
-
-	for i, item := range application.Spec.Items {
-		switch item.Kind {
+func (c *ApplicationController) unifyDaemon(application *api.Application) {
+	for i := range application.Spec.Items {
+		switch application.Spec.Items[i].Kind {
 		case "ServiceBroker":
+			resource, err := c.Client.ServiceBrokers().Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
 
-			sb, err := c.Client.ServiceBrokers().Get(item.Name)
-			if err != nil {
-				// 用户将item删除
-				if kerrors.IsNotFound(err) && item.Status != api.ApplicationItemDelete {
-					application.Spec.Items[i].Status = api.ApplicationItemDelete
-					application.Status.Phase = api.ApplicationChecking
-					continue
-				}
-			} else {
-				// 用户将item的label删除
-				if !containsLabelKey(sb.Labels, selectorKey) {
-					application.Spec.Items[i].Status = api.ApplicationItemLabelDelete
-					application.Status.Phase = api.ApplicationChecking
-					continue
-				}
-			}
+		case "BackingService":
+			resource, err := c.Client.BackingServices().Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "BackingServiceInstance":
+			resource, err := c.Client.BackingServiceInstances(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "Build":
+			resource, err := c.Client.Builds(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "BuildConfig":
+			resource, err := c.Client.BuildConfigs(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "DeploymentConfig":
+			resource, err := c.Client.DeploymentConfigs(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "ReplicationController":
+			resource, err := c.KubeClient.ReplicationControllers(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "Node":
+			resource, err := c.KubeClient.Nodes().Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "Pod":
+			resource, err := c.KubeClient.Pods(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
+		case "Service":
+			resource, err := c.KubeClient.Services(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
 		}
 	}
 
@@ -90,190 +109,107 @@ func (c *ApplicationController) checkResourceDeletedDeamon(application *api.Appl
 	}
 }
 
-func (c *ApplicationController) unSetItemLabel(application *api.Application) error {
+func (c *ApplicationController) preHandleAllLabel(application *api.Application) error {
+
+	selector, err := getLabelSelectorByApplication(application)
+	if err != nil {
+		return err
+	}
+
 	errs := []error{}
 
-	if err := unsetServiceBrokersLabel(c.Client, application); err != nil {
+	if err := unloadServiceBrokerLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadBackingServiceLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadBackingServiceInstanceLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadBuildLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadBuildConfigLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadDeploymentConfigLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadReplicationControllerLabel(c.KubeClient, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadNodeLabel(c.KubeClient, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadPodLabel(c.KubeClient, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadServiceLabel(c.KubeClient, application, selector); err != nil {
 		errs = append(errs, err)
 	}
 
 	return errutil.NewAggregate(errs)
 }
 
-func unsetServiceBrokersLabel(client osclient.Interface, application *api.Application) error {
-
-	selectorStr := fmt.Sprintf("%s.application.%s=%s", application.Namespace, application.Name, application.Name)
-	selector, err := labels.Parse(selectorStr)
-	if err != nil {
-		return err
-	}
-
-	items, _ := client.ServiceBrokers().List(selector, fields.Everything())
+func (c *ApplicationController) handleAllLabel(app *api.Application) error {
 	errs := []error{}
-	for _, oldItem := range items.Items {
-		if !hasItem(application.Spec.Items, api.Item{Kind: "ServiceBroker", Name: oldItem.Name}) {
-			delete(oldItem.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
-			if _, err := client.ServiceBrokers().Update(&oldItem); err != nil {
-				errs = append(errs, err)
-			}
-		}
-	}
-
-	return nil
-}
-
-func (c *ApplicationController) handleLabel(app *api.Application) error {
-	errs := []error{}
-	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	for i, item := range app.Spec.Items {
 		switch item.Kind {
 		case "ServiceBroker":
-
-			client := c.Client.ServiceBrokers()
-
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
+			if err := c.handleServiceBrokerLabel(app, i, item.Name); err != nil {
 				errs = append(errs, err)
-				continue
 			}
-
-			switch app.Status.Phase {
-			case api.ApplicationActiveUpdate:
-				if _, exists := resource.Labels[labelSelectorStr]; exists { //Active正常状态,当有新的更新时,如果这个label不存在,则新建
-					continue
-				}
-				fallthrough
-			case api.ApplicationNew:
-				if resource.Labels == nil {
-					resource.Labels = make(map[string]string)
-				}
-
-				resource.Labels[labelSelectorStr] = app.Name
-				if _, err := client.Update(resource); err != nil {
-					errs = append(errs, err)
-				}
-
-			case api.ApplicationTerminating:
-				if !containsOtherLabel(resource.Labels, labelSelectorStr) {
-					if err := client.Delete(item.Name); err != nil {
-						errs = append(errs, err)
-					}
-				} else {
-					delete(resource.Labels, labelSelectorStr)
-					if _, err := client.Update(resource); err != nil {
-						errs = append(errs, err)
-					}
-				}
-
-				app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i+1:]...)
-
-				if len(app.Spec.Items) == 0 {
-					c.Client.Applications(app.Namespace).Delete(app.Name)
-				}
-
-			case api.ApplicationTerminatingLabel:
-				delete(resource.Labels, labelSelectorStr)
-				if _, err := client.Update(resource); err != nil {
-					errs = append(errs, err)
-				}
-
-				app.Spec.Items = append(app.Spec.Items[:i], app.Spec.Items[i + 1:]...)
-
-				if len(app.Spec.Items) == 0 {
-					c.Client.Applications(app.Namespace).Delete(app.Name)
-				}
+		case "BackingService":
+			if err := c.handleBackingServiceLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
 			}
-
+		case "BackingServiceInstance":
+			if err := c.handleBackingServiceInstanceLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "Build":
+			if err := c.handleBuildLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "BuildConfig":
+			if err := c.handleBuildConfigLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "DeploymentConfig":
+			if err := c.handleDeploymentConfigLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "ReplicationController":
+			if err := c.handleReplicationControllerLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "Node":
+			if err := c.handleNodeLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "Pod":
+			if err := c.handlePodLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
+		case "Service":
+			if err := c.handleServiceLabel(app, i, item.Name); err != nil {
+				errs = append(errs, err)
+			}
 		default:
 			errs = append(errs, errors.New("unknown resource "+item.Kind+"="+item.Name))
 		}
 	}
 
 	return errutil.NewAggregate(errs)
-}
-
-func (c *ApplicationController) deleteAllContentLabel(app *api.Application) error {
-	errs := []error{}
-	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
-
-	for i, item := range app.Spec.Items {
-		switch item.Kind {
-		case "ServiceBroker":
-
-			client := c.Client.ServiceBrokers()
-			resource, err := client.Get(item.Name)
-			if err != nil && !kerrors.IsNotFound(err) {
-				errs = append(errs, err)
-				continue
-			}
-
-			if app.Status.Phase == api.ApplicationActive {
-				//Post New
-				if _, exists := resource.Labels[labelSelectorStr]; !exists {
-					app.Spec.Items[i].Status = "user deleted"
-				}
-			}
-
-			resource.Labels[labelSelectorStr] = app.Name
-
-			if _, err := client.Update(resource); err != nil {
-				errs = append(errs, err)
-			}
-			return nil
-
-		default:
-			errs = append(errs, errors.New("unknown resource " + item.Kind + "=" + item.Name))
-		}
-	}
-
-	return errutil.NewAggregate(errs)
-}
-
-func containsOtherLabel(label map[string]string, labelStr string) bool {
-	list := getApplicationLabelKeyList(label)
-	if len(list) > 1 {
-		for _, v := range list {
-			if v == labelStr {
-				return true
-			}
-		}
-	}
-
-	return false
-}
-
-func containsLabelKey(label map[string]string, labelStr string) bool {
-	list := getApplicationLabelKeyList(label)
-	for _, v := range list {
-		if v == labelStr {
-			return true
-		}
-	}
-
-	return false
-}
-
-func getApplicationLabelKeyList(label map[string]string) []string {
-	arr := []string{}
-
-	if label != nil {
-		for key := range label {
-			if strings.Contains(key, ".application.") {
-				arr = append(arr, key)
-			}
-		}
-	}
-
-	return arr
-}
-
-func hasItem(items api.ItemList, item api.Item) bool {
-	for i := range items {
-		if items[i].Kind == item.Kind && items[i].Name == item.Name {
-			return true
-		}
-	}
-
-	return false
 }
