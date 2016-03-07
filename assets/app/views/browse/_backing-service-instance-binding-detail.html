@@ -2,13 +2,12 @@
   <div class="row">
     <div class="col-lg-6">
       <h3>绑定应用</h3>
-      <dl class="dl-horizontal left">
+      <div ng-if="!backingserviceinstance.spec.bound">
+        未绑定
+      </div>
+      <dl ng-if="backingserviceinstance.spec.bound" class="dl-horizontal left">
       	<dt>服务名称</dt>
         <dd>{{backingserviceinstance.spec.provisioning.backingservice_name}}</dd>
-        <!--<dt>已绑定的服务</dt>-->
-        <!--<dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>-->
-        <!-- <dt>runningStatus</dt>
-        <dd>{{deploymentconfig.status}}</dd> -->
         <dt>运行时间</dt>
         <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>
       </dl>
