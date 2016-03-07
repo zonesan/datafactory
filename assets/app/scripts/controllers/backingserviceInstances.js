@@ -9,7 +9,7 @@
  */
 angular.module('openshiftConsole')
   .controller('BackingServiceInstancesController', function ($scope, AuthService, DataService) {
-    $scope.emptyMessage = 'No instances to show';
+    $scope.emptyMessage = '现在没有数据...';
     AuthService.withUser().then(function() {
       loadBackingServiceInstances();
     });
