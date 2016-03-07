@@ -7,9 +7,9 @@
     <table class="table table-bordered table-hover table-mobile">
       <thead>
       <tr>
-        <th>Backing Service Name</th>
-        <th>Instance Name</th>
-        <th>Created Time</th>
+        <th>服务名称</th>
+        <th>实例名称</th>
+        <th>创建时间</th>
       </tr>
       </thead>
       <tbody ng-if="(backingserviceinstances | hashSize) == 0">
@@ -22,8 +22,7 @@
         <td data-title="Instance Name">
         <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
         <td data-title="Created Time">
-        <a ng-href="{{bsi | navigateResourceURL}}"></a>   
-        <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp> 
+        <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp>
         </td>
       </tr>
       </tbody>
