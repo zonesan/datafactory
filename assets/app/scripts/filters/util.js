@@ -402,5 +402,5 @@ angular.module('openshiftConsole')
         return res;
       }
       return costs;
-    }
+    };
   });
