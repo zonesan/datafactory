@@ -8,12 +8,11 @@
       <table class="table table-bordered table-hover table-mobile">
         <thead>
         <tr>
-          <th>Name</th>
-          <th>Cluster IP</th>
-          <th>External IP</th>
-          <th>Ports</th>
-          <th>Selector</th>
-          <th>Age</th>
+          <th>应用名称</th>
+          <th>应用编排时间</th>
+          <th>服务个数</th>
+          <th>后端服务个数</th>
+          <th>域名</th>
         </tr>
         </thead>
         <tbody ng-if="(apps | hashSize) == 0">
@@ -22,26 +21,28 @@
         <tbody ng-repeat="app in apps | orderObjectsByDate : true">
         <tr>
           <td data-title="Name"><a href="{{app | navigateResourceURL}}">{{app.metadata.name}}</a></td>
-          <td data-title="Cluster IP">{{app.spec.clusterIP}}</td>
-          <td data-title="External IP">
-            <span ng-if="!app.status.loadBalancer.ingress.length"><em>none</em></span>
-              <span ng-repeat="ingress in app.status.loadBalancer.ingress | limitTo: 4">{{ingress.ip}}<span ng-if="!$last">,
-              </span></span><span ng-if="app.status.loadBalancer.ingress.length === 5">,
-                {{app.status.loadBalancer.ingress[4].ip}}</span><span ng-if="app.status.loadBalancer.ingress.length > 5">,
-                and {{app.status.loadBalancer.ingress.length - 4}} others</span>
+          <td data-title="CreationTime">
+            <relative-timestamp timestamp="app.metadata.creationTimestamp" drop-suffix="true"></relative-timestamp>
           </td>
-          <td data-title="Ports">
-            <span ng-if="!app.spec.ports.length"><em>none</em></span>
-              <span ng-repeat="portMapping in app.spec.ports | limitTo: 4">{{portMapping.port}}/{{portMapping.protocol}}<span ng-if="!$last">,
-              </span></span><span ng-if="app.spec.ports.length === 5">,
-                {{app.spec.ports[4].port}}/{{app.spec.ports[4].protocol}}</span><span ng-if="app.spec.ports.length > 5">,
-                and {{app.spec.ports.length - 4}} others</span>
+          <td data-title="BackingserviceinstanceNum">
+            <a data-toggle="collapse" href="#backing-service-instance">{{app.spec.items | serviceLenFilter: 'Backingserviceinstance'}}</a>
+            <div class="collapse" id="backing-service-instance">
+              <span ng-repeat="item in app.spec.items | filter: 'Backingserviceinstance' as results track by item.kind">
+                <a ng-href="project/{{projectName}}/backingserviceinstances/{{item.name}}">{{item.name}}</a>
+              </span>
+            </div>
           </td>
-          <td data-title="Selector">
-            <span ng-if="!app.spec.selector"><em>none</em></span>
-            <span ng-repeat="(selectorLabel, selectorValue) in app.spec.selector">{{selectorLabel}}={{selectorValue}}<span ng-show="!$last">, </span></span>
+          <td data-title="BackingserviceNum">
+            <a data-toggle="collapse" href="#backing-service">{{app.spec.items | serviceLenFilter: 'Backingservice'}}</a>
+            <div class="collapse" id="backing-service">
+              <span ng-repeat="item in app.spec.items | filter: 'Backingservice' as results track by item.kind">
+                <a href="backingservices/{{item.name}}">{{item.name}}</a>
+              </span>
+            </div>
           </td>
-          <td data-title="Age"><relative-timestamp timestamp="app.metadata.creationTimestamp" drop-suffix="true"></relative-timestamp></td>
+          <td data-title="Host">
+
+          </td>
         </tr>
         </tbody>
       </table>

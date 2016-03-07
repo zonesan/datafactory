@@ -403,4 +403,18 @@ angular.module('openshiftConsole')
       }
       return costs;
     };
+  })
+  .filter('serviceLenFilter', function() {
+    return function(bs, kind) {
+      if (bs instanceof Array) {
+        var len = 0;
+        for (var i = 0; i < bs.length; i++) {
+          if (bs[i].kind === kind) {
+            len++;
+          }
+        }
+        return len;
+      }
+      return 0;
+    };
   });
