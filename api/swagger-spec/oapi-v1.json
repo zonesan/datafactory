@@ -9,6 +9,667 @@
   },
   "apis": [
    {
+    "path": "/oapi/v1/namespaces/{namespace}/applications",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.ApplicationList",
+      "method": "GET",
+      "summary": "list or watch objects of kind Application",
+      "nickname": "listNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.ApplicationList"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.Application",
+      "method": "POST",
+      "summary": "create a Application",
+      "nickname": "createNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.Application",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.Application"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/namespaces/{namespace}/applications",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch individual changes to a list of Application",
+      "nickname": "watchNamespacedApplicationList",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/namespaces/{namespace}/applications/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.Application",
+      "method": "GET",
+      "summary": "read the specified Application",
+      "nickname": "readNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the Application",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.Application"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.Application",
+      "method": "PUT",
+      "summary": "replace the specified Application",
+      "nickname": "replaceNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.Application",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the Application",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.Application"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.Application",
+      "method": "PATCH",
+      "summary": "partially update the specified Application",
+      "nickname": "patchNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "unversioned.Patch",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the Application",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.Application"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "application/json-patch+json",
+       "application/merge-patch+json",
+       "application/strategic-merge-patch+json"
+      ]
+     },
+     {
+      "type": "unversioned.Status",
+      "method": "DELETE",
+      "summary": "delete a Application",
+      "nickname": "deleteNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.DeleteOptions",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the Application",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "unversioned.Status"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/namespaces/{namespace}/applications/{name}",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch changes to an object of kind Application",
+      "nickname": "watchNamespacedApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the Application",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/applications",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "v1.ApplicationList",
+      "method": "GET",
+      "summary": "list or watch objects of kind Application",
+      "nickname": "listApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.ApplicationList"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
+      "type": "v1.Application",
+      "method": "POST",
+      "summary": "create a Application",
+      "nickname": "createApplication",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.Application",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.Application"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
+    "path": "/oapi/v1/watch/applications",
+    "description": "OpenShift REST API, version v1",
+    "operations": [
+     {
+      "type": "json.WatchEvent",
+      "method": "GET",
+      "summary": "watch individual changes to a list of Application",
+      "nickname": "watchApplicationList",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "labelSelector",
+        "description": "A selector to restrict the list of returned objects by their labels. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "fieldSelector",
+        "description": "A selector to restrict the list of returned objects by their fields. Defaults to everything.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "boolean",
+        "paramType": "query",
+        "name": "watch",
+        "description": "Watch for changes to the described resources and return them as a stream of add, update, and remove notifications. Specify resourceVersion.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "resourceVersion",
+        "description": "When specified with a watch call, shows changes that occur after that particular version of a resource. Defaults to changes from the beginning of history.",
+        "required": false,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "json.WatchEvent"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     }
+    ]
+   },
+   {
     "path": "/oapi/v1/namespaces/{namespace}/backingserviceinstances",
     "description": "OpenShift REST API, version v1",
     "operations": [
@@ -16057,8 +16718,8 @@
    }
   ],
   "models": {
-   "v1.BackingServiceInstanceList": {
-    "id": "v1.BackingServiceInstanceList",
+   "v1.ApplicationList": {
+    "id": "v1.ApplicationList",
     "required": [
      "items"
     ],
@@ -16077,9 +16738,9 @@
      "items": {
       "type": "array",
       "items": {
-       "$ref": "v1.BackingServiceInstance"
+       "$ref": "v1.Application"
       },
-      "description": "list of BackingServiceInstances"
+      "description": "list of Applications"
      }
     }
    },
@@ -16097,8 +16758,8 @@
      }
     }
    },
-   "v1.BackingServiceInstance": {
-    "id": "v1.BackingServiceInstance",
+   "v1.Application": {
+    "id": "v1.Application",
     "properties": {
      "kind": {
       "type": "string",
@@ -16112,12 +16773,12 @@
       "$ref": "v1.ObjectMeta"
      },
      "spec": {
-      "$ref": "v1.BackingServiceInstanceSpec",
-      "description": "spec defines the behavior of the BackingServiceInstance"
+      "$ref": "v1.ApplicationSpec",
+      "description": "spec defines the behavior of the Application"
      },
      "status": {
-      "$ref": "v1.BackingServiceInstanceStatus",
-      "description": "status describes the current status of a Project; read-only"
+      "$ref": "v1.ApplicationStatus",
+      "description": "status describes the current status of a Application; read-only"
      }
     }
    },
@@ -16177,125 +16838,69 @@
      }
     }
    },
-   "v1.BackingServiceInstanceSpec": {
-    "id": "v1.BackingServiceInstanceSpec",
+   "v1.ApplicationSpec": {
+    "id": "v1.ApplicationSpec",
     "required": [
-     "provisioning",
-     "binding",
-     "bound",
-     "instance_id",
-     "tags"
+     "name",
+     "items",
+     "destoryOption"
     ],
     "properties": {
-     "provisioning": {
-      "$ref": "v1.InstanceProvisioning"
+     "name": {
+      "type": "string",
+      "description": "name defines the name of a Application"
      },
-     "binding": {
-      "$ref": "v1.InstanceBinding"
-     },
-     "bound": {
-      "type": "boolean"
-     },
-     "instance_id": {
-      "type": "string"
-     },
-     "tags": {
+     "items": {
       "type": "array",
       "items": {
-       "type": "string"
-      }
+       "$ref": "v1.Item"
+      },
+      "description": "items defines the resources to be labeled in a Application"
+     },
+     "destoryOption": {
+      "type": "boolean",
+      "description": "items defines the resources to be removed in a Application"
+     },
+     "finalizers": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.FinalizerName"
+      },
+      "description": "an opaque list of values that must be empty to permanently remove object from storage"
      }
     }
    },
-   "v1.InstanceProvisioning": {
-    "id": "v1.InstanceProvisioning",
+   "v1.Item": {
+    "id": "v1.Item",
     "required": [
-     "dashboard_url",
-     "backingservice_name",
-     "backingservice_spec_id",
-     "backingservice_plan_guid",
-     "parameters"
+     "kind",
+     "name"
     ],
     "properties": {
-     "dashboard_url": {
-      "type": "string"
+     "kind": {
+      "type": "string",
+      "description": "kind defines the item kind of a item in Application"
      },
-     "backingservice_name": {
-      "type": "string"
+     "name": {
+      "type": "string",
+      "description": "name defines the item name of a item in Application"
      },
-     "backingservice_spec_id": {
-      "type": "string"
-     },
-     "backingservice_plan_guid": {
-      "type": "string"
-     },
-     "parameters": {
-      "type": "any"
+     "status": {
+      "type": "string",
+      "description": "status defines a operate to the item label"
      }
     }
    },
-   "v1.InstanceBinding": {
-    "id": "v1.InstanceBinding",
-    "required": [
-     "bind_uuid",
-     "bind_deploymentconfig",
-     "credentials"
-    ],
-    "properties": {
-     "bound_time": {
-      "type": "string"
-     },
-     "bind_uuid": {
-      "type": "string"
-     },
-     "bind_deploymentconfig": {
-      "type": "string"
-     },
-     "credentials": {
-      "type": "any"
-     }
-    }
+   "v1.FinalizerName": {
+    "id": "v1.FinalizerName",
+    "properties": {}
    },
-   "v1.BackingServiceInstanceStatus": {
-    "id": "v1.BackingServiceInstanceStatus",
-    "required": [
-     "phase",
-     "action",
-     "error",
-     "last_operation"
-    ],
+   "v1.ApplicationStatus": {
+    "id": "v1.ApplicationStatus",
     "properties": {
      "phase": {
-      "type": "string"
-     },
-     "action": {
-      "type": "string"
-     },
-     "error": {
-      "type": "string"
-     },
-     "last_operation": {
-      "$ref": "v1.LastOperation"
-     }
-    }
-   },
-   "v1.LastOperation": {
-    "id": "v1.LastOperation",
-    "required": [
-     "state",
-     "description",
-     "async_poll_interval_seconds"
-    ],
-    "properties": {
-     "state": {
-      "type": "string"
-     },
-     "description": {
-      "type": "string"
-     },
-     "async_poll_interval_seconds": {
-      "type": "integer",
-      "format": "int32"
+      "type": "string",
+      "description": "phase is the current lifecycle phase of the Application"
      }
     }
    },
@@ -16419,6 +17024,178 @@
       "type": "integer",
       "format": "int64",
       "description": "The duration in seconds before the object should be deleted. Value must be non-negative integer. The value zero indicates delete immediately. If this value is nil, the default grace period for the specified type will be used. Defaults to a per object value if not specified. zero means delete immediately."
+     }
+    }
+   },
+   "v1.BackingServiceInstanceList": {
+    "id": "v1.BackingServiceInstanceList",
+    "required": [
+     "items"
+    ],
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "unversioned.ListMeta"
+     },
+     "items": {
+      "type": "array",
+      "items": {
+       "$ref": "v1.BackingServiceInstance"
+      },
+      "description": "list of BackingServiceInstances"
+     }
+    }
+   },
+   "v1.BackingServiceInstance": {
+    "id": "v1.BackingServiceInstance",
+    "properties": {
+     "kind": {
+      "type": "string",
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#types-kinds"
+     },
+     "apiVersion": {
+      "type": "string",
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
+     },
+     "metadata": {
+      "$ref": "v1.ObjectMeta"
+     },
+     "spec": {
+      "$ref": "v1.BackingServiceInstanceSpec",
+      "description": "spec defines the behavior of the BackingServiceInstance"
+     },
+     "status": {
+      "$ref": "v1.BackingServiceInstanceStatus",
+      "description": "status describes the current status of a Project; read-only"
+     }
+    }
+   },
+   "v1.BackingServiceInstanceSpec": {
+    "id": "v1.BackingServiceInstanceSpec",
+    "required": [
+     "provisioning",
+     "binding",
+     "bound",
+     "instance_id",
+     "tags"
+    ],
+    "properties": {
+     "provisioning": {
+      "$ref": "v1.InstanceProvisioning"
+     },
+     "binding": {
+      "$ref": "v1.InstanceBinding"
+     },
+     "bound": {
+      "type": "boolean"
+     },
+     "instance_id": {
+      "type": "string"
+     },
+     "tags": {
+      "type": "array",
+      "items": {
+       "type": "string"
+      }
+     }
+    }
+   },
+   "v1.InstanceProvisioning": {
+    "id": "v1.InstanceProvisioning",
+    "required": [
+     "dashboard_url",
+     "backingservice_name",
+     "backingservice_spec_id",
+     "backingservice_plan_guid",
+     "parameters"
+    ],
+    "properties": {
+     "dashboard_url": {
+      "type": "string"
+     },
+     "backingservice_name": {
+      "type": "string"
+     },
+     "backingservice_spec_id": {
+      "type": "string"
+     },
+     "backingservice_plan_guid": {
+      "type": "string"
+     },
+     "parameters": {
+      "type": "any"
+     }
+    }
+   },
+   "v1.InstanceBinding": {
+    "id": "v1.InstanceBinding",
+    "required": [
+     "bind_uuid",
+     "bind_deploymentconfig",
+     "credentials"
+    ],
+    "properties": {
+     "bound_time": {
+      "type": "string"
+     },
+     "bind_uuid": {
+      "type": "string"
+     },
+     "bind_deploymentconfig": {
+      "type": "string"
+     },
+     "credentials": {
+      "type": "any"
+     }
+    }
+   },
+   "v1.BackingServiceInstanceStatus": {
+    "id": "v1.BackingServiceInstanceStatus",
+    "required": [
+     "phase",
+     "action",
+     "error",
+     "last_operation"
+    ],
+    "properties": {
+     "phase": {
+      "type": "string"
+     },
+     "action": {
+      "type": "string"
+     },
+     "error": {
+      "type": "string"
+     },
+     "last_operation": {
+      "$ref": "v1.LastOperation"
+     }
+    }
+   },
+   "v1.LastOperation": {
+    "id": "v1.LastOperation",
+    "required": [
+     "state",
+     "description",
+     "async_poll_interval_seconds"
+    ],
+    "properties": {
+     "state": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "async_poll_interval_seconds": {
+      "type": "integer",
+      "format": "int32"
      }
     }
    },
@@ -20521,10 +21298,6 @@
       "description": "an opaque list of values that must be empty to permanently remove object from storage"
      }
     }
-   },
-   "v1.FinalizerName": {
-    "id": "v1.FinalizerName",
-    "properties": {}
    },
    "v1.ProjectStatus": {
     "id": "v1.ProjectStatus",

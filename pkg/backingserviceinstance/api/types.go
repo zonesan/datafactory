@@ -11,7 +11,7 @@ type BackingServiceInstance struct {
 
 	// Spec defines the behavior of the Namespace.
 	Spec BackingServiceInstanceSpec
-	
+
 	// Status describes the current status of a Namespace
 	Status BackingServiceInstanceStatus
 }
@@ -83,7 +83,7 @@ type BackingServiceInstanceStatus struct {
 	Phase  BackingServiceInstancePhase
 	Action BackingServiceInstanceAction
 	Error  string
-	
+
 	LastOperation *LastOperation
 }
 
@@ -93,7 +93,7 @@ type LastOperation struct {
 	AsyncPollIntervalSeconds int
 }
 
-type BackingServiceInstancePhase  string
+type BackingServiceInstancePhase string
 type BackingServiceInstanceAction string
 
 const (
@@ -103,19 +103,19 @@ const (
 	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
 	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
 	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
-	
+
 	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
 	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
 	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
 	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
-	
+
 	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
 	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
 	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
-// 
+//
 //=====================================================
 
 const BindKind_DeploymentConfig = "DeploymentConfig"
@@ -131,16 +131,15 @@ const BindKind_DeploymentConfig = "DeploymentConfig"
 type BindingRequestOptions struct {
 	unversioned.TypeMeta
 	kapi.ObjectMeta
-	
 	BindKind            string
 	BindResourceVersion string
 	ResourceName        string
 }
 
-func NewBindingRequestOptions (kind, version, name string) *BindingRequestOptions {
+func NewBindingRequestOptions(kind, version, name string) *BindingRequestOptions {
 	return &BindingRequestOptions{
-		BindKind: kind,
+		BindKind:            kind,
 		BindResourceVersion: version,
-		ResourceName: name,
+		ResourceName:        name,
 	}
 }
