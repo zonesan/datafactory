@@ -9,7 +9,6 @@ import (
 
 	backingservice "github.com/openshift/origin/pkg/backingservice/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"time"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -39,10 +38,8 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 	services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url, sb.Spec.UserName, sb.Spec.Password)
 	if err != nil {
 		fmt.Printf("ServiceBroker %s catalog err %s\n", sb.Name, err.Error())
-		time.Sleep(time.Minute * 5)
 		sb.Status.Phase = servicebrokerapi.ServiceBrokerFailed
 		c.Client.ServiceBrokers().Update(sb)
-
 		return nil
 	}
 
@@ -50,7 +47,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 		backingService := &backingservice.BackingService{}
 		backingService.Spec = backingservice.BackingServiceSpec(v)
 		backingService.Annotations = make(map[string]string)
-		backingService.Name = sb.Name
+		backingService.Name = v.Name
 		backingService.GenerateName = v.Name
 		backingService.Labels = map[string]string{
 			servicebrokerapi.ServiceBrokerLabel: sb.Name,
