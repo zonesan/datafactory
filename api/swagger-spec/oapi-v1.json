@@ -674,10 +674,10 @@
     "description": "OpenShift REST API, version v1",
     "operations": [
      {
-      "type": "v1.BindingRequest",
+      "type": "v1.BindingRequestOptions",
       "method": "POST",
-      "summary": "create binding of a BindingRequest",
-      "nickname": "createNamespacedBindingRequestBinding",
+      "summary": "create binding of a BindingRequestOptions",
+      "nickname": "createNamespacedBindingRequestOptionsBinding",
       "parameters": [
        {
         "type": "string",
@@ -688,7 +688,7 @@
         "allowMultiple": false
        },
        {
-        "type": "v1.BindingRequest",
+        "type": "v1.BindingRequestOptions",
         "paramType": "body",
         "name": "body",
         "description": "",
@@ -707,7 +707,7 @@
         "type": "string",
         "paramType": "path",
         "name": "name",
-        "description": "name of the BindingRequest",
+        "description": "name of the BindingRequestOptions",
         "required": true,
         "allowMultiple": false
        }
@@ -716,7 +716,7 @@
        {
         "code": 200,
         "message": "OK",
-        "responseModel": "v1.BindingRequest"
+        "responseModel": "v1.BindingRequestOptions"
        }
       ],
       "produces": [
@@ -729,8 +729,8 @@
      {
       "type": "unversioned.Status",
       "method": "DELETE",
-      "summary": "delete binding of a BindingRequest",
-      "nickname": "deleteNamespacedBindingRequestBinding",
+      "summary": "delete binding of a BindingRequestOptions",
+      "nickname": "deleteNamespacedBindingRequestOptionsBinding",
       "parameters": [
        {
         "type": "string",
@@ -760,7 +760,7 @@
         "type": "string",
         "paramType": "path",
         "name": "name",
-        "description": "name of the BindingRequest",
+        "description": "name of the BindingRequestOptions",
         "required": true,
         "allowMultiple": false
        }
@@ -16212,9 +16212,8 @@
     "required": [
      "dashboard_url",
      "backingservice_name",
-     "backingservice_id",
+     "backingservice_spec_id",
      "backingservice_plan_guid",
-     "backingservice_plan_name",
      "parameters"
     ],
     "properties": {
@@ -16224,13 +16223,10 @@
      "backingservice_name": {
       "type": "string"
      },
-     "backingservice_id": {
+     "backingservice_spec_id": {
       "type": "string"
      },
      "backingservice_plan_guid": {
-      "type": "string"
-     },
-     "backingservice_plan_name": {
       "type": "string"
      },
      "parameters": {
@@ -16243,16 +16239,19 @@
     "required": [
      "bind_uuid",
      "bind_deploymentconfig",
-     "credential"
+     "credentials"
     ],
     "properties": {
+     "bound_time": {
+      "type": "string"
+     },
      "bind_uuid": {
       "type": "string"
      },
      "bind_deploymentconfig": {
-      "type": "any"
+      "type": "string"
      },
-     "credential": {
+     "credentials": {
       "type": "any"
      }
     }
@@ -16391,10 +16390,12 @@
      }
     }
    },
-   "v1.BindingRequest": {
-    "id": "v1.BindingRequest",
+   "v1.BindingRequestOptions": {
+    "id": "v1.BindingRequestOptions",
     "required": [
-     "application_uuid"
+     "bindKind",
+     "bindResourceVersion",
+     "resourceName"
     ],
     "properties": {
      "kind": {
@@ -16455,7 +16456,13 @@
       "type": "any",
       "description": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://releases.k8s.io/HEAD/docs/user-guide/annotations.md"
      },
-     "application_uuid": {
+     "bindKind": {
+      "type": "string"
+     },
+     "bindResourceVersion": {
+      "type": "string"
+     },
+     "resourceName": {
       "type": "string"
      }
     }
