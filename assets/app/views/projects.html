@@ -42,16 +42,16 @@
 </div>
 
 <div ng-if="showGetStarted" class="empty-state-message empty-state-full-page text-center">
-  <h1>欢迎使用DataFactory</h1>
+  <h1>欢迎使用DataFoundry</h1>
 
   <p>
-    DataFactory帮助您快速开发、部署健壮的应用 <br>
+    DataFoundry帮助您快速开发、部署健壮的应用 <br>
     <span ng-if="canCreate">为你的应用创建一个项目吧</span>
   </p>
 
   <a ng-if="canCreate" href="createProject" class="btn btn-lg btn-primary">新建项目</a>
 
-  <p>了解更多, 请访问 DataFactory <a ng-href="{{'' | helpLink}}">文档</a>.</p>
+  <p>了解更多, 请访问 DataFoundry <a ng-href="{{'' | helpLink}}">文档</a>.</p>
 
   <p ng-if="canCreate === false">
     <span ng-if="!newProjectMessage">

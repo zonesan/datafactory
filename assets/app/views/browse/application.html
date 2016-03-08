@@ -36,24 +36,20 @@
               <h3>服务列表</h3>
 
               <div class="service-table table-responsive">
-                <table ng-if="app.spec.items" style="max-width: 650px;">
+                <table class="table table-bordered table-hover table-mobile" ng-if="app.spec.items" style="max-width: 650px;">
                   <thead>
                   <tr>
                     <th>名称</th>
                     <th>类型</th>
-                    <th>状态</th>
                   </tr>
                   </thead>
                   <tbody>
-                  <tr ng-repeat="item in app.spec.items | filter: 'Backingserviceinstance' as results track by item.kind">
+                  <tr ng-repeat="item in app.spec.items" ng-if="item.kind == 'BackingServiceInstance'">
                     <td>
-                      <a href="project/{{projectName}}/backingserviceinstances/{{item.name}}">{{item.name}}</a>
+                      <a href="project/{{projectName}}/browse/backingserviceinstances/{{item.name}}">{{item.name}}</a>
                     </td>
                     <td>
                       {{item.kind}}
-                    </td>
-                    <td>
-                      {{item.status}}
                     </td>
                   </tr>
                   </tbody>
@@ -63,24 +59,20 @@
               <h3>后端服务列表</h3>
 
               <div class="service-table table-responsive">
-                <table ng-if="app.spec.items" style="max-width: 650px;">
+                <table class="table table-bordered table-hover table-mobile" ng-if="app.spec.items" style="max-width: 650px;">
                   <thead>
                   <tr>
                     <th>名称</th>
                     <th>类型</th>
-                    <th>状态</th>
                   </tr>
                   </thead>
                   <tbody>
-                  <tr ng-repeat="item in app.spec.items | filter: 'Backingservice' as results track by item.kind">
+                  <tr ng-repeat="item in app.spec.items" ng-if="item.kind == 'BackingService'">
                     <td>
                       <a href="backingservices/{{item.name}}">{{item.name}}</a>
                     </td>
                     <td>
                       {{item.kind}}
-                    </td>
-                    <td>
-                      {{item.status}}
                     </td>
                   </tr>
                   </tbody>
