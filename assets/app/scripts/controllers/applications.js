@@ -33,7 +33,6 @@ angular.module('openshiftConsole')
         $scope.project = project;
         watches.push(DataService.watch("applications", context, function(apps, action) {
           $scope.unfilteredApps = apps.by("metadata.name");
-          console.log("unfilteredApps", $scope.unfilteredApps);
           LabelFilter.addLabelSuggestionsFromResources($scope.unfilteredApps, $scope.labelSuggestions);
           LabelFilter.setLabelSuggestions($scope.labelSuggestions);
           $scope.apps = LabelFilter.getLabelSelector().select($scope.unfilteredApps);
