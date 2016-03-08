@@ -79,7 +79,7 @@ const (
 )
 
 //=====================================================
-// 
+//
 //=====================================================
 
 const BindKind_DeploymentConfig = "DeploymentConfig"
@@ -95,18 +95,16 @@ const BindKind_DeploymentConfig = "DeploymentConfig"
 type BindingRequestOptions struct {
 	unversioned.TypeMeta
 	kapi.ObjectMeta
-	
-	
-	
+
 	BindKind            string `json:"bindKind, omitempty"`
 	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
 	ResourceName        string `json:"resourceName, omitempty"`
 }
 
-func NewBindingRequestOptions (kind, version, name string) *BindingRequestOptions {
+func NewBindingRequestOptions(kind, version, name string) *BindingRequestOptions {
 	return &BindingRequestOptions{
-		BindKind: kind,
+		BindKind:            kind,
 		BindResourceVersion: version,
-		ResourceName: name,
+		ResourceName:        name,
 	}
 }
