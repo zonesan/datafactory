@@ -20,3 +20,7 @@ origin.iml
 .tag*
 .project
 *.go~
+Godeps
+assets
+examples
+
