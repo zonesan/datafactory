@@ -67,7 +67,7 @@ func NewCmdNewBackingServiceInstance(fullName string, f *clientcmd.Factory, out 
 		},
 	}
 
-	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService GUID")
+	cmd.Flags().StringVar(&options.BackingServiceName, "backingservice_name", "", "BackingService Name")
 	cmd.Flags().StringVar(&options.BackingServicePlanGuid, "planid", "", "BackingService Plan GUID")
 	// todo: dashboard_url
 	
@@ -112,12 +112,12 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	backingServiceInstance := &backingserviceinstanceapi.BackingServiceInstance{}
 	
 	backingServiceInstance.Name = o.Name
-	backingServiceInstance.GenerateName = o.Name
+	//backingServiceInstance.GenerateName = o.Name
 	
-	backingServiceInstance.Spec.BackingServiceName = bs.Spec.Name
-	backingServiceInstance.Spec.BackingServiceID = bs.Spec.Id
-	backingServiceInstance.Spec.BackingServicePlanGuid = plan.Id
-	backingServiceInstance.Spec.BackingServicePlanName = plan.Name
+	backingServiceInstance.Spec.BackingServiceName = bs.Name // o.BackingServiceName
+	//backingServiceInstance.Spec.BackingServiceID = bs.Spec.Id
+	backingServiceInstance.Spec.BackingServicePlanGuid = plan.Id // o.BackingServicePlanGuid
+	//backingServiceInstance.Spec.BackingServicePlanName = plan.Name
 	
 	//backingServiceInstance.Status = backingserviceinstanceapi.BackingServiceInstancePhaseCreated
 	
@@ -313,6 +313,8 @@ func (o *BindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 		backingserviceinstanceapi.BindKind_DeploymentConfig, 
 		latestapi.Version, 
 		o.DeploymentConfigName)
+	bro.Name = o.Name 
+	bro.Namespace = namespace
 	
 	err = client.BackingServiceInstances(namespace).CreateBinding(o.Name, bro)
 	if err != nil {

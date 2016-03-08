@@ -48,34 +48,66 @@ type BackingServiceInstanceSpec struct {
 	Tags                 []string `json:"tags, omitempty"`
 }
 
+/*
 type InstanceProvisioning struct {
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingService         string            `json:"backingservice, omitempty"`
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	BackingServicePlanName string            `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
+*/
+
+type InstanceProvisioning struct {
+	DashboardUrl           string            `json:"dashboard_url, omitempty"`
+	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceSpecID   string            `json:"backingservice_spec_id, omitempty"`
+	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	Parameters             map[string]string `json:"parameters, omitempty"`
+}
 
 type InstanceBinding struct {
+	BoundTime            *unversioned.Time `json:"bound_time,omitempty"`
 	BindUuid             string            `json:"bind_uuid, omitempty"`
 	BindDeploymentConfig string            `json:"bind_deploymentconfig, omitempty"`
 	Credentials          map[string]string `json:"credentials, omitempty"`
 }
 
 type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase `json:"phase, omitempty"`
+	Phase  BackingServiceInstancePhase  `json:"phase, omitempty"`
+	Action BackingServiceInstanceAction `json:"action, omitempty"`
+	Error  string                       `json:"error, omitempty"`
+	
+	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }
 
-type BackingServiceInstancePhase string
+type LastOperation struct {
+	State                    string `json:"state"`
+	Description              string `json:"description"`
+	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
+}
+
+type BackingServiceInstancePhase  string
+type BackingServiceInstanceAction string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
+	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
+	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	
+	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
+	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
+	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
+	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
+	
+	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
+	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
+	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
@@ -93,8 +125,8 @@ const BindKind_DeploymentConfig = "DeploymentConfig"
 //}
 
 type BindingRequestOptions struct {
-	unversioned.TypeMeta
-	kapi.ObjectMeta
+	unversioned.TypeMeta `json:",inline"`
+	kapi.ObjectMeta      `json:"metadata,omitempty"`
 
 	BindKind            string `json:"bindKind, omitempty"`
 	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
