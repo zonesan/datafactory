@@ -2,10 +2,12 @@ package v1
 
 // AUTO-GENERATED FUNCTIONS START HERE
 import (
-	api "github.com/openshift/origin/pkg/authorization/api"
-	v1 "github.com/openshift/origin/pkg/authorization/api/v1"
+	api "github.com/openshift/origin/pkg/application/api"
+	v1 "github.com/openshift/origin/pkg/application/api/v1"
+	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	apiv1 "github.com/openshift/origin/pkg/authorization/api/v1"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
-	apiv1 "github.com/openshift/origin/pkg/backingservice/api/v1"
+	backingserviceapiv1 "github.com/openshift/origin/pkg/backingservice/api/v1"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	backingserviceinstanceapiv1 "github.com/openshift/origin/pkg/backingserviceinstance/api/v1"
 	buildapi "github.com/openshift/origin/pkg/build/api"
@@ -35,9 +37,223 @@ import (
 	reflect "reflect"
 )
 
-func autoconvert_api_ClusterPolicy_To_v1_ClusterPolicy(in *api.ClusterPolicy, out *v1.ClusterPolicy, s conversion.Scope) error {
+func autoconvert_api_Application_To_v1_Application(in *api.Application, out *v1.Application, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterPolicy))(in)
+		defaulting.(func(*api.Application))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_api_ObjectMeta_To_v1_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	if err := convert_api_ApplicationSpec_To_v1_ApplicationSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := convert_api_ApplicationStatus_To_v1_ApplicationStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+func convert_api_Application_To_v1_Application(in *api.Application, out *v1.Application, s conversion.Scope) error {
+	return autoconvert_api_Application_To_v1_Application(in, out, s)
+}
+
+func autoconvert_api_ApplicationList_To_v1_ApplicationList(in *api.ApplicationList, out *v1.ApplicationList, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*api.ApplicationList))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := s.Convert(&in.ListMeta, &out.ListMeta, 0); err != nil {
+		return err
+	}
+	if in.Items != nil {
+		out.Items = make([]v1.Application, len(in.Items))
+		for i := range in.Items {
+			if err := convert_api_Application_To_v1_Application(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func convert_api_ApplicationList_To_v1_ApplicationList(in *api.ApplicationList, out *v1.ApplicationList, s conversion.Scope) error {
+	return autoconvert_api_ApplicationList_To_v1_ApplicationList(in, out, s)
+}
+
+func autoconvert_api_ApplicationSpec_To_v1_ApplicationSpec(in *api.ApplicationSpec, out *v1.ApplicationSpec, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*api.ApplicationSpec))(in)
+	}
+	out.Name = in.Name
+	if in.Items != nil {
+		out.Items = make([]v1.Item, len(in.Items))
+		for i := range in.Items {
+			if err := convert_api_Item_To_v1_Item(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	out.Destory = in.Destory
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapiv1.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = pkgapiv1.FinalizerName(in.Finalizers[i])
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func convert_api_ApplicationSpec_To_v1_ApplicationSpec(in *api.ApplicationSpec, out *v1.ApplicationSpec, s conversion.Scope) error {
+	return autoconvert_api_ApplicationSpec_To_v1_ApplicationSpec(in, out, s)
+}
+
+func autoconvert_api_ApplicationStatus_To_v1_ApplicationStatus(in *api.ApplicationStatus, out *v1.ApplicationStatus, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*api.ApplicationStatus))(in)
+	}
+	out.Phase = v1.ApplicationPhase(in.Phase)
+	return nil
+}
+
+func convert_api_ApplicationStatus_To_v1_ApplicationStatus(in *api.ApplicationStatus, out *v1.ApplicationStatus, s conversion.Scope) error {
+	return autoconvert_api_ApplicationStatus_To_v1_ApplicationStatus(in, out, s)
+}
+
+func autoconvert_api_Item_To_v1_Item(in *api.Item, out *v1.Item, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*api.Item))(in)
+	}
+	out.Kind = in.Kind
+	out.Name = in.Name
+	out.Status = in.Status
+	return nil
+}
+
+func convert_api_Item_To_v1_Item(in *api.Item, out *v1.Item, s conversion.Scope) error {
+	return autoconvert_api_Item_To_v1_Item(in, out, s)
+}
+
+func autoconvert_v1_Application_To_api_Application(in *v1.Application, out *api.Application, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*v1.Application))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_v1_ObjectMeta_To_api_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	if err := convert_v1_ApplicationSpec_To_api_ApplicationSpec(&in.Spec, &out.Spec, s); err != nil {
+		return err
+	}
+	if err := convert_v1_ApplicationStatus_To_api_ApplicationStatus(&in.Status, &out.Status, s); err != nil {
+		return err
+	}
+	return nil
+}
+
+func convert_v1_Application_To_api_Application(in *v1.Application, out *api.Application, s conversion.Scope) error {
+	return autoconvert_v1_Application_To_api_Application(in, out, s)
+}
+
+func autoconvert_v1_ApplicationList_To_api_ApplicationList(in *v1.ApplicationList, out *api.ApplicationList, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*v1.ApplicationList))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := s.Convert(&in.ListMeta, &out.ListMeta, 0); err != nil {
+		return err
+	}
+	if in.Items != nil {
+		out.Items = make([]api.Application, len(in.Items))
+		for i := range in.Items {
+			if err := convert_v1_Application_To_api_Application(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	return nil
+}
+
+func convert_v1_ApplicationList_To_api_ApplicationList(in *v1.ApplicationList, out *api.ApplicationList, s conversion.Scope) error {
+	return autoconvert_v1_ApplicationList_To_api_ApplicationList(in, out, s)
+}
+
+func autoconvert_v1_ApplicationSpec_To_api_ApplicationSpec(in *v1.ApplicationSpec, out *api.ApplicationSpec, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*v1.ApplicationSpec))(in)
+	}
+	out.Name = in.Name
+	if in.Items != nil {
+		out.Items = make([]api.Item, len(in.Items))
+		for i := range in.Items {
+			if err := convert_v1_Item_To_api_Item(&in.Items[i], &out.Items[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Items = nil
+	}
+	out.Destory = in.Destory
+	if in.Finalizers != nil {
+		out.Finalizers = make([]pkgapi.FinalizerName, len(in.Finalizers))
+		for i := range in.Finalizers {
+			out.Finalizers[i] = pkgapi.FinalizerName(in.Finalizers[i])
+		}
+	} else {
+		out.Finalizers = nil
+	}
+	return nil
+}
+
+func convert_v1_ApplicationSpec_To_api_ApplicationSpec(in *v1.ApplicationSpec, out *api.ApplicationSpec, s conversion.Scope) error {
+	return autoconvert_v1_ApplicationSpec_To_api_ApplicationSpec(in, out, s)
+}
+
+func autoconvert_v1_ApplicationStatus_To_api_ApplicationStatus(in *v1.ApplicationStatus, out *api.ApplicationStatus, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*v1.ApplicationStatus))(in)
+	}
+	out.Phase = api.ApplicationPhase(in.Phase)
+	return nil
+}
+
+func convert_v1_ApplicationStatus_To_api_ApplicationStatus(in *v1.ApplicationStatus, out *api.ApplicationStatus, s conversion.Scope) error {
+	return autoconvert_v1_ApplicationStatus_To_api_ApplicationStatus(in, out, s)
+}
+
+func autoconvert_v1_Item_To_api_Item(in *v1.Item, out *api.Item, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*v1.Item))(in)
+	}
+	out.Kind = in.Kind
+	out.Name = in.Name
+	out.Status = in.Status
+	return nil
+}
+
+func convert_v1_Item_To_api_Item(in *v1.Item, out *api.Item, s conversion.Scope) error {
+	return autoconvert_v1_Item_To_api_Item(in, out, s)
+}
+
+func autoconvert_api_ClusterPolicy_To_v1_ClusterPolicy(in *authorizationapi.ClusterPolicy, out *apiv1.ClusterPolicy, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*authorizationapi.ClusterPolicy))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -54,9 +270,9 @@ func autoconvert_api_ClusterPolicy_To_v1_ClusterPolicy(in *api.ClusterPolicy, ou
 	return nil
 }
 
-func autoconvert_api_ClusterPolicyBinding_To_v1_ClusterPolicyBinding(in *api.ClusterPolicyBinding, out *v1.ClusterPolicyBinding, s conversion.Scope) error {
+func autoconvert_api_ClusterPolicyBinding_To_v1_ClusterPolicyBinding(in *authorizationapi.ClusterPolicyBinding, out *apiv1.ClusterPolicyBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterPolicyBinding))(in)
+		defaulting.(func(*authorizationapi.ClusterPolicyBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -76,9 +292,9 @@ func autoconvert_api_ClusterPolicyBinding_To_v1_ClusterPolicyBinding(in *api.Clu
 	return nil
 }
 
-func autoconvert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in *api.ClusterPolicyBindingList, out *v1.ClusterPolicyBindingList, s conversion.Scope) error {
+func autoconvert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in *authorizationapi.ClusterPolicyBindingList, out *apiv1.ClusterPolicyBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterPolicyBindingList))(in)
+		defaulting.(func(*authorizationapi.ClusterPolicyBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -87,7 +303,7 @@ func autoconvert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in 
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.ClusterPolicyBinding, len(in.Items))
+		out.Items = make([]apiv1.ClusterPolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -99,13 +315,13 @@ func autoconvert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in 
 	return nil
 }
 
-func convert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in *api.ClusterPolicyBindingList, out *v1.ClusterPolicyBindingList, s conversion.Scope) error {
+func convert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in *authorizationapi.ClusterPolicyBindingList, out *apiv1.ClusterPolicyBindingList, s conversion.Scope) error {
 	return autoconvert_api_ClusterPolicyBindingList_To_v1_ClusterPolicyBindingList(in, out, s)
 }
 
-func autoconvert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *api.ClusterPolicyList, out *v1.ClusterPolicyList, s conversion.Scope) error {
+func autoconvert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *authorizationapi.ClusterPolicyList, out *apiv1.ClusterPolicyList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterPolicyList))(in)
+		defaulting.(func(*authorizationapi.ClusterPolicyList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -114,7 +330,7 @@ func autoconvert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *api.ClusterPo
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.ClusterPolicy, len(in.Items))
+		out.Items = make([]apiv1.ClusterPolicy, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -126,13 +342,13 @@ func autoconvert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *api.ClusterPo
 	return nil
 }
 
-func convert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *api.ClusterPolicyList, out *v1.ClusterPolicyList, s conversion.Scope) error {
+func convert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in *authorizationapi.ClusterPolicyList, out *apiv1.ClusterPolicyList, s conversion.Scope) error {
 	return autoconvert_api_ClusterPolicyList_To_v1_ClusterPolicyList(in, out, s)
 }
 
-func autoconvert_api_ClusterRole_To_v1_ClusterRole(in *api.ClusterRole, out *v1.ClusterRole, s conversion.Scope) error {
+func autoconvert_api_ClusterRole_To_v1_ClusterRole(in *authorizationapi.ClusterRole, out *apiv1.ClusterRole, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterRole))(in)
+		defaulting.(func(*authorizationapi.ClusterRole))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -141,7 +357,7 @@ func autoconvert_api_ClusterRole_To_v1_ClusterRole(in *api.ClusterRole, out *v1.
 		return err
 	}
 	if in.Rules != nil {
-		out.Rules = make([]v1.PolicyRule, len(in.Rules))
+		out.Rules = make([]apiv1.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := s.Convert(&in.Rules[i], &out.Rules[i], 0); err != nil {
 				return err
@@ -153,13 +369,13 @@ func autoconvert_api_ClusterRole_To_v1_ClusterRole(in *api.ClusterRole, out *v1.
 	return nil
 }
 
-func convert_api_ClusterRole_To_v1_ClusterRole(in *api.ClusterRole, out *v1.ClusterRole, s conversion.Scope) error {
+func convert_api_ClusterRole_To_v1_ClusterRole(in *authorizationapi.ClusterRole, out *apiv1.ClusterRole, s conversion.Scope) error {
 	return autoconvert_api_ClusterRole_To_v1_ClusterRole(in, out, s)
 }
 
-func autoconvert_api_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *api.ClusterRoleBinding, out *v1.ClusterRoleBinding, s conversion.Scope) error {
+func autoconvert_api_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *authorizationapi.ClusterRoleBinding, out *apiv1.ClusterRoleBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterRoleBinding))(in)
+		defaulting.(func(*authorizationapi.ClusterRoleBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -183,9 +399,9 @@ func autoconvert_api_ClusterRoleBinding_To_v1_ClusterRoleBinding(in *api.Cluster
 	return nil
 }
 
-func autoconvert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *api.ClusterRoleBindingList, out *v1.ClusterRoleBindingList, s conversion.Scope) error {
+func autoconvert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorizationapi.ClusterRoleBindingList, out *apiv1.ClusterRoleBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterRoleBindingList))(in)
+		defaulting.(func(*authorizationapi.ClusterRoleBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -194,7 +410,7 @@ func autoconvert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *api
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.ClusterRoleBinding, len(in.Items))
+		out.Items = make([]apiv1.ClusterRoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -206,13 +422,13 @@ func autoconvert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *api
 	return nil
 }
 
-func convert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *api.ClusterRoleBindingList, out *v1.ClusterRoleBindingList, s conversion.Scope) error {
+func convert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in *authorizationapi.ClusterRoleBindingList, out *apiv1.ClusterRoleBindingList, s conversion.Scope) error {
 	return autoconvert_api_ClusterRoleBindingList_To_v1_ClusterRoleBindingList(in, out, s)
 }
 
-func autoconvert_api_ClusterRoleList_To_v1_ClusterRoleList(in *api.ClusterRoleList, out *v1.ClusterRoleList, s conversion.Scope) error {
+func autoconvert_api_ClusterRoleList_To_v1_ClusterRoleList(in *authorizationapi.ClusterRoleList, out *apiv1.ClusterRoleList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ClusterRoleList))(in)
+		defaulting.(func(*authorizationapi.ClusterRoleList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -221,7 +437,7 @@ func autoconvert_api_ClusterRoleList_To_v1_ClusterRoleList(in *api.ClusterRoleLi
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.ClusterRole, len(in.Items))
+		out.Items = make([]apiv1.ClusterRole, len(in.Items))
 		for i := range in.Items {
 			if err := convert_api_ClusterRole_To_v1_ClusterRole(&in.Items[i], &out.Items[i], s); err != nil {
 				return err
@@ -233,13 +449,13 @@ func autoconvert_api_ClusterRoleList_To_v1_ClusterRoleList(in *api.ClusterRoleLi
 	return nil
 }
 
-func convert_api_ClusterRoleList_To_v1_ClusterRoleList(in *api.ClusterRoleList, out *v1.ClusterRoleList, s conversion.Scope) error {
+func convert_api_ClusterRoleList_To_v1_ClusterRoleList(in *authorizationapi.ClusterRoleList, out *apiv1.ClusterRoleList, s conversion.Scope) error {
 	return autoconvert_api_ClusterRoleList_To_v1_ClusterRoleList(in, out, s)
 }
 
-func autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *api.IsPersonalSubjectAccessReview, out *v1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorizationapi.IsPersonalSubjectAccessReview, out *apiv1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.IsPersonalSubjectAccessReview))(in)
+		defaulting.(func(*authorizationapi.IsPersonalSubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -247,13 +463,13 @@ func autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccess
 	return nil
 }
 
-func convert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *api.IsPersonalSubjectAccessReview, out *v1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func convert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in *authorizationapi.IsPersonalSubjectAccessReview, out *apiv1.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview(in, out, s)
 }
 
-func autoconvert_api_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *api.LocalResourceAccessReview, out *v1.LocalResourceAccessReview, s conversion.Scope) error {
+func autoconvert_api_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(in *authorizationapi.LocalResourceAccessReview, out *apiv1.LocalResourceAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.LocalResourceAccessReview))(in)
+		defaulting.(func(*authorizationapi.LocalResourceAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -262,9 +478,9 @@ func autoconvert_api_LocalResourceAccessReview_To_v1_LocalResourceAccessReview(i
 	return nil
 }
 
-func autoconvert_api_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in *api.LocalSubjectAccessReview, out *v1.LocalSubjectAccessReview, s conversion.Scope) error {
+func autoconvert_api_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in *authorizationapi.LocalSubjectAccessReview, out *apiv1.LocalSubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.LocalSubjectAccessReview))(in)
+		defaulting.(func(*authorizationapi.LocalSubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -275,9 +491,9 @@ func autoconvert_api_LocalSubjectAccessReview_To_v1_LocalSubjectAccessReview(in 
 	return nil
 }
 
-func autoconvert_api_Policy_To_v1_Policy(in *api.Policy, out *v1.Policy, s conversion.Scope) error {
+func autoconvert_api_Policy_To_v1_Policy(in *authorizationapi.Policy, out *apiv1.Policy, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.Policy))(in)
+		defaulting.(func(*authorizationapi.Policy))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -294,9 +510,9 @@ func autoconvert_api_Policy_To_v1_Policy(in *api.Policy, out *v1.Policy, s conve
 	return nil
 }
 
-func autoconvert_api_PolicyBinding_To_v1_PolicyBinding(in *api.PolicyBinding, out *v1.PolicyBinding, s conversion.Scope) error {
+func autoconvert_api_PolicyBinding_To_v1_PolicyBinding(in *authorizationapi.PolicyBinding, out *apiv1.PolicyBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.PolicyBinding))(in)
+		defaulting.(func(*authorizationapi.PolicyBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -316,9 +532,9 @@ func autoconvert_api_PolicyBinding_To_v1_PolicyBinding(in *api.PolicyBinding, ou
 	return nil
 }
 
-func autoconvert_api_PolicyBindingList_To_v1_PolicyBindingList(in *api.PolicyBindingList, out *v1.PolicyBindingList, s conversion.Scope) error {
+func autoconvert_api_PolicyBindingList_To_v1_PolicyBindingList(in *authorizationapi.PolicyBindingList, out *apiv1.PolicyBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.PolicyBindingList))(in)
+		defaulting.(func(*authorizationapi.PolicyBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -327,7 +543,7 @@ func autoconvert_api_PolicyBindingList_To_v1_PolicyBindingList(in *api.PolicyBin
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.PolicyBinding, len(in.Items))
+		out.Items = make([]apiv1.PolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -339,13 +555,13 @@ func autoconvert_api_PolicyBindingList_To_v1_PolicyBindingList(in *api.PolicyBin
 	return nil
 }
 
-func convert_api_PolicyBindingList_To_v1_PolicyBindingList(in *api.PolicyBindingList, out *v1.PolicyBindingList, s conversion.Scope) error {
+func convert_api_PolicyBindingList_To_v1_PolicyBindingList(in *authorizationapi.PolicyBindingList, out *apiv1.PolicyBindingList, s conversion.Scope) error {
 	return autoconvert_api_PolicyBindingList_To_v1_PolicyBindingList(in, out, s)
 }
 
-func autoconvert_api_PolicyList_To_v1_PolicyList(in *api.PolicyList, out *v1.PolicyList, s conversion.Scope) error {
+func autoconvert_api_PolicyList_To_v1_PolicyList(in *authorizationapi.PolicyList, out *apiv1.PolicyList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.PolicyList))(in)
+		defaulting.(func(*authorizationapi.PolicyList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -354,7 +570,7 @@ func autoconvert_api_PolicyList_To_v1_PolicyList(in *api.PolicyList, out *v1.Pol
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.Policy, len(in.Items))
+		out.Items = make([]apiv1.Policy, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -366,13 +582,13 @@ func autoconvert_api_PolicyList_To_v1_PolicyList(in *api.PolicyList, out *v1.Pol
 	return nil
 }
 
-func convert_api_PolicyList_To_v1_PolicyList(in *api.PolicyList, out *v1.PolicyList, s conversion.Scope) error {
+func convert_api_PolicyList_To_v1_PolicyList(in *authorizationapi.PolicyList, out *apiv1.PolicyList, s conversion.Scope) error {
 	return autoconvert_api_PolicyList_To_v1_PolicyList(in, out, s)
 }
 
-func autoconvert_api_PolicyRule_To_v1_PolicyRule(in *api.PolicyRule, out *v1.PolicyRule, s conversion.Scope) error {
+func autoconvert_api_PolicyRule_To_v1_PolicyRule(in *authorizationapi.PolicyRule, out *apiv1.PolicyRule, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.PolicyRule))(in)
+		defaulting.(func(*authorizationapi.PolicyRule))(in)
 	}
 	// in.Verbs has no peer in out
 	if err := s.Convert(&in.AttributeRestrictions, &out.AttributeRestrictions, 0); err != nil {
@@ -392,9 +608,9 @@ func autoconvert_api_PolicyRule_To_v1_PolicyRule(in *api.PolicyRule, out *v1.Pol
 	return nil
 }
 
-func autoconvert_api_ResourceAccessReview_To_v1_ResourceAccessReview(in *api.ResourceAccessReview, out *v1.ResourceAccessReview, s conversion.Scope) error {
+func autoconvert_api_ResourceAccessReview_To_v1_ResourceAccessReview(in *authorizationapi.ResourceAccessReview, out *apiv1.ResourceAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ResourceAccessReview))(in)
+		defaulting.(func(*authorizationapi.ResourceAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -403,9 +619,9 @@ func autoconvert_api_ResourceAccessReview_To_v1_ResourceAccessReview(in *api.Res
 	return nil
 }
 
-func autoconvert_api_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(in *api.ResourceAccessReviewResponse, out *v1.ResourceAccessReviewResponse, s conversion.Scope) error {
+func autoconvert_api_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResponse(in *authorizationapi.ResourceAccessReviewResponse, out *apiv1.ResourceAccessReviewResponse, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.ResourceAccessReviewResponse))(in)
+		defaulting.(func(*authorizationapi.ResourceAccessReviewResponse))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -416,9 +632,9 @@ func autoconvert_api_ResourceAccessReviewResponse_To_v1_ResourceAccessReviewResp
 	return nil
 }
 
-func autoconvert_api_Role_To_v1_Role(in *api.Role, out *v1.Role, s conversion.Scope) error {
+func autoconvert_api_Role_To_v1_Role(in *authorizationapi.Role, out *apiv1.Role, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.Role))(in)
+		defaulting.(func(*authorizationapi.Role))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -427,7 +643,7 @@ func autoconvert_api_Role_To_v1_Role(in *api.Role, out *v1.Role, s conversion.Sc
 		return err
 	}
 	if in.Rules != nil {
-		out.Rules = make([]v1.PolicyRule, len(in.Rules))
+		out.Rules = make([]apiv1.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := s.Convert(&in.Rules[i], &out.Rules[i], 0); err != nil {
 				return err
@@ -439,13 +655,13 @@ func autoconvert_api_Role_To_v1_Role(in *api.Role, out *v1.Role, s conversion.Sc
 	return nil
 }
 
-func convert_api_Role_To_v1_Role(in *api.Role, out *v1.Role, s conversion.Scope) error {
+func convert_api_Role_To_v1_Role(in *authorizationapi.Role, out *apiv1.Role, s conversion.Scope) error {
 	return autoconvert_api_Role_To_v1_Role(in, out, s)
 }
 
-func autoconvert_api_RoleBinding_To_v1_RoleBinding(in *api.RoleBinding, out *v1.RoleBinding, s conversion.Scope) error {
+func autoconvert_api_RoleBinding_To_v1_RoleBinding(in *authorizationapi.RoleBinding, out *apiv1.RoleBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.RoleBinding))(in)
+		defaulting.(func(*authorizationapi.RoleBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -469,9 +685,9 @@ func autoconvert_api_RoleBinding_To_v1_RoleBinding(in *api.RoleBinding, out *v1.
 	return nil
 }
 
-func autoconvert_api_RoleBindingList_To_v1_RoleBindingList(in *api.RoleBindingList, out *v1.RoleBindingList, s conversion.Scope) error {
+func autoconvert_api_RoleBindingList_To_v1_RoleBindingList(in *authorizationapi.RoleBindingList, out *apiv1.RoleBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.RoleBindingList))(in)
+		defaulting.(func(*authorizationapi.RoleBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -480,7 +696,7 @@ func autoconvert_api_RoleBindingList_To_v1_RoleBindingList(in *api.RoleBindingLi
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.RoleBinding, len(in.Items))
+		out.Items = make([]apiv1.RoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -492,13 +708,13 @@ func autoconvert_api_RoleBindingList_To_v1_RoleBindingList(in *api.RoleBindingLi
 	return nil
 }
 
-func convert_api_RoleBindingList_To_v1_RoleBindingList(in *api.RoleBindingList, out *v1.RoleBindingList, s conversion.Scope) error {
+func convert_api_RoleBindingList_To_v1_RoleBindingList(in *authorizationapi.RoleBindingList, out *apiv1.RoleBindingList, s conversion.Scope) error {
 	return autoconvert_api_RoleBindingList_To_v1_RoleBindingList(in, out, s)
 }
 
-func autoconvert_api_RoleList_To_v1_RoleList(in *api.RoleList, out *v1.RoleList, s conversion.Scope) error {
+func autoconvert_api_RoleList_To_v1_RoleList(in *authorizationapi.RoleList, out *apiv1.RoleList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.RoleList))(in)
+		defaulting.(func(*authorizationapi.RoleList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -507,7 +723,7 @@ func autoconvert_api_RoleList_To_v1_RoleList(in *api.RoleList, out *v1.RoleList,
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]v1.Role, len(in.Items))
+		out.Items = make([]apiv1.Role, len(in.Items))
 		for i := range in.Items {
 			if err := convert_api_Role_To_v1_Role(&in.Items[i], &out.Items[i], s); err != nil {
 				return err
@@ -519,13 +735,13 @@ func autoconvert_api_RoleList_To_v1_RoleList(in *api.RoleList, out *v1.RoleList,
 	return nil
 }
 
-func convert_api_RoleList_To_v1_RoleList(in *api.RoleList, out *v1.RoleList, s conversion.Scope) error {
+func convert_api_RoleList_To_v1_RoleList(in *authorizationapi.RoleList, out *apiv1.RoleList, s conversion.Scope) error {
 	return autoconvert_api_RoleList_To_v1_RoleList(in, out, s)
 }
 
-func autoconvert_api_SubjectAccessReview_To_v1_SubjectAccessReview(in *api.SubjectAccessReview, out *v1.SubjectAccessReview, s conversion.Scope) error {
+func autoconvert_api_SubjectAccessReview_To_v1_SubjectAccessReview(in *authorizationapi.SubjectAccessReview, out *apiv1.SubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.SubjectAccessReview))(in)
+		defaulting.(func(*authorizationapi.SubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -536,9 +752,9 @@ func autoconvert_api_SubjectAccessReview_To_v1_SubjectAccessReview(in *api.Subje
 	return nil
 }
 
-func autoconvert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *api.SubjectAccessReviewResponse, out *v1.SubjectAccessReviewResponse, s conversion.Scope) error {
+func autoconvert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorizationapi.SubjectAccessReviewResponse, out *apiv1.SubjectAccessReviewResponse, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*api.SubjectAccessReviewResponse))(in)
+		defaulting.(func(*authorizationapi.SubjectAccessReviewResponse))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -549,13 +765,13 @@ func autoconvert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewRespon
 	return nil
 }
 
-func convert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *api.SubjectAccessReviewResponse, out *v1.SubjectAccessReviewResponse, s conversion.Scope) error {
+func convert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in *authorizationapi.SubjectAccessReviewResponse, out *apiv1.SubjectAccessReviewResponse, s conversion.Scope) error {
 	return autoconvert_api_SubjectAccessReviewResponse_To_v1_SubjectAccessReviewResponse(in, out, s)
 }
 
-func autoconvert_v1_ClusterPolicy_To_api_ClusterPolicy(in *v1.ClusterPolicy, out *api.ClusterPolicy, s conversion.Scope) error {
+func autoconvert_v1_ClusterPolicy_To_api_ClusterPolicy(in *apiv1.ClusterPolicy, out *authorizationapi.ClusterPolicy, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterPolicy))(in)
+		defaulting.(func(*apiv1.ClusterPolicy))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -572,9 +788,9 @@ func autoconvert_v1_ClusterPolicy_To_api_ClusterPolicy(in *v1.ClusterPolicy, out
 	return nil
 }
 
-func autoconvert_v1_ClusterPolicyBinding_To_api_ClusterPolicyBinding(in *v1.ClusterPolicyBinding, out *api.ClusterPolicyBinding, s conversion.Scope) error {
+func autoconvert_v1_ClusterPolicyBinding_To_api_ClusterPolicyBinding(in *apiv1.ClusterPolicyBinding, out *authorizationapi.ClusterPolicyBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterPolicyBinding))(in)
+		defaulting.(func(*apiv1.ClusterPolicyBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -594,9 +810,9 @@ func autoconvert_v1_ClusterPolicyBinding_To_api_ClusterPolicyBinding(in *v1.Clus
 	return nil
 }
 
-func autoconvert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in *v1.ClusterPolicyBindingList, out *api.ClusterPolicyBindingList, s conversion.Scope) error {
+func autoconvert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in *apiv1.ClusterPolicyBindingList, out *authorizationapi.ClusterPolicyBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterPolicyBindingList))(in)
+		defaulting.(func(*apiv1.ClusterPolicyBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -605,7 +821,7 @@ func autoconvert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in 
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterPolicyBinding, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterPolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -617,13 +833,13 @@ func autoconvert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in 
 	return nil
 }
 
-func convert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in *v1.ClusterPolicyBindingList, out *api.ClusterPolicyBindingList, s conversion.Scope) error {
+func convert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in *apiv1.ClusterPolicyBindingList, out *authorizationapi.ClusterPolicyBindingList, s conversion.Scope) error {
 	return autoconvert_v1_ClusterPolicyBindingList_To_api_ClusterPolicyBindingList(in, out, s)
 }
 
-func autoconvert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *v1.ClusterPolicyList, out *api.ClusterPolicyList, s conversion.Scope) error {
+func autoconvert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *apiv1.ClusterPolicyList, out *authorizationapi.ClusterPolicyList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterPolicyList))(in)
+		defaulting.(func(*apiv1.ClusterPolicyList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -632,7 +848,7 @@ func autoconvert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *v1.ClusterPol
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterPolicy, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterPolicy, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -644,13 +860,13 @@ func autoconvert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *v1.ClusterPol
 	return nil
 }
 
-func convert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *v1.ClusterPolicyList, out *api.ClusterPolicyList, s conversion.Scope) error {
+func convert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in *apiv1.ClusterPolicyList, out *authorizationapi.ClusterPolicyList, s conversion.Scope) error {
 	return autoconvert_v1_ClusterPolicyList_To_api_ClusterPolicyList(in, out, s)
 }
 
-func autoconvert_v1_ClusterRole_To_api_ClusterRole(in *v1.ClusterRole, out *api.ClusterRole, s conversion.Scope) error {
+func autoconvert_v1_ClusterRole_To_api_ClusterRole(in *apiv1.ClusterRole, out *authorizationapi.ClusterRole, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterRole))(in)
+		defaulting.(func(*apiv1.ClusterRole))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -659,7 +875,7 @@ func autoconvert_v1_ClusterRole_To_api_ClusterRole(in *v1.ClusterRole, out *api.
 		return err
 	}
 	if in.Rules != nil {
-		out.Rules = make([]api.PolicyRule, len(in.Rules))
+		out.Rules = make([]authorizationapi.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := s.Convert(&in.Rules[i], &out.Rules[i], 0); err != nil {
 				return err
@@ -671,13 +887,13 @@ func autoconvert_v1_ClusterRole_To_api_ClusterRole(in *v1.ClusterRole, out *api.
 	return nil
 }
 
-func convert_v1_ClusterRole_To_api_ClusterRole(in *v1.ClusterRole, out *api.ClusterRole, s conversion.Scope) error {
+func convert_v1_ClusterRole_To_api_ClusterRole(in *apiv1.ClusterRole, out *authorizationapi.ClusterRole, s conversion.Scope) error {
 	return autoconvert_v1_ClusterRole_To_api_ClusterRole(in, out, s)
 }
 
-func autoconvert_v1_ClusterRoleBinding_To_api_ClusterRoleBinding(in *v1.ClusterRoleBinding, out *api.ClusterRoleBinding, s conversion.Scope) error {
+func autoconvert_v1_ClusterRoleBinding_To_api_ClusterRoleBinding(in *apiv1.ClusterRoleBinding, out *authorizationapi.ClusterRoleBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterRoleBinding))(in)
+		defaulting.(func(*apiv1.ClusterRoleBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -703,9 +919,9 @@ func autoconvert_v1_ClusterRoleBinding_To_api_ClusterRoleBinding(in *v1.ClusterR
 	return nil
 }
 
-func autoconvert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *v1.ClusterRoleBindingList, out *api.ClusterRoleBindingList, s conversion.Scope) error {
+func autoconvert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *apiv1.ClusterRoleBindingList, out *authorizationapi.ClusterRoleBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterRoleBindingList))(in)
+		defaulting.(func(*apiv1.ClusterRoleBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -714,7 +930,7 @@ func autoconvert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *v1.
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterRoleBinding, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterRoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -726,13 +942,13 @@ func autoconvert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *v1.
 	return nil
 }
 
-func convert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *v1.ClusterRoleBindingList, out *api.ClusterRoleBindingList, s conversion.Scope) error {
+func convert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in *apiv1.ClusterRoleBindingList, out *authorizationapi.ClusterRoleBindingList, s conversion.Scope) error {
 	return autoconvert_v1_ClusterRoleBindingList_To_api_ClusterRoleBindingList(in, out, s)
 }
 
-func autoconvert_v1_ClusterRoleList_To_api_ClusterRoleList(in *v1.ClusterRoleList, out *api.ClusterRoleList, s conversion.Scope) error {
+func autoconvert_v1_ClusterRoleList_To_api_ClusterRoleList(in *apiv1.ClusterRoleList, out *authorizationapi.ClusterRoleList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ClusterRoleList))(in)
+		defaulting.(func(*apiv1.ClusterRoleList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -741,7 +957,7 @@ func autoconvert_v1_ClusterRoleList_To_api_ClusterRoleList(in *v1.ClusterRoleLis
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.ClusterRole, len(in.Items))
+		out.Items = make([]authorizationapi.ClusterRole, len(in.Items))
 		for i := range in.Items {
 			if err := convert_v1_ClusterRole_To_api_ClusterRole(&in.Items[i], &out.Items[i], s); err != nil {
 				return err
@@ -753,13 +969,13 @@ func autoconvert_v1_ClusterRoleList_To_api_ClusterRoleList(in *v1.ClusterRoleLis
 	return nil
 }
 
-func convert_v1_ClusterRoleList_To_api_ClusterRoleList(in *v1.ClusterRoleList, out *api.ClusterRoleList, s conversion.Scope) error {
+func convert_v1_ClusterRoleList_To_api_ClusterRoleList(in *apiv1.ClusterRoleList, out *authorizationapi.ClusterRoleList, s conversion.Scope) error {
 	return autoconvert_v1_ClusterRoleList_To_api_ClusterRoleList(in, out, s)
 }
 
-func autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview(in *v1.IsPersonalSubjectAccessReview, out *api.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview(in *apiv1.IsPersonalSubjectAccessReview, out *authorizationapi.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.IsPersonalSubjectAccessReview))(in)
+		defaulting.(func(*apiv1.IsPersonalSubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -767,13 +983,13 @@ func autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccess
 	return nil
 }
 
-func convert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview(in *v1.IsPersonalSubjectAccessReview, out *api.IsPersonalSubjectAccessReview, s conversion.Scope) error {
+func convert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview(in *apiv1.IsPersonalSubjectAccessReview, out *authorizationapi.IsPersonalSubjectAccessReview, s conversion.Scope) error {
 	return autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview(in, out, s)
 }
 
-func autoconvert_v1_LocalResourceAccessReview_To_api_LocalResourceAccessReview(in *v1.LocalResourceAccessReview, out *api.LocalResourceAccessReview, s conversion.Scope) error {
+func autoconvert_v1_LocalResourceAccessReview_To_api_LocalResourceAccessReview(in *apiv1.LocalResourceAccessReview, out *authorizationapi.LocalResourceAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.LocalResourceAccessReview))(in)
+		defaulting.(func(*apiv1.LocalResourceAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -782,9 +998,9 @@ func autoconvert_v1_LocalResourceAccessReview_To_api_LocalResourceAccessReview(i
 	return nil
 }
 
-func autoconvert_v1_LocalSubjectAccessReview_To_api_LocalSubjectAccessReview(in *v1.LocalSubjectAccessReview, out *api.LocalSubjectAccessReview, s conversion.Scope) error {
+func autoconvert_v1_LocalSubjectAccessReview_To_api_LocalSubjectAccessReview(in *apiv1.LocalSubjectAccessReview, out *authorizationapi.LocalSubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.LocalSubjectAccessReview))(in)
+		defaulting.(func(*apiv1.LocalSubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -795,9 +1011,9 @@ func autoconvert_v1_LocalSubjectAccessReview_To_api_LocalSubjectAccessReview(in 
 	return nil
 }
 
-func autoconvert_v1_Policy_To_api_Policy(in *v1.Policy, out *api.Policy, s conversion.Scope) error {
+func autoconvert_v1_Policy_To_api_Policy(in *apiv1.Policy, out *authorizationapi.Policy, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.Policy))(in)
+		defaulting.(func(*apiv1.Policy))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -814,9 +1030,9 @@ func autoconvert_v1_Policy_To_api_Policy(in *v1.Policy, out *api.Policy, s conve
 	return nil
 }
 
-func autoconvert_v1_PolicyBinding_To_api_PolicyBinding(in *v1.PolicyBinding, out *api.PolicyBinding, s conversion.Scope) error {
+func autoconvert_v1_PolicyBinding_To_api_PolicyBinding(in *apiv1.PolicyBinding, out *authorizationapi.PolicyBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.PolicyBinding))(in)
+		defaulting.(func(*apiv1.PolicyBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -836,9 +1052,9 @@ func autoconvert_v1_PolicyBinding_To_api_PolicyBinding(in *v1.PolicyBinding, out
 	return nil
 }
 
-func autoconvert_v1_PolicyBindingList_To_api_PolicyBindingList(in *v1.PolicyBindingList, out *api.PolicyBindingList, s conversion.Scope) error {
+func autoconvert_v1_PolicyBindingList_To_api_PolicyBindingList(in *apiv1.PolicyBindingList, out *authorizationapi.PolicyBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.PolicyBindingList))(in)
+		defaulting.(func(*apiv1.PolicyBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -847,7 +1063,7 @@ func autoconvert_v1_PolicyBindingList_To_api_PolicyBindingList(in *v1.PolicyBind
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.PolicyBinding, len(in.Items))
+		out.Items = make([]authorizationapi.PolicyBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -859,13 +1075,13 @@ func autoconvert_v1_PolicyBindingList_To_api_PolicyBindingList(in *v1.PolicyBind
 	return nil
 }
 
-func convert_v1_PolicyBindingList_To_api_PolicyBindingList(in *v1.PolicyBindingList, out *api.PolicyBindingList, s conversion.Scope) error {
+func convert_v1_PolicyBindingList_To_api_PolicyBindingList(in *apiv1.PolicyBindingList, out *authorizationapi.PolicyBindingList, s conversion.Scope) error {
 	return autoconvert_v1_PolicyBindingList_To_api_PolicyBindingList(in, out, s)
 }
 
-func autoconvert_v1_PolicyList_To_api_PolicyList(in *v1.PolicyList, out *api.PolicyList, s conversion.Scope) error {
+func autoconvert_v1_PolicyList_To_api_PolicyList(in *apiv1.PolicyList, out *authorizationapi.PolicyList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.PolicyList))(in)
+		defaulting.(func(*apiv1.PolicyList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -874,7 +1090,7 @@ func autoconvert_v1_PolicyList_To_api_PolicyList(in *v1.PolicyList, out *api.Pol
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.Policy, len(in.Items))
+		out.Items = make([]authorizationapi.Policy, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -886,13 +1102,13 @@ func autoconvert_v1_PolicyList_To_api_PolicyList(in *v1.PolicyList, out *api.Pol
 	return nil
 }
 
-func convert_v1_PolicyList_To_api_PolicyList(in *v1.PolicyList, out *api.PolicyList, s conversion.Scope) error {
+func convert_v1_PolicyList_To_api_PolicyList(in *apiv1.PolicyList, out *authorizationapi.PolicyList, s conversion.Scope) error {
 	return autoconvert_v1_PolicyList_To_api_PolicyList(in, out, s)
 }
 
-func autoconvert_v1_PolicyRule_To_api_PolicyRule(in *v1.PolicyRule, out *api.PolicyRule, s conversion.Scope) error {
+func autoconvert_v1_PolicyRule_To_api_PolicyRule(in *apiv1.PolicyRule, out *authorizationapi.PolicyRule, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.PolicyRule))(in)
+		defaulting.(func(*apiv1.PolicyRule))(in)
 	}
 	// in.Verbs has no peer in out
 	if err := s.Convert(&in.AttributeRestrictions, &out.AttributeRestrictions, 0); err != nil {
@@ -912,9 +1128,9 @@ func autoconvert_v1_PolicyRule_To_api_PolicyRule(in *v1.PolicyRule, out *api.Pol
 	return nil
 }
 
-func autoconvert_v1_ResourceAccessReview_To_api_ResourceAccessReview(in *v1.ResourceAccessReview, out *api.ResourceAccessReview, s conversion.Scope) error {
+func autoconvert_v1_ResourceAccessReview_To_api_ResourceAccessReview(in *apiv1.ResourceAccessReview, out *authorizationapi.ResourceAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ResourceAccessReview))(in)
+		defaulting.(func(*apiv1.ResourceAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -923,9 +1139,9 @@ func autoconvert_v1_ResourceAccessReview_To_api_ResourceAccessReview(in *v1.Reso
 	return nil
 }
 
-func autoconvert_v1_ResourceAccessReviewResponse_To_api_ResourceAccessReviewResponse(in *v1.ResourceAccessReviewResponse, out *api.ResourceAccessReviewResponse, s conversion.Scope) error {
+func autoconvert_v1_ResourceAccessReviewResponse_To_api_ResourceAccessReviewResponse(in *apiv1.ResourceAccessReviewResponse, out *authorizationapi.ResourceAccessReviewResponse, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.ResourceAccessReviewResponse))(in)
+		defaulting.(func(*apiv1.ResourceAccessReviewResponse))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -936,9 +1152,9 @@ func autoconvert_v1_ResourceAccessReviewResponse_To_api_ResourceAccessReviewResp
 	return nil
 }
 
-func autoconvert_v1_Role_To_api_Role(in *v1.Role, out *api.Role, s conversion.Scope) error {
+func autoconvert_v1_Role_To_api_Role(in *apiv1.Role, out *authorizationapi.Role, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.Role))(in)
+		defaulting.(func(*apiv1.Role))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -947,7 +1163,7 @@ func autoconvert_v1_Role_To_api_Role(in *v1.Role, out *api.Role, s conversion.Sc
 		return err
 	}
 	if in.Rules != nil {
-		out.Rules = make([]api.PolicyRule, len(in.Rules))
+		out.Rules = make([]authorizationapi.PolicyRule, len(in.Rules))
 		for i := range in.Rules {
 			if err := s.Convert(&in.Rules[i], &out.Rules[i], 0); err != nil {
 				return err
@@ -959,13 +1175,13 @@ func autoconvert_v1_Role_To_api_Role(in *v1.Role, out *api.Role, s conversion.Sc
 	return nil
 }
 
-func convert_v1_Role_To_api_Role(in *v1.Role, out *api.Role, s conversion.Scope) error {
+func convert_v1_Role_To_api_Role(in *apiv1.Role, out *authorizationapi.Role, s conversion.Scope) error {
 	return autoconvert_v1_Role_To_api_Role(in, out, s)
 }
 
-func autoconvert_v1_RoleBinding_To_api_RoleBinding(in *v1.RoleBinding, out *api.RoleBinding, s conversion.Scope) error {
+func autoconvert_v1_RoleBinding_To_api_RoleBinding(in *apiv1.RoleBinding, out *authorizationapi.RoleBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.RoleBinding))(in)
+		defaulting.(func(*apiv1.RoleBinding))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -991,9 +1207,9 @@ func autoconvert_v1_RoleBinding_To_api_RoleBinding(in *v1.RoleBinding, out *api.
 	return nil
 }
 
-func autoconvert_v1_RoleBindingList_To_api_RoleBindingList(in *v1.RoleBindingList, out *api.RoleBindingList, s conversion.Scope) error {
+func autoconvert_v1_RoleBindingList_To_api_RoleBindingList(in *apiv1.RoleBindingList, out *authorizationapi.RoleBindingList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.RoleBindingList))(in)
+		defaulting.(func(*apiv1.RoleBindingList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1002,7 +1218,7 @@ func autoconvert_v1_RoleBindingList_To_api_RoleBindingList(in *v1.RoleBindingLis
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.RoleBinding, len(in.Items))
+		out.Items = make([]authorizationapi.RoleBinding, len(in.Items))
 		for i := range in.Items {
 			if err := s.Convert(&in.Items[i], &out.Items[i], 0); err != nil {
 				return err
@@ -1014,13 +1230,13 @@ func autoconvert_v1_RoleBindingList_To_api_RoleBindingList(in *v1.RoleBindingLis
 	return nil
 }
 
-func convert_v1_RoleBindingList_To_api_RoleBindingList(in *v1.RoleBindingList, out *api.RoleBindingList, s conversion.Scope) error {
+func convert_v1_RoleBindingList_To_api_RoleBindingList(in *apiv1.RoleBindingList, out *authorizationapi.RoleBindingList, s conversion.Scope) error {
 	return autoconvert_v1_RoleBindingList_To_api_RoleBindingList(in, out, s)
 }
 
-func autoconvert_v1_RoleList_To_api_RoleList(in *v1.RoleList, out *api.RoleList, s conversion.Scope) error {
+func autoconvert_v1_RoleList_To_api_RoleList(in *apiv1.RoleList, out *authorizationapi.RoleList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.RoleList))(in)
+		defaulting.(func(*apiv1.RoleList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1029,7 +1245,7 @@ func autoconvert_v1_RoleList_To_api_RoleList(in *v1.RoleList, out *api.RoleList,
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]api.Role, len(in.Items))
+		out.Items = make([]authorizationapi.Role, len(in.Items))
 		for i := range in.Items {
 			if err := convert_v1_Role_To_api_Role(&in.Items[i], &out.Items[i], s); err != nil {
 				return err
@@ -1041,13 +1257,13 @@ func autoconvert_v1_RoleList_To_api_RoleList(in *v1.RoleList, out *api.RoleList,
 	return nil
 }
 
-func convert_v1_RoleList_To_api_RoleList(in *v1.RoleList, out *api.RoleList, s conversion.Scope) error {
+func convert_v1_RoleList_To_api_RoleList(in *apiv1.RoleList, out *authorizationapi.RoleList, s conversion.Scope) error {
 	return autoconvert_v1_RoleList_To_api_RoleList(in, out, s)
 }
 
-func autoconvert_v1_SubjectAccessReview_To_api_SubjectAccessReview(in *v1.SubjectAccessReview, out *api.SubjectAccessReview, s conversion.Scope) error {
+func autoconvert_v1_SubjectAccessReview_To_api_SubjectAccessReview(in *apiv1.SubjectAccessReview, out *authorizationapi.SubjectAccessReview, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.SubjectAccessReview))(in)
+		defaulting.(func(*apiv1.SubjectAccessReview))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1058,9 +1274,9 @@ func autoconvert_v1_SubjectAccessReview_To_api_SubjectAccessReview(in *v1.Subjec
 	return nil
 }
 
-func autoconvert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewResponse(in *v1.SubjectAccessReviewResponse, out *api.SubjectAccessReviewResponse, s conversion.Scope) error {
+func autoconvert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewResponse(in *apiv1.SubjectAccessReviewResponse, out *authorizationapi.SubjectAccessReviewResponse, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*v1.SubjectAccessReviewResponse))(in)
+		defaulting.(func(*apiv1.SubjectAccessReviewResponse))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1071,11 +1287,11 @@ func autoconvert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewRespon
 	return nil
 }
 
-func convert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewResponse(in *v1.SubjectAccessReviewResponse, out *api.SubjectAccessReviewResponse, s conversion.Scope) error {
+func convert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewResponse(in *apiv1.SubjectAccessReviewResponse, out *authorizationapi.SubjectAccessReviewResponse, s conversion.Scope) error {
 	return autoconvert_v1_SubjectAccessReviewResponse_To_api_SubjectAccessReviewResponse(in, out, s)
 }
 
-func autoconvert_api_BackingService_To_v1_BackingService(in *backingserviceapi.BackingService, out *apiv1.BackingService, s conversion.Scope) error {
+func autoconvert_api_BackingService_To_v1_BackingService(in *backingserviceapi.BackingService, out *backingserviceapiv1.BackingService, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.BackingService))(in)
 	}
@@ -1094,11 +1310,11 @@ func autoconvert_api_BackingService_To_v1_BackingService(in *backingserviceapi.B
 	return nil
 }
 
-func convert_api_BackingService_To_v1_BackingService(in *backingserviceapi.BackingService, out *apiv1.BackingService, s conversion.Scope) error {
+func convert_api_BackingService_To_v1_BackingService(in *backingserviceapi.BackingService, out *backingserviceapiv1.BackingService, s conversion.Scope) error {
 	return autoconvert_api_BackingService_To_v1_BackingService(in, out, s)
 }
 
-func autoconvert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserviceapi.BackingServiceList, out *apiv1.BackingServiceList, s conversion.Scope) error {
+func autoconvert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserviceapi.BackingServiceList, out *backingserviceapiv1.BackingServiceList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.BackingServiceList))(in)
 	}
@@ -1109,7 +1325,7 @@ func autoconvert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserv
 		return err
 	}
 	if in.Items != nil {
-		out.Items = make([]apiv1.BackingService, len(in.Items))
+		out.Items = make([]backingserviceapiv1.BackingService, len(in.Items))
 		for i := range in.Items {
 			if err := convert_api_BackingService_To_v1_BackingService(&in.Items[i], &out.Items[i], s); err != nil {
 				return err
@@ -1121,11 +1337,11 @@ func autoconvert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserv
 	return nil
 }
 
-func convert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserviceapi.BackingServiceList, out *apiv1.BackingServiceList, s conversion.Scope) error {
+func convert_api_BackingServiceList_To_v1_BackingServiceList(in *backingserviceapi.BackingServiceList, out *backingserviceapiv1.BackingServiceList, s conversion.Scope) error {
 	return autoconvert_api_BackingServiceList_To_v1_BackingServiceList(in, out, s)
 }
 
-func autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserviceapi.BackingServiceSpec, out *apiv1.BackingServiceSpec, s conversion.Scope) error {
+func autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserviceapi.BackingServiceSpec, out *backingserviceapiv1.BackingServiceSpec, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.BackingServiceSpec))(in)
 	}
@@ -1159,7 +1375,7 @@ func autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserv
 		out.Metadata = nil
 	}
 	if in.Plans != nil {
-		out.Plans = make([]apiv1.ServicePlan, len(in.Plans))
+		out.Plans = make([]backingserviceapiv1.ServicePlan, len(in.Plans))
 		for i := range in.Plans {
 			if err := convert_api_ServicePlan_To_v1_ServicePlan(&in.Plans[i], &out.Plans[i], s); err != nil {
 				return err
@@ -1179,23 +1395,23 @@ func autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserv
 	return nil
 }
 
-func convert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserviceapi.BackingServiceSpec, out *apiv1.BackingServiceSpec, s conversion.Scope) error {
+func convert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in *backingserviceapi.BackingServiceSpec, out *backingserviceapiv1.BackingServiceSpec, s conversion.Scope) error {
 	return autoconvert_api_BackingServiceSpec_To_v1_BackingServiceSpec(in, out, s)
 }
 
-func autoconvert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backingserviceapi.BackingServiceStatus, out *apiv1.BackingServiceStatus, s conversion.Scope) error {
+func autoconvert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backingserviceapi.BackingServiceStatus, out *backingserviceapiv1.BackingServiceStatus, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.BackingServiceStatus))(in)
 	}
-	out.Phase = apiv1.BackingServicePhase(in.Phase)
+	out.Phase = backingserviceapiv1.BackingServicePhase(in.Phase)
 	return nil
 }
 
-func convert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backingserviceapi.BackingServiceStatus, out *apiv1.BackingServiceStatus, s conversion.Scope) error {
+func convert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in *backingserviceapi.BackingServiceStatus, out *backingserviceapiv1.BackingServiceStatus, s conversion.Scope) error {
 	return autoconvert_api_BackingServiceStatus_To_v1_BackingServiceStatus(in, out, s)
 }
 
-func autoconvert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *apiv1.ServicePlan, s conversion.Scope) error {
+func autoconvert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *backingserviceapiv1.ServicePlan, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.ServicePlan))(in)
 	}
@@ -1209,11 +1425,11 @@ func autoconvert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.Service
 	return nil
 }
 
-func convert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *apiv1.ServicePlan, s conversion.Scope) error {
+func convert_api_ServicePlan_To_v1_ServicePlan(in *backingserviceapi.ServicePlan, out *backingserviceapiv1.ServicePlan, s conversion.Scope) error {
 	return autoconvert_api_ServicePlan_To_v1_ServicePlan(in, out, s)
 }
 
-func autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *apiv1.ServicePlanCost, s conversion.Scope) error {
+func autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *backingserviceapiv1.ServicePlanCost, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.ServicePlanCost))(in)
 	}
@@ -1229,11 +1445,11 @@ func autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi
 	return nil
 }
 
-func convert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *apiv1.ServicePlanCost, s conversion.Scope) error {
+func convert_api_ServicePlanCost_To_v1_ServicePlanCost(in *backingserviceapi.ServicePlanCost, out *backingserviceapiv1.ServicePlanCost, s conversion.Scope) error {
 	return autoconvert_api_ServicePlanCost_To_v1_ServicePlanCost(in, out, s)
 }
 
-func autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, s conversion.Scope) error {
+func autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *backingserviceapiv1.ServicePlanMetadata, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceapi.ServicePlanMetadata))(in)
 	}
@@ -1246,7 +1462,7 @@ func autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingse
 		out.Bullets = nil
 	}
 	if in.Costs != nil {
-		out.Costs = make([]apiv1.ServicePlanCost, len(in.Costs))
+		out.Costs = make([]backingserviceapiv1.ServicePlanCost, len(in.Costs))
 		for i := range in.Costs {
 			if err := convert_api_ServicePlanCost_To_v1_ServicePlanCost(&in.Costs[i], &out.Costs[i], s); err != nil {
 				return err
@@ -1259,13 +1475,13 @@ func autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingse
 	return nil
 }
 
-func convert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *apiv1.ServicePlanMetadata, s conversion.Scope) error {
+func convert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in *backingserviceapi.ServicePlanMetadata, out *backingserviceapiv1.ServicePlanMetadata, s conversion.Scope) error {
 	return autoconvert_api_ServicePlanMetadata_To_v1_ServicePlanMetadata(in, out, s)
 }
 
-func autoconvert_v1_BackingService_To_api_BackingService(in *apiv1.BackingService, out *backingserviceapi.BackingService, s conversion.Scope) error {
+func autoconvert_v1_BackingService_To_api_BackingService(in *backingserviceapiv1.BackingService, out *backingserviceapi.BackingService, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.BackingService))(in)
+		defaulting.(func(*backingserviceapiv1.BackingService))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1282,13 +1498,13 @@ func autoconvert_v1_BackingService_To_api_BackingService(in *apiv1.BackingServic
 	return nil
 }
 
-func convert_v1_BackingService_To_api_BackingService(in *apiv1.BackingService, out *backingserviceapi.BackingService, s conversion.Scope) error {
+func convert_v1_BackingService_To_api_BackingService(in *backingserviceapiv1.BackingService, out *backingserviceapi.BackingService, s conversion.Scope) error {
 	return autoconvert_v1_BackingService_To_api_BackingService(in, out, s)
 }
 
-func autoconvert_v1_BackingServiceList_To_api_BackingServiceList(in *apiv1.BackingServiceList, out *backingserviceapi.BackingServiceList, s conversion.Scope) error {
+func autoconvert_v1_BackingServiceList_To_api_BackingServiceList(in *backingserviceapiv1.BackingServiceList, out *backingserviceapi.BackingServiceList, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.BackingServiceList))(in)
+		defaulting.(func(*backingserviceapiv1.BackingServiceList))(in)
 	}
 	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
 		return err
@@ -1309,13 +1525,13 @@ func autoconvert_v1_BackingServiceList_To_api_BackingServiceList(in *apiv1.Backi
 	return nil
 }
 
-func convert_v1_BackingServiceList_To_api_BackingServiceList(in *apiv1.BackingServiceList, out *backingserviceapi.BackingServiceList, s conversion.Scope) error {
+func convert_v1_BackingServiceList_To_api_BackingServiceList(in *backingserviceapiv1.BackingServiceList, out *backingserviceapi.BackingServiceList, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceList_To_api_BackingServiceList(in, out, s)
 }
 
-func autoconvert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *apiv1.BackingServiceSpec, out *backingserviceapi.BackingServiceSpec, s conversion.Scope) error {
+func autoconvert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *backingserviceapiv1.BackingServiceSpec, out *backingserviceapi.BackingServiceSpec, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.BackingServiceSpec))(in)
+		defaulting.(func(*backingserviceapiv1.BackingServiceSpec))(in)
 	}
 	out.Name = in.Name
 	out.Id = in.Id
@@ -1367,25 +1583,25 @@ func autoconvert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *apiv1.Backi
 	return nil
 }
 
-func convert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *apiv1.BackingServiceSpec, out *backingserviceapi.BackingServiceSpec, s conversion.Scope) error {
+func convert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in *backingserviceapiv1.BackingServiceSpec, out *backingserviceapi.BackingServiceSpec, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceSpec_To_api_BackingServiceSpec(in, out, s)
 }
 
-func autoconvert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *apiv1.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, s conversion.Scope) error {
+func autoconvert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *backingserviceapiv1.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.BackingServiceStatus))(in)
+		defaulting.(func(*backingserviceapiv1.BackingServiceStatus))(in)
 	}
 	out.Phase = backingserviceapi.BackingServicePhase(in.Phase)
 	return nil
 }
 
-func convert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *apiv1.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, s conversion.Scope) error {
+func convert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in *backingserviceapiv1.BackingServiceStatus, out *backingserviceapi.BackingServiceStatus, s conversion.Scope) error {
 	return autoconvert_v1_BackingServiceStatus_To_api_BackingServiceStatus(in, out, s)
 }
 
-func autoconvert_v1_ServicePlan_To_api_ServicePlan(in *apiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
+func autoconvert_v1_ServicePlan_To_api_ServicePlan(in *backingserviceapiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.ServicePlan))(in)
+		defaulting.(func(*backingserviceapiv1.ServicePlan))(in)
 	}
 	out.Name = in.Name
 	out.Id = in.Id
@@ -1397,13 +1613,13 @@ func autoconvert_v1_ServicePlan_To_api_ServicePlan(in *apiv1.ServicePlan, out *b
 	return nil
 }
 
-func convert_v1_ServicePlan_To_api_ServicePlan(in *apiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
+func convert_v1_ServicePlan_To_api_ServicePlan(in *backingserviceapiv1.ServicePlan, out *backingserviceapi.ServicePlan, s conversion.Scope) error {
 	return autoconvert_v1_ServicePlan_To_api_ServicePlan(in, out, s)
 }
 
-func autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in *apiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
+func autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in *backingserviceapiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.ServicePlanCost))(in)
+		defaulting.(func(*backingserviceapiv1.ServicePlanCost))(in)
 	}
 	if in.Amount != nil {
 		out.Amount = make(map[string]float64)
@@ -1417,13 +1633,13 @@ func autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in *apiv1.ServicePlan
 	return nil
 }
 
-func convert_v1_ServicePlanCost_To_api_ServicePlanCost(in *apiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
+func convert_v1_ServicePlanCost_To_api_ServicePlanCost(in *backingserviceapiv1.ServicePlanCost, out *backingserviceapi.ServicePlanCost, s conversion.Scope) error {
 	return autoconvert_v1_ServicePlanCost_To_api_ServicePlanCost(in, out, s)
 }
 
-func autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *apiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
+func autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *backingserviceapiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
-		defaulting.(func(*apiv1.ServicePlanMetadata))(in)
+		defaulting.(func(*backingserviceapiv1.ServicePlanMetadata))(in)
 	}
 	if in.Bullets != nil {
 		out.Bullets = make([]string, len(in.Bullets))
@@ -1447,7 +1663,7 @@ func autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *apiv1.Ser
 	return nil
 }
 
-func convert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *apiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
+func convert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in *backingserviceapiv1.ServicePlanMetadata, out *backingserviceapi.ServicePlanMetadata, s conversion.Scope) error {
 	return autoconvert_v1_ServicePlanMetadata_To_api_ServicePlanMetadata(in, out, s)
 }
 
@@ -8777,6 +8993,10 @@ func autoconvert_v1_VolumeSource_To_api_VolumeSource(in *pkgapiv1.VolumeSource, 
 func init() {
 	err := pkgapi.Scheme.AddGeneratedConversionFuncs(
 		autoconvert_api_AWSElasticBlockStoreVolumeSource_To_v1_AWSElasticBlockStoreVolumeSource,
+		autoconvert_api_ApplicationList_To_v1_ApplicationList,
+		autoconvert_api_ApplicationSpec_To_v1_ApplicationSpec,
+		autoconvert_api_ApplicationStatus_To_v1_ApplicationStatus,
+		autoconvert_api_Application_To_v1_Application,
 		autoconvert_api_BackingServiceInstanceList_To_v1_BackingServiceInstanceList,
 		autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec,
 		autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus,
@@ -8875,6 +9095,7 @@ func init() {
 		autoconvert_api_InstanceBinding_To_v1_InstanceBinding,
 		autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning,
 		autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview,
+		autoconvert_api_Item_To_v1_Item,
 		autoconvert_api_LastOperation_To_v1_LastOperation,
 		autoconvert_api_LifecycleHook_To_v1_LifecycleHook,
 		autoconvert_api_Lifecycle_To_v1_Lifecycle,
@@ -8953,6 +9174,10 @@ func init() {
 		autoconvert_api_Volume_To_v1_Volume,
 		autoconvert_api_WebHookTrigger_To_v1_WebHookTrigger,
 		autoconvert_v1_AWSElasticBlockStoreVolumeSource_To_api_AWSElasticBlockStoreVolumeSource,
+		autoconvert_v1_ApplicationList_To_api_ApplicationList,
+		autoconvert_v1_ApplicationSpec_To_api_ApplicationSpec,
+		autoconvert_v1_ApplicationStatus_To_api_ApplicationStatus,
+		autoconvert_v1_Application_To_api_Application,
 		autoconvert_v1_BackingServiceInstanceList_To_api_BackingServiceInstanceList,
 		autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec,
 		autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus,
@@ -9051,6 +9276,7 @@ func init() {
 		autoconvert_v1_InstanceBinding_To_api_InstanceBinding,
 		autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning,
 		autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview,
+		autoconvert_v1_Item_To_api_Item,
 		autoconvert_v1_LastOperation_To_api_LastOperation,
 		autoconvert_v1_LifecycleHook_To_api_LifecycleHook,
 		autoconvert_v1_Lifecycle_To_api_Lifecycle,

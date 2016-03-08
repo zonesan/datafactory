@@ -2,14 +2,13 @@
   <div>
     <breadcrumbs breadcrumbs="breadcrumbs"></breadcrumbs>
     <alerts alerts="alerts"></alerts>
-    <div ng-if="!loaded">Loading...</div>
+    <div ng-if="!loaded">加载中...</div>
     <div ng-if="backingservice">
       <div class="row">
         <div class="col-md-12">
           <div class="tile">
             <h1>
-              {{backingservice.metadata.name}}
-              <span ng-if="backingservice.status.message" class="pficon pficon-warning-triangle-o" style="cursor: help;" data-toggle="popover" data-placement="right" data-trigger="hover" dynamic-content="{{backingservice.status.message}}"></span>
+              {{backingservice.spec.name}}
               <small class="meta">created <relative-timestamp timestamp="backingservice.metadata.creationTimestamp"></relative-timestamp></small>
               <div class="pull-right dropdown">
                 <a href="" class="dropdown-toggle resource-actions-dropdown" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i><span class="sr-only">Actions</span></a>
@@ -39,17 +38,17 @@
           </div>
 
           <h1>
-            plans
+            计划列表
           </h1>
 
           <table class="table table-bordered table-hover table-mobile" ng-if="(backingservice.spec.plans | hashSize) != 0">
             <thead>
             <tr>
-              <th>Name</th>
-              <th>DisplayName</th>
-              <th>Costs</th>
-              <th>Description</th>
-              <th>Bullets</th>
+              <th>名称</th>
+              <th>显示名</th>
+              <th>价格</th>
+              <th>描述</th>
+              <th>项目列表</th>
             </tr>
             </thead>
             <tbody ng-repeat="plan in backingservice.spec.plans">
@@ -61,7 +60,7 @@
                 {{plan.metadata.displayName}}
               </td>
               <td data-title="Costs">
-                {{plan.metadata.costs}}
+                <span ng-bind-html="plan.metadata.costs | costsFilter"></span>
               </td>
               <td data-title="Description">
                 {{plan.description}}

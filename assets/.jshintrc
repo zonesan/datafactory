@@ -19,6 +19,7 @@
   "undef": true,
   "unused": true,
   "globals": {
+    "daovoice": true,
     "angular": false,
     "c3": false,
     "d3": false,

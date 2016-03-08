@@ -2,16 +2,18 @@ package controller
 
 import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
-	//"errors"
+
+
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
+	osclient "github.com/openshift/origin/pkg/client"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
-	osclient "github.com/openshift/origin/pkg/client"
 	"io/ioutil"
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util"
@@ -690,7 +692,9 @@ func servicebroker_create_instance(param *ServiceInstance, instance_guid string,
 	}
 	svcinstance := &CreateServiceInstanceResponse{}
 
-	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated {
+	if resp.StatusCode == http.StatusOK || resp.StatusCode == http.StatusCreated ||
+		resp.StatusCode == http.StatusAccepted {
+
 		if len(body) > 0 {
 			err = json.Unmarshal(body, svcinstance)
 

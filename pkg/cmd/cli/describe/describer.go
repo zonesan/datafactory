@@ -24,6 +24,7 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/util/sets"
 
+	applicationapi "github.com/openshift/origin/pkg/application/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
@@ -38,6 +39,7 @@ import (
 
 func describerMap(c *client.Client, kclient kclient.Interface, host string) map[string]kctl.Describer {
 	m := map[string]kctl.Describer{
+		"Application":            &ApplicationDescriber{c, kclient},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
 		"BackingService":         &BackingServiceDescriber{c},
 		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
@@ -107,6 +109,9 @@ func (d *ServiceBrokerDescriber) Describe(namespace, name string) (string, error
 func describeServiceBroker(sb *servicebrokerapi.ServiceBroker) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, sb.ObjectMeta)
+		formatString(out, "Url", sb.Spec.Url)
+		formatString(out, "Username", sb.Spec.UserName)
+		formatString(out, "Password", sb.Spec.Password)
 		formatString(out, "Status", sb.Status.Phase)
 		return nil
 	})
@@ -167,6 +172,126 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			}
 
 		}
+		return nil
+	})
+}
+
+type ApplicationDescriber struct {
+	osClient   client.Interface
+	kubeClient kclient.Interface
+}
+
+func (appDescriber *ApplicationDescriber) Describe(namespace, name string) (string, error) {
+	a := appDescriber.osClient.Applications(namespace)
+	application, err := a.Get(name)
+	if err != nil {
+		return "", err
+	}
+
+	itemDescriberStr := "\n"
+	itemDescriberStr += printItem("Object Type", "Name", "Create Time")
+
+	var itemCreateTime string
+	for _, item := range application.Spec.Items {
+		switch item.Kind {
+		case "Build":
+			b, _ := appDescriber.osClient.Builds(application.Namespace).Get(item.Name)
+			itemCreateTime = b.CreationTimestamp.String()
+
+		case "BuildConfig":
+			bc, _ := appDescriber.osClient.BuildConfigs(application.Namespace).Get(item.Name)
+
+			itemCreateTime = bc.CreationTimestamp.String()
+
+		case "DeploymentConfig":
+			dc, _ := appDescriber.osClient.DeploymentConfigs(application.Namespace).Get(item.Name)
+
+			itemCreateTime = dc.CreationTimestamp.String()
+
+		case "ImageStream":
+			is, _ := appDescriber.osClient.ImageStreams(application.Namespace).Get(item.Name)
+
+			itemCreateTime = is.CreationTimestamp.String()
+
+		case "ImageStreamTag":
+		//	is := appDescriber.Interface.ImageStreams(application.Namespace).Get(item.Name)
+		//	itemCreateTime = is.CreationTimestamp.String()
+		//	itemStatus = is.Status.Phase
+		//if ist, err := c.Client.ImageStreamTags(app.Namespace).Get(item.Name); ist != nil {
+		//	return err
+		//} else {
+		//	ist.Labels[applicationapi.ApplicationSelector] = app.Name
+		//}
+
+		case "ImageStreamImage":
+		//if isi, err := c.Client.ImageStreamImages(app.Namespace).Get(item.Name); isi != nil {
+		//	return err
+		//} else {
+		//	isi.Labels[applicationapi.ApplicationSelector] = app.Name
+		//}
+
+		case "Event":
+			e, _ := appDescriber.kubeClient.Events(application.Namespace).Get(item.Name)
+			itemCreateTime = e.CreationTimestamp.String()
+
+		case "Node":
+			n, _ := appDescriber.kubeClient.Nodes().Get(item.Name)
+			itemCreateTime = n.CreationTimestamp.String()
+
+		case "Job":
+
+		case "Pod":
+			p, _ := appDescriber.kubeClient.Pods(application.Namespace).Get(item.Name)
+			itemCreateTime = p.CreationTimestamp.String()
+
+		case "ReplicationController":
+			r, _ := appDescriber.kubeClient.ReplicationControllers(application.Namespace).Get(item.Name)
+			itemCreateTime = r.CreationTimestamp.String()
+
+		case "Service":
+			s, _ := appDescriber.kubeClient.Services(application.Namespace).Get(item.Name)
+			itemCreateTime = s.CreationTimestamp.String()
+
+		case "PersistentVolume":
+			pv, _ := appDescriber.kubeClient.PersistentVolumes().Get(item.Name)
+			itemCreateTime = pv.CreationTimestamp.String()
+
+		case "PersistentVolumeClaim":
+			pvc, _ := appDescriber.kubeClient.PersistentVolumeClaims(application.Namespace).Get(item.Name)
+			itemCreateTime = pvc.CreationTimestamp.String()
+
+		case "ServiceBroker":
+			sb, _ := appDescriber.osClient.ServiceBrokers().Get(item.Name)
+			itemCreateTime = sb.CreationTimestamp.String()
+
+		case "BackingService":
+			bs, _ := appDescriber.osClient.BackingServices().Get(item.Name)
+			itemCreateTime = bs.CreationTimestamp.String()
+
+		case "BackingServiceInstance":
+			bsi, _ := appDescriber.osClient.BackingServiceInstances(application.Namespace).Get(item.Name)
+			itemCreateTime = bsi.CreationTimestamp.String()
+		}
+
+		itemDescriberStr += printItem(item.Kind, item.Name, itemCreateTime)
+	}
+
+	return describeApplication(application, itemDescriberStr)
+}
+
+func describeApplication(app *applicationapi.Application, itemStr string) (string, error) {
+
+	return tabbedString(func(out *tabwriter.Writer) error {
+		formatString(out, "Name", app.Name)
+		formatString(out, "Namespace", app.Namespace)
+		formatString(out, "Labels", formatLabels(app.Labels))
+		formatTime(out, "Create Time", app.ObjectMeta.CreationTimestamp.Time)
+		//formatTime(out, "Delete Time", app.ObjectMeta.DeletionTimestamp.Time.String())
+		//todo 查看 DeletionTimestamp 如何生成
+		formatString(out, "Items", itemStr)
+		formatString(out, "Status", app.Status.Phase)
+		formatString(out, "Event", "todo")
+		//todo 查看Event 如何输出
 		return nil
 	})
 }

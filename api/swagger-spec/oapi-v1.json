@@ -674,10 +674,10 @@
     "description": "OpenShift REST API, version v1",
     "operations": [
      {
-      "type": "v1.BindingRequest",
+      "type": "v1.BindingRequestOptions",
       "method": "POST",
-      "summary": "create binding of a BindingRequest",
-      "nickname": "createNamespacedBindingRequestBinding",
+      "summary": "create binding of a BindingRequestOptions",
+      "nickname": "createNamespacedBindingRequestOptionsBinding",
       "parameters": [
        {
         "type": "string",
@@ -688,7 +688,7 @@
         "allowMultiple": false
        },
        {
-        "type": "v1.BindingRequest",
+        "type": "v1.BindingRequestOptions",
         "paramType": "body",
         "name": "body",
         "description": "",
@@ -707,7 +707,7 @@
         "type": "string",
         "paramType": "path",
         "name": "name",
-        "description": "name of the BindingRequest",
+        "description": "name of the BindingRequestOptions",
         "required": true,
         "allowMultiple": false
        }
@@ -716,7 +716,7 @@
        {
         "code": 200,
         "message": "OK",
-        "responseModel": "v1.BindingRequest"
+        "responseModel": "v1.BindingRequestOptions"
        }
       ],
       "produces": [
@@ -729,8 +729,8 @@
      {
       "type": "unversioned.Status",
       "method": "DELETE",
-      "summary": "delete binding of a BindingRequest",
-      "nickname": "deleteNamespacedBindingRequestBinding",
+      "summary": "delete binding of a BindingRequestOptions",
+      "nickname": "deleteNamespacedBindingRequestOptionsBinding",
       "parameters": [
        {
         "type": "string",
@@ -760,7 +760,7 @@
         "type": "string",
         "paramType": "path",
         "name": "name",
-        "description": "name of the BindingRequest",
+        "description": "name of the BindingRequestOptions",
         "required": true,
         "allowMultiple": false
        }
@@ -16212,9 +16212,8 @@
     "required": [
      "dashboard_url",
      "backingservice_name",
-     "backingservice_id",
+     "backingservice_spec_id",
      "backingservice_plan_guid",
-     "backingservice_plan_name",
      "parameters"
     ],
     "properties": {
@@ -16224,13 +16223,10 @@
      "backingservice_name": {
       "type": "string"
      },
-     "backingservice_id": {
+     "backingservice_spec_id": {
       "type": "string"
      },
      "backingservice_plan_guid": {
-      "type": "string"
-     },
-     "backingservice_plan_name": {
       "type": "string"
      },
      "parameters": {
@@ -16243,16 +16239,19 @@
     "required": [
      "bind_uuid",
      "bind_deploymentconfig",
-     "credential"
+     "credentials"
     ],
     "properties": {
+     "bound_time": {
+      "type": "string"
+     },
      "bind_uuid": {
       "type": "string"
      },
      "bind_deploymentconfig": {
-      "type": "any"
+      "type": "string"
      },
-     "credential": {
+     "credentials": {
       "type": "any"
      }
     }
@@ -16260,11 +16259,43 @@
    "v1.BackingServiceInstanceStatus": {
     "id": "v1.BackingServiceInstanceStatus",
     "required": [
-     "phase"
+     "phase",
+     "action",
+     "error",
+     "last_operation"
     ],
     "properties": {
      "phase": {
       "type": "string"
+     },
+     "action": {
+      "type": "string"
+     },
+     "error": {
+      "type": "string"
+     },
+     "last_operation": {
+      "$ref": "v1.LastOperation"
+     }
+    }
+   },
+   "v1.LastOperation": {
+    "id": "v1.LastOperation",
+    "required": [
+     "state",
+     "description",
+     "async_poll_interval_seconds"
+    ],
+    "properties": {
+     "state": {
+      "type": "string"
+     },
+     "description": {
+      "type": "string"
+     },
+     "async_poll_interval_seconds": {
+      "type": "integer",
+      "format": "int32"
      }
     }
    },
@@ -16391,10 +16422,12 @@
      }
     }
    },
-   "v1.BindingRequest": {
-    "id": "v1.BindingRequest",
+   "v1.BindingRequestOptions": {
+    "id": "v1.BindingRequestOptions",
     "required": [
-     "application_uuid"
+     "bindKind",
+     "bindResourceVersion",
+     "resourceName"
     ],
     "properties": {
      "kind": {
@@ -16405,57 +16438,16 @@
       "type": "string",
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#resources"
      },
-     "name": {
-      "type": "string",
-      "description": "Name must be unique within a namespace. Is required when creating resources, although some resources may allow a client to request the generation of an appropriate name automatically. Name is primarily intended for creation idempotence and configuration definition. Cannot be updated. More info: http://releases.k8s.io/HEAD/docs/user-guide/identifiers.md#names"
+     "metadata": {
+      "$ref": "v1.ObjectMeta"
      },
-     "generateName": {
-      "type": "string",
-      "description": "GenerateName is an optional prefix, used by the server, to generate a unique name ONLY IF the Name field has not been provided. If this field is used, the name returned to the client will be different than the name passed. This value will also be combined with a unique suffix. The provided value has the same validation rules as the Name field, and may be truncated by the length of the suffix required to make the value unique on the server.\n\nIf this field is specified and the generated name exists, the server will NOT return a 409 - instead, it will either return 201 Created or 500 with Reason ServerTimeout indicating a unique name could not be found in the time allotted, and the client should retry (optionally after the time indicated in the Retry-After header).\n\nApplied only if Name is not specified. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#idempotency"
+     "bindKind": {
+      "type": "string"
      },
-     "namespace": {
-      "type": "string",
-      "description": "Namespace defines the space within each name must be unique. An empty namespace is equivalent to the \"default\" namespace, but \"default\" is the canonical representation. Not all objects are required to be scoped to a namespace - the value of this field for those objects will be empty.\n\nMust be a DNS_LABEL. Cannot be updated. More info: http://releases.k8s.io/HEAD/docs/user-guide/namespaces.md"
+     "bindResourceVersion": {
+      "type": "string"
      },
-     "selfLink": {
-      "type": "string",
-      "description": "SelfLink is a URL representing this object. Populated by the system. Read-only."
-     },
-     "uid": {
-      "type": "string",
-      "description": "UID is the unique in time and space value for this object. It is typically generated by the server on successful creation of a resource and is not allowed to change on PUT operations.\n\nPopulated by the system. Read-only. More info: http://releases.k8s.io/HEAD/docs/user-guide/identifiers.md#uids"
-     },
-     "resourceVersion": {
-      "type": "string",
-      "description": "An opaque value that represents the internal version of this object that can be used by clients to determine when objects have changed. May be used for optimistic concurrency, change detection, and the watch operation on a resource or set of resources. Clients must treat these values as opaque and passed unmodified back to the server. They may only be valid for a particular resource or set of resources.\n\nPopulated by the system. Read-only. Value must be treated as opaque by clients and . More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#concurrency-control-and-consistency"
-     },
-     "generation": {
-      "type": "integer",
-      "format": "int64",
-      "description": "A sequence number representing a specific generation of the desired state. Currently only implemented by replication controllers. Populated by the system. Read-only."
-     },
-     "creationTimestamp": {
-      "type": "string",
-      "description": "CreationTimestamp is a timestamp representing the server time when this object was created. It is not guaranteed to be set in happens-before order across separate operations. Clients may not set this value. It is represented in RFC3339 form and is in UTC.\n\nPopulated by the system. Read-only. Null for lists. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#metadata"
-     },
-     "deletionTimestamp": {
-      "type": "string",
-      "description": "DeletionTimestamp is RFC 3339 date and time at which this resource will be deleted. This field is set by the server when a graceful deletion is requested by the user, and is not directly settable by a client. The resource will be deleted (no longer visible from resource lists, and not reachable by name) after the time in this field. Once set, this value may not be unset or be set further into the future, although it may be shortened or the resource may be deleted prior to this time. For example, a user may request that a pod is deleted in 30 seconds. The Kubelet will react by sending a graceful termination signal to the containers in the pod. Once the resource is deleted in the API, the Kubelet will send a hard termination signal to the container. If not set, graceful deletion of the object has not been requested.\n\nPopulated by the system when a graceful deletion is requested. Read-only. More info: http://releases.k8s.io/HEAD/docs/devel/api-conventions.md#metadata"
-     },
-     "deletionGracePeriodSeconds": {
-      "type": "integer",
-      "format": "int64",
-      "description": "Number of seconds allowed for this object to gracefully terminate before it will be removed from the system. Only set when deletionTimestamp is also set. May only be shortened. Read-only."
-     },
-     "labels": {
-      "type": "any",
-      "description": "Map of string keys and values that can be used to organize and categorize (scope and select) objects. May match selectors of replication controllers and services. More info: http://releases.k8s.io/HEAD/docs/user-guide/labels.md"
-     },
-     "annotations": {
-      "type": "any",
-      "description": "Annotations is an unstructured key value map stored with a resource that may be set by external tools to store and retrieve arbitrary metadata. They are not queryable and should be preserved when modifying objects. More info: http://releases.k8s.io/HEAD/docs/user-guide/annotations.md"
-     },
-     "application_uuid": {
+     "resourceName": {
       "type": "string"
      }
     }

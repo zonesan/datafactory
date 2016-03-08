@@ -34,9 +34,9 @@ const (
 
 	// ResourceGroupPrefix is the prefix for indicating that a resource entry is actually a group of resources.  The groups are defined in code and indicate resources that are commonly permissioned together
 	ResourceGroupPrefix = "resourcegroup:"
-	
+
 	BackingServiceInstanceGroupName = ResourceGroupPrefix + "backingserviceinstances"
-	
+
 	BuildGroupName      = ResourceGroupPrefix + "builds"
 	DeploymentGroupName = ResourceGroupPrefix + "deployments"
 	ImageGroupName      = ResourceGroupPrefix + "images"
@@ -78,7 +78,7 @@ const (
 var (
 	GroupsToResources = map[string][]string{
 		BackingServiceInstanceGroupName: {"backingserviceinstances", "backingserviceinstances/binding"},
-		
+
 		BuildGroupName:       {"builds", "buildconfigs", "buildlogs", "buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/log", "builds/clone", "buildconfigs/webhooks"},
 		ImageGroupName:       {"imagestreams", "imagestreammappings", "imagestreamtags", "imagestreamimages"},
 		DeploymentGroupName:  {"deployments", "deploymentconfigs", "generatedeploymentconfigs", "deploymentconfigrollbacks", "deploymentconfigs/log", "deploymentconfigs/scale"},
@@ -94,9 +94,10 @@ var (
 		OpenshiftExposedGroupName:   {BuildGroupName, ImageGroupName, DeploymentGroupName, TemplateGroupName, "routes"},
 		OpenshiftAllGroupName: {OpenshiftExposedGroupName, UserGroupName, OAuthGroupName, PolicyOwnerGroupName, SDNGroupName, PermissionGrantingGroupName, OpenshiftStatusGroupName, "projects",
 			"clusterroles", "clusterrolebindings", "clusterpolicies", "clusterpolicybindings", "images" /* cluster scoped*/, "projectrequests", "builds/details",
-			"servicebrokers", "backingservices", 
+			"servicebrokers", "backingservices",
 			BackingServiceInstanceGroupName,
-			},
+			"applications",
+		},
 		OpenshiftStatusGroupName: {"imagestreams/status", "routes/status"},
 
 		QuotaGroupName:         {"limitranges", "resourcequotas", "resourcequotausages"},

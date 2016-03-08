@@ -15,6 +15,7 @@ import (
 
 // Interface exposes methods on OpenShift resources.
 type Interface interface {
+	ApplicationsInterface
 	ServiceBrokersInterface
 	BackingServicesInterface
 	BackingServiceInstancesInterface
@@ -55,6 +56,11 @@ type Interface interface {
 	ClusterPolicyBindingsInterface
 	ClusterRolesInterface
 	ClusterRoleBindingsInterface
+}
+
+// Application provides a REST client for servicebroker
+func (c *Client) Applications(namespace string) ApplicationInterface {
+	return newApplications(c, namespace)
 }
 
 // ServiceBroker provides a REST client for servicebroker

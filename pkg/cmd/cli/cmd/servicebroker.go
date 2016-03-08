@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"io"
 	kcmdutil "k8s.io/kubernetes/pkg/kubectl/cmd/util"
+	"net/url"
 	"strings"
 )
 
@@ -18,7 +19,7 @@ Create a new servicebroker for administrator
 
 `
 	newServiceBrokerExample = `# Create a new servicebroker with [name username password url]
-  $ %[1]s  mysql_servicebroker  --username="username"  --password="password" --url="url"`
+  $ %[1]s  mysql_servicebroker  --username="username"  --password="password" --url="127.0.0.1:8000"`
 )
 
 type NewServiceBrokerOptions struct {
@@ -45,6 +46,7 @@ func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *
 			var err error
 			if err = options.complete(cmd, f); err != nil {
 				kcmdutil.CheckErr(err)
+				return
 			}
 
 			if options.Client, _, err = f.Clients(); err != nil {
@@ -72,8 +74,21 @@ func (o *NewServiceBrokerOptions) complete(cmd *cobra.Command, f *clientcmd.Fact
 		return errors.New("must have exactly one argument")
 	}
 
-	if strings.HasPrefix(o.Url, "http://") {
-		fmt.Println(strings.TrimPrefix(o.Url, "http://"))
+	URL, err := url.Parse(o.Url)
+	if err != nil {
+		cmd.Help()
+		return errors.New("wrong param url format")
+	}
+
+	if URL.Scheme == "" {
+		o.Url = strings.TrimSuffix(URL.Path, "/")
+	} else {
+		o.Url = URL.Host
+	}
+
+	if len(o.Url) == 0 {
+		cmd.Help()
+		return errors.New("wrong param url format")
 	}
 
 	o.Name = args[0]
