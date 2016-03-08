@@ -1721,11 +1721,21 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapi.BackingServiceInstanceSpec))(in)
 	}
-	if err := convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(&in.Provisioning, &out.Provisioning, s); err != nil {
+	if err := convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.Binding, &out.Binding, s); err != nil {
+	if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
 		return err
+	}
+	out.Bound = in.Bound
+	out.InstanceID = in.InstanceID
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
 	}
 	return nil
 }
@@ -1746,26 +1756,39 @@ func convert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus
 	return autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceStatus(in, out, s)
 }
 
+func autoconvert_api_BindingRequestOptions_To_v1_BindingRequestOptions(in *backingserviceinstanceapi.BindingRequestOptions, out *backingserviceinstanceapiv1.BindingRequestOptions, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapi.BindingRequestOptions))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_api_ObjectMeta_To_v1_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	out.BindKind = in.BindKind
+	out.BindResourceVersion = in.BindResourceVersion
+	out.ResourceName = in.ResourceName
+	return nil
+}
+
+func convert_api_BindingRequestOptions_To_v1_BindingRequestOptions(in *backingserviceinstanceapi.BindingRequestOptions, out *backingserviceinstanceapiv1.BindingRequestOptions, s conversion.Scope) error {
+	return autoconvert_api_BindingRequestOptions_To_v1_BindingRequestOptions(in, out, s)
+}
+
 func autoconvert_api_InstanceBinding_To_v1_InstanceBinding(in *backingserviceinstanceapi.InstanceBinding, out *backingserviceinstanceapiv1.InstanceBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapi.InstanceBinding))(in)
 	}
 	out.BindUuid = in.BindUuid
-	if in.InstanceBindDeploymentConfig != nil {
-		out.InstanceBindDeploymentConfig = make(map[string]string)
-		for key, val := range in.InstanceBindDeploymentConfig {
-			out.InstanceBindDeploymentConfig[key] = val
+	out.BindDeploymentConfig = in.BindDeploymentConfig
+	if in.Credentials != nil {
+		out.Credentials = make(map[string]string)
+		for key, val := range in.Credentials {
+			out.Credentials[key] = val
 		}
 	} else {
-		out.InstanceBindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
+		out.Credentials = nil
 	}
 	return nil
 }
@@ -1780,7 +1803,9 @@ func autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in *backing
 	}
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {
@@ -1850,11 +1875,21 @@ func autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapiv1.BackingServiceInstanceSpec))(in)
 	}
-	if err := convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(&in.Provisioning, &out.Provisioning, s); err != nil {
+	if err := convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.Binding, &out.Binding, s); err != nil {
+	if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
 		return err
+	}
+	out.Bound = in.Bound
+	out.InstanceID = in.InstanceID
+	if in.Tags != nil {
+		out.Tags = make([]string, len(in.Tags))
+		for i := range in.Tags {
+			out.Tags[i] = in.Tags[i]
+		}
+	} else {
+		out.Tags = nil
 	}
 	return nil
 }
@@ -1875,26 +1910,39 @@ func convert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus
 	return autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceStatus(in, out, s)
 }
 
+func autoconvert_v1_BindingRequestOptions_To_api_BindingRequestOptions(in *backingserviceinstanceapiv1.BindingRequestOptions, out *backingserviceinstanceapi.BindingRequestOptions, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapiv1.BindingRequestOptions))(in)
+	}
+	if err := s.Convert(&in.TypeMeta, &out.TypeMeta, 0); err != nil {
+		return err
+	}
+	if err := convert_v1_ObjectMeta_To_api_ObjectMeta(&in.ObjectMeta, &out.ObjectMeta, s); err != nil {
+		return err
+	}
+	out.BindKind = in.BindKind
+	out.BindResourceVersion = in.BindResourceVersion
+	out.ResourceName = in.ResourceName
+	return nil
+}
+
+func convert_v1_BindingRequestOptions_To_api_BindingRequestOptions(in *backingserviceinstanceapiv1.BindingRequestOptions, out *backingserviceinstanceapi.BindingRequestOptions, s conversion.Scope) error {
+	return autoconvert_v1_BindingRequestOptions_To_api_BindingRequestOptions(in, out, s)
+}
+
 func autoconvert_v1_InstanceBinding_To_api_InstanceBinding(in *backingserviceinstanceapiv1.InstanceBinding, out *backingserviceinstanceapi.InstanceBinding, s conversion.Scope) error {
 	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
 		defaulting.(func(*backingserviceinstanceapiv1.InstanceBinding))(in)
 	}
 	out.BindUuid = in.BindUuid
-	if in.InstanceBindDeploymentConfig != nil {
-		out.InstanceBindDeploymentConfig = make(map[string]string)
-		for key, val := range in.InstanceBindDeploymentConfig {
-			out.InstanceBindDeploymentConfig[key] = val
+	out.BindDeploymentConfig = in.BindDeploymentConfig
+	if in.Credentials != nil {
+		out.Credentials = make(map[string]string)
+		for key, val := range in.Credentials {
+			out.Credentials[key] = val
 		}
 	} else {
-		out.InstanceBindDeploymentConfig = nil
-	}
-	if in.Credential != nil {
-		out.Credential = make(map[string]string)
-		for key, val := range in.Credential {
-			out.Credential[key] = val
-		}
-	} else {
-		out.Credential = nil
+		out.Credentials = nil
 	}
 	return nil
 }
@@ -1909,7 +1957,9 @@ func autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in *backing
 	}
 	out.DashboardUrl = in.DashboardUrl
 	out.BackingServiceName = in.BackingServiceName
+	out.BackingServiceID = in.BackingServiceID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {
@@ -8897,6 +8947,7 @@ func init() {
 		autoconvert_api_BackingService_To_v1_BackingService,
 		autoconvert_api_BinaryBuildRequestOptions_To_v1_BinaryBuildRequestOptions,
 		autoconvert_api_BinaryBuildSource_To_v1_BinaryBuildSource,
+		autoconvert_api_BindingRequestOptions_To_v1_BindingRequestOptions,
 		autoconvert_api_BuildConfigList_To_v1_BuildConfigList,
 		autoconvert_api_BuildConfigSpec_To_v1_BuildConfigSpec,
 		autoconvert_api_BuildConfigStatus_To_v1_BuildConfigStatus,
@@ -9076,6 +9127,7 @@ func init() {
 		autoconvert_v1_BackingService_To_api_BackingService,
 		autoconvert_v1_BinaryBuildRequestOptions_To_api_BinaryBuildRequestOptions,
 		autoconvert_v1_BinaryBuildSource_To_api_BinaryBuildSource,
+		autoconvert_v1_BindingRequestOptions_To_api_BindingRequestOptions,
 		autoconvert_v1_BuildConfigList_To_api_BuildConfigList,
 		autoconvert_v1_BuildConfigSpec_To_api_BuildConfigSpec,
 		autoconvert_v1_BuildConfigStatus_To_api_BuildConfigStatus,

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/golang/glog"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	"io/ioutil"
 	"net/http"
@@ -77,6 +78,7 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 		}
 	}
 
+	glog.Infof("GET %s returns http code %v", getUrl, resp.StatusCode)
 	return ioutil.ReadAll(resp.Body)
 }
 

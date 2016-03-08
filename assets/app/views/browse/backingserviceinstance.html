@@ -1,0 +1,102 @@
+<div class="content">
+  <project-page>
+  <breadcrumbs breadcrumbs="breadcrumbs"></breadcrumbs>
+  <alerts alerts="alerts"></alerts>
+  <div ng-if="!loaded">Loading...</div>
+  <div ng-if="backingserviceinstance">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="tile">
+            <h1>{{backingserviceinstance.metadata.name}}
+             <small class="meta">created <relative-timestamp timestamp="backingserviceinstance.metadata.creationTimestamp"></relative-timestamp></small>
+               <div class="pull-right dropdown">
+                <a href="" class="dropdown-toggle resource-actions-dropdown" data-toggle="dropdown"><i class="fa fa-ellipsis-v"></i><span class="sr-only">Actions</span></a>
+                <ul class="dropdown-menu actions action-button">
+                <li>
+                  <edit-link
+                  resource="backingserviceinstances"
+                  kind="backingserviceinstances"
+                  alerts="alerts">
+                  </edit-link>
+                </li>
+                <li>
+                  <delete-link
+                  resource-type="backingserviceinstances"
+                  resource-name="{{backingserviceinstance.metadata.name}}"
+                  project-name="{{backingservice.metadata.namespace}}"
+                  alerts="alerts">
+                  </delete-link>
+                </li>
+                </ul>
+              </div>
+            </h1>
+            <ng-include src=" 'views/browse/_backing-service-instance-detail.html' "></ng-include>
+          </div>
+        </div>
+      </div>
+    </div> 
+
+    <div class="row">
+      <div class="col-md-12">
+        <div class="tile">  
+        <ng-include src=" 'views/browse/_backing-service-instance-binding-detail.html' "></ng-include>
+        </div>
+      </div> 
+    </div> 
+    <!-- <div class='resource-details'>
+      <div class="row">
+       <div class="col-md-12">
+          <div class="binding">
+            <h3>Binding Application</h3>
+              <dl class="dl-horizontal left">
+                <dt>myMySQL</dt>
+                <dd>{{backingserviceinstance.meta.name}}</dd>
+                <dt>bindingService</dt>
+                <dd>{{backingservice.meta.creationTimestamp}}</dd>
+                <dt>serviceName</dt>
+                <dd>{{backingservice.spec.binding.bind_deploymentconfig}}</dd>
+                <dt>runningStatus</dt>
+                <dd>{{backingservice.spec.provisioning.providerDisplayName}}</dd>
+                <dt>runningTime</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd>   
+                <dt>runningTime</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
+                <dt>binding Status</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd>
+                <dt>serviceCreateTime</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
+                <dt>bindingTime</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd> 
+                <dt>restartService</dt>
+                <dd>{{backingservice.spec.provisioning.plan_name}}</dd>   
+              </dl>
+          </div>
+        </div>
+      </div>
+    </div>   -->
+
+    <!-- <table class="table table-bordered table-hover table-mobile">
+      <thead>
+      <tr>
+        <th>Backing Service Name</th>
+        <th>Instance Name</th>
+        <th>Created Time</th>
+      </tr>
+      </thead>
+      <tbody ng-if="(backingserviceinstances | hashSize) == 0">
+      <tr><td colspan="5"><em>{{emptyMessage}}</em></td></tr>
+      </tbody>
+      <tbody ng-repeat="bsi in backingserviceinstances | orderObjectsByDate : true">
+      <tr>
+        <td data-title="Backing Service Name"><a ng-href="{{bsi | navigateResourceURL}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
+        <td data-title="Instance Name">
+        <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
+        <td data-title="Created Time">
+        <a ng-href="{{bsi | navigateResourceURL}}"></a>   
+        <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp> 
+        </td>
+      </tr>
+      </tbody>
+    </table> -->
+  </project-page>
+</div>

@@ -28,7 +28,8 @@ import (
 
 	application "github.com/openshift/origin/pkg/application/registry/application/etcd"
 	backingservice "github.com/openshift/origin/pkg/backingservice/registry/backingservice/etcd"
-	backingserviceinstance "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/etcd"
+	backingserviceinstanceetcd "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/etcd"
+	backingserviceinstanceregistry "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
 	buildclient "github.com/openshift/origin/pkg/build/client"
 	buildgenerator "github.com/openshift/origin/pkg/build/generator"
 	buildregistry "github.com/openshift/origin/pkg/build/registry/build"
@@ -339,8 +340,7 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	applicationStorage := application.NewREST(c.EtcdHelper)
 	serviceBrokerStorage := servicebroker.NewREST(c.EtcdHelper)
 	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
-	backingServiceInstanceStorage := backingserviceinstance.NewREST(c.EtcdHelper)
-
+	
 	buildStorage, buildDetailsStorage := buildetcd.NewStorage(c.EtcdHelper)
 	buildRegistry := buildregistry.NewRegistry(buildStorage)
 
@@ -394,6 +394,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	imageStreamTagRegistry := imagestreamtag.NewRegistry(imageStreamTagStorage)
 	imageStreamImageStorage := imagestreamimage.NewREST(imageRegistry, imageStreamRegistry)
 	imageStreamImageRegistry := imagestreamimage.NewRegistry(imageStreamImageStorage)
+	
+	backingServiceInstanceEtcd := backingserviceinstanceetcd.NewREST(c.EtcdHelper)
+	backingServiceInstanceRegistry := backingserviceinstanceregistry.NewRegistry(backingServiceInstanceEtcd)
+	backingServiceInstanceBindingEtcd := backingserviceinstanceetcd.NewBindingREST(backingServiceInstanceRegistry, deployConfigRegistry)
 
 	buildGenerator := &buildgenerator.BuildGenerator{
 		Client: buildgenerator.Client{
@@ -448,7 +452,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 		"applications":            applicationStorage,
 		"serviceBrokers":          serviceBrokerStorage,
 		"backingServices":         backingServiceStorage,
-		"backingServiceInstances": backingServiceInstanceStorage,
+		
+		"backingServiceInstances"        : backingServiceInstanceEtcd,
+		"backingServiceInstances/binding": backingServiceInstanceBindingEtcd,
+		
 		"images":                  imageStorage,
 		"imageStreams":            imageStreamStorage,
 		"imageStreams/status":     imageStreamStatusStorage,

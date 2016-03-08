@@ -8,8 +8,12 @@ func init() {
 	api.Scheme.AddKnownTypes("",
 		&BackingServiceInstance{},
 		&BackingServiceInstanceList{},
+		//&BindingRequest{},
+		&BindingRequestOptions{},
 	)
 }
 
 func (*BackingServiceInstance) IsAnAPIObject()     {}
 func (*BackingServiceInstanceList) IsAnAPIObject() {}
+//func (*BindingRequest) IsAnAPIObject()             {}
+func (*BindingRequestOptions) IsAnAPIObject()      {}

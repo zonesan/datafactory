@@ -14,6 +14,7 @@ import (
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
+
 )
 
 type BackingServiceInstanceControllerFactory struct {
@@ -63,6 +64,7 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 			kutil.NewTokenBucketRateLimiter(1, 10),
 		),
 		Handle: func(obj interface{}) error {
+
 			backingserviceinstance := obj.(*backingserviceinstanceapi.BackingServiceInstance)
 			return backingserviceInstanceController.Handle(backingserviceinstance)
 		},

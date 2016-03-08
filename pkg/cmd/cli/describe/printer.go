@@ -34,7 +34,7 @@ var (
 	applicationColumns            = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
-	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BINDING", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BOUND", "STATUS"}
 	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
 	imageColumns                  = []string{"NAME", "DOCKER REF"}
@@ -180,7 +180,15 @@ func printApplicationList(applications *applicationapi.ApplicationList, w io.Wri
 }
 
 func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, labels.Set(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
+	/*
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
+	*/
+
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
 	return err
 }
 
@@ -194,8 +202,16 @@ func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.
 	return nil
 }
 
-func printBackingServiceInstance(bs *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, labels.Set(bs.Labels), bs.Spec.Binding, bs.Status.Phase)
+func printBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	/*
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
+	*/
+
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bsi.Name, formatLabels(bsi.Labels), bsi.Spec.Bound, bsi.Status.Phase)
 	return err
 }
 

@@ -27,8 +27,10 @@ type BackingServiceInstanceList struct {
 /*
 type BackingServiceInstanceSpec struct {
 	Config                 map[string]string `json:"config, omitempty"`
+	InstanceID             string            `json:"instance_id, omitempty"`
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
-	BackingServiceGuid     string            `json:"backingservice_guid, omitempty"`
+	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 	Binding                bool              `json:"binding, omitempty"`
@@ -38,27 +40,27 @@ type BackingServiceInstanceSpec struct {
 	Tags                   []string          `json:"tags, omitempty"`
 }
 */
-
 type BackingServiceInstanceSpec struct {
-	Provisioning InstanceProvisioning `json:"provisioning, omitempty"`
-	Binding      InstanceBinding      `json:"binding, omitempty"`
+	InstanceProvisioning          `json:"provisioning, omitempty"`
+	InstanceBinding               `json:"binding, omitempty"`
+	Bound                bool     `json:"bound, omitempty"`
+	InstanceID           string   `json:"instance_id, omitempty"`
+	Tags                 []string `json:"tags, omitempty"`
 }
 
 type InstanceProvisioning struct {
 	DashboardUrl           string            `json:"dashboard_url, omitempty"`
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
+	BackingServiceID       string            `json:"backingservice_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	BackingServicePlanName string            `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 
 type InstanceBinding struct {
-	BindUuid                     string            `json:"bind_uuid, omitempty"`
-	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
-	Credential                   map[string]string `json:"credential, omitempty"`
-}
-
-type InstanceBindDeploymentConfig struct {
-	Parameters map[string]string `json:"parameters, omitempty"`
+	BindUuid             string            `json:"bind_uuid, omitempty"`
+	BindDeploymentConfig string            `json:"bind_deploymentconfig, omitempty"`
+	Credentials          map[string]string `json:"credentials, omitempty"`
 }
 
 type BackingServiceInstanceStatus struct {
@@ -75,3 +77,26 @@ const (
 	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
+
+//=====================================================
+// 
+//=====================================================
+
+const BindKind_DeploymentConfig = "DeploymentConfig"
+
+//type BindingRequest struct {
+//	unversioned.TypeMeta
+//	kapi.ObjectMeta
+//
+//	// the dc
+//	DeploymentConfigName string `json:"deployment_name, omitempty"`
+//}
+
+type BindingRequestOptions struct {
+	unversioned.TypeMeta
+	kapi.ObjectMeta
+
+	BindKind            string `json:"bindKind, omitempty"`
+	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
+	ResourceName        string `json:"resourceName, omitempty"`
+}

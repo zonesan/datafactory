@@ -40,29 +40,31 @@ type BackingServiceInstanceSpec struct {
 */
 
 type BackingServiceInstanceSpec struct {
-	Provisioning InstanceProvisioning `json:"provisioning, omitempty"`
-	Binding      InstanceBinding      `json:"binding, omitempty"`
+	InstanceProvisioning
+	InstanceBinding
+	Bound      bool
+	InstanceID string
+	Tags       []string
 }
 
 type InstanceProvisioning struct {
-	DashboardUrl           string            `json:"dashboard_url, omitempty"`
-	BackingServiceName     string            `json:"backingservice_name, omitempty"`
-	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
-	Parameters             map[string]string `json:"parameters, omitempty"`
+	DashboardUrl           string
+	BackingServiceName     string
+	BackingServiceID       string
+	BackingServicePlanGuid string
+	BackingServicePlanName string
+	Parameters             map[string]string
 }
 
 type InstanceBinding struct {
-	BindUuid                     string            `json:"bind_uuid, omitempty"`
-	InstanceBindDeploymentConfig map[string]string `json:"bind_deploymentconfig, omitempty"`
-	Credential                   map[string]string `json:"credential, omitempty"`
+	BindUuid             string
+	BindDeploymentConfig string
+	Credentials          map[string]string
 }
 
-type InstanceBindDeploymentConfig struct {
-	Parameters map[string]string `json:"parameters, omitempty"`
-}
-
+// ProjectStatus is information about the current status of a Project
 type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase `json:"phase, omitempty"`
+	Phase BackingServiceInstancePhase
 }
 
 type BackingServiceInstancePhase string
@@ -75,3 +77,36 @@ const (
 	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
 	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
 )
+
+//=====================================================
+// 
+//=====================================================
+
+const BindKind_DeploymentConfig = "DeploymentConfig"
+
+//type BindingRequest struct {
+//	unversioned.TypeMeta
+//	kapi.ObjectMeta
+//
+//	// the dc
+//	DeploymentConfigName string `json:"deployment_name, omitempty"`
+//}
+
+type BindingRequestOptions struct {
+	unversioned.TypeMeta
+	kapi.ObjectMeta
+	
+	
+	
+	BindKind            string `json:"bindKind, omitempty"`
+	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
+	ResourceName        string `json:"resourceName, omitempty"`
+}
+
+func NewBindingRequestOptions (kind, version, name string) *BindingRequestOptions {
+	return &BindingRequestOptions{
+		BindKind: kind,
+		BindResourceVersion: version,
+		ResourceName: name,
+	}
+}
