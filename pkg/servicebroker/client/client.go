@@ -77,6 +77,7 @@ func httpGet(getUrl string, credential ...string) ([]byte, error) {
 			return nil, fmt.Errorf("[http get] status err %s, %d\n", getUrl, resp.StatusCode)
 		}
 	}
+
 	glog.Infof("GET %s returns http code %v", getUrl, resp.StatusCode)
 	return ioutil.ReadAll(resp.Body)
 }

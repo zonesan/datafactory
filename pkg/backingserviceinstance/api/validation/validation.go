@@ -1,10 +1,10 @@
 package validation
 
 import (
-	"k8s.io/kubernetes/pkg/api/validation"
-	"k8s.io/kubernetes/pkg/util/fielderrors"
 	oapi "github.com/openshift/origin/pkg/api"
 	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
+	"k8s.io/kubernetes/pkg/api/validation"
+	"k8s.io/kubernetes/pkg/util/fielderrors"
 )
 
 func BackingServiceInstanceName(name string, prefix bool) (bool, string) {
@@ -16,9 +16,9 @@ func BackingServiceInstanceName(name string, prefix bool) (bool, string) {
 		return false, "must be at least 2 characters long"
 	}
 
-
 	return true, ""
 }
+
 // ValidateBackingServiceInstance tests required fields for a BackingServiceInstance.
 func ValidateBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance) fielderrors.ValidationErrorList {
 	allErrs := fielderrors.ValidationErrorList{}
@@ -34,7 +34,7 @@ func ValidateBackingServiceInstanceUpdate(bsi *backingserviceinstanceapi.Backing
 
 	allErrs = append(allErrs, ValidateBackingServiceInstance(bsi)...)
 
-	// todo: 
+	// todo:
 	//if older.Status != bsi.Status {
 	//	allErrs = append(allErrs, fielderrors.NewFieldInvalid("Status", bsi.Status.Phase, "status cannot be updated from a terminal state"))
 	//}
