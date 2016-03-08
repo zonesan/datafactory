@@ -318,7 +318,7 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 		formatString(out, "Status", bsi.Status.Phase)
 		formatString(out, "DashboardUrl", bsi.Spec.DashboardUrl)
 		formatString(out, "BackingServiceName", bsi.Spec.BackingServiceName)
-		formatString(out, "BackingServicePlanName", bsi.Spec.BackingServicePlanName)
+		//formatString(out, "BackingServicePlanName", bsi.Spec.BackingServicePlanName)
 		formatString(out, "BackingServicePlanGuid", bsi.Spec.BackingServicePlanGuid)
 		fmt.Fprintf(out, "Parameters:\n")
 		for k, v := range bsi.Spec.Parameters {

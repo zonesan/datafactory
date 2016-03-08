@@ -38,7 +38,6 @@ func (Strategy) GenerateName(base string) string {
 func (Strategy) PrepareForCreate(obj runtime.Object) {
 }
 
-// Validate validates a new sdn
 func (Strategy) Validate(ctx kapi.Context, obj runtime.Object) fielderrors.ValidationErrorList {
 	return fielderrors.ValidationErrorList{}
 	// todo

@@ -11,7 +11,7 @@ type BackingServiceInstance struct {
 
 	// Spec defines the behavior of the Namespace.
 	Spec BackingServiceInstanceSpec
-
+	
 	// Status describes the current status of a Namespace
 	Status BackingServiceInstanceStatus
 }
@@ -43,10 +43,12 @@ type BackingServiceInstanceSpec struct {
 	InstanceProvisioning
 	InstanceBinding
 	Bound      bool
-	InstanceID string
 	Tags       []string
+	InstanceID string
+	// InstanceID is blank means to delete (when len(Parameters) > 0)
 }
 
+/*
 type InstanceProvisioning struct {
 	DashboardUrl           string
 	BackingServiceName     string
@@ -54,28 +56,62 @@ type InstanceProvisioning struct {
 	BackingServicePlanGuid string
 	BackingServicePlanName string
 	Parameters             map[string]string
+	// len(Parameters) == 0 means not inited
+}
+*/
+
+type InstanceProvisioning struct {
+	DashboardUrl           string
+	BackingServiceName     string
+	BackingServiceSpecID   string
+	BackingServicePlanGuid string
+	Parameters             map[string]string
+	// len(Parameters) == 0 means not inited
 }
 
 type InstanceBinding struct {
+	// BindUuid is blank for not bound (Bound=false) or to unbind (Bound=true)
+	// BindUuid != "" and Bound=false means to bind
 	BindUuid             string
+	BoundTime            *unversioned.Time
 	BindDeploymentConfig string
 	Credentials          map[string]string
 }
 
 // ProjectStatus is information about the current status of a Project
 type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase
+	Phase  BackingServiceInstancePhase
+	Action BackingServiceInstanceAction
+	Error  string
+	
+	LastOperation *LastOperation
 }
 
-type BackingServiceInstancePhase string
+type LastOperation struct {
+	State                    string
+	Description              string
+	AsyncPollIntervalSeconds int
+}
+
+type BackingServiceInstancePhase  string
+type BackingServiceInstanceAction string
 
 const (
-	BackingServiceInstancePhaseActive   BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseCreated  BackingServiceInstancePhase = "Created"
-	BackingServiceInstancePhaseInactive BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady    BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError    BackingServiceInstancePhase = "Error"
+	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
+	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	
+	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
+	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
+	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
+	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
+	
+	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
+	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
+	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
@@ -96,11 +132,9 @@ type BindingRequestOptions struct {
 	unversioned.TypeMeta
 	kapi.ObjectMeta
 	
-	
-	
-	BindKind            string `json:"bindKind, omitempty"`
-	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
-	ResourceName        string `json:"resourceName, omitempty"`
+	BindKind            string
+	BindResourceVersion string
+	ResourceName        string
 }
 
 func NewBindingRequestOptions (kind, version, name string) *BindingRequestOptions {

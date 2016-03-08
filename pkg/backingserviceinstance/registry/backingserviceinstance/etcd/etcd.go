@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	
+	//"k8s.io/kubernetes/pkg/api/rest"
+	
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
@@ -12,7 +14,7 @@ import (
 	"k8s.io/kubernetes/pkg/runtime"
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
-	"k8s.io/kubernetes/pkg/util"
+	//"k8s.io/kubernetes/pkg/util"
 	
 	"github.com/golang/glog"
 	"k8s.io/kubernetes/pkg/api/unversioned"
@@ -32,8 +34,14 @@ type REST struct {
 
 func NewREST(s storage.Interface) *REST {
 	store := &etcdgeneric.Etcd{
-		NewFunc:     func() runtime.Object { return &backingserviceinstanceapi.BackingServiceInstance{} },
-		NewListFunc: func() runtime.Object { return &backingserviceinstanceapi.BackingServiceInstanceList{} },
+		NewFunc:     func() runtime.Object { 
+			bsi := &backingserviceinstanceapi.BackingServiceInstance{}
+			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseProvisioning
+			return bsi
+		},
+		NewListFunc: func() runtime.Object { 
+			return &backingserviceinstanceapi.BackingServiceInstanceList{} 
+		},
 		KeyRootFunc: func(ctx kapi.Context) string {
 			return etcdgeneric.NamespaceKeyRootFunc(ctx, BackingServiceInstancePath)
 		},
@@ -93,7 +101,9 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 	if bsi.DeletionTimestamp.IsZero() {
 		now := unversioned.Now()
 		bsi.DeletionTimestamp = &now
-		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseInactive
+		
+		bsi.Status.Action = bsi.Status.Action + backingserviceinstanceapi.BackingServiceInstanceActionToDelete
+		
 		result, _, err := r.store.Update(ctx, bsi)
 		return result, err
 	}
@@ -126,23 +136,25 @@ func (r *BindingREST) New() runtime.Object {
 func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
 	glog.Infoln("to create a bsi binding.")
 	
-	bro := obj.(*backingserviceinstanceapi.BindingRequestOptions)
-	if bro.BindKind != backingserviceinstanceapi.BindKind_DeploymentConfig {
+	//if err := rest.BeforeCreate(backingserviceinstanceregistry.BsiStrategy, ctx, obj); err != nil {
+	//	return nil, err
+	//}
+	
+	bro, ok := obj.(*backingserviceinstanceapi.BindingRequestOptions)
+	if !ok || bro.BindKind != backingserviceinstanceapi.BindKind_DeploymentConfig {
 		return nil, fmt.Errorf("unsupported bind type: %s", bro.BindKind)
 	}
 	// todo: check bro.BindResourceVersion
+	
+	//kapi.FillObjectMetaSystemFields(ctx, &bro.ObjectMeta)
 	
 	bsi, err := r.backingServiceInstanceRegistry.GetBackingServiceInstance(ctx, bro.Name)
 	if err != nil {
 		return nil, err
 	}
 	
-	if bsi.Spec.Bound {
-		return nil, errors.New("back service instance already bound")
-	}
-	
-	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseActive {
-		return nil, errors.New("back service instance is not in active phase")
+	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseUnbound {
+		return nil, errors.New("back service instance is not in unbound phase")
 	}
 	
 	//bs, err := r.backingServiceRegistry.GetBackingService(ctx, bsi.Spec.BackingServiceName)
@@ -158,8 +170,10 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 	
 	// update bsi
 	
-	bsi.Spec.BindUuid = string(util.NewUUID())
+	
 	bsi.Spec.BindDeploymentConfig = bro.ResourceName // dc.Name
+	
+	bsi.Status.Action = backingserviceinstanceapi.BackingServiceInstanceActionToBind
 	
 	bsi, err = r.backingServiceInstanceRegistry.UpdateBackingServiceInstance(ctx, bsi)
 	if err != nil {
@@ -179,11 +193,11 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 		return nil, err
 	}
 	
-	if ! bsi.Spec.Bound {
+	if bsi.Status.Phase != backingserviceinstanceapi.BackingServiceInstancePhaseBound {
 		return nil, errors.New("back service instance is not bound yet")
 	}
 	
-	bsi.Spec.BindUuid = "" // notify controller to unbind
+	bsi.Status.Action = backingserviceinstanceapi.BackingServiceInstanceActionToUnbind
 	
 	bsi, err = r.backingServiceInstanceRegistry.UpdateBackingServiceInstance(ctx, bsi)
 	if err != nil {
@@ -192,4 +206,5 @@ func (r *BindingREST) Delete(ctx kapi.Context, name string, options *kapi.Delete
 
 	return bsi, nil
 }
+
 
