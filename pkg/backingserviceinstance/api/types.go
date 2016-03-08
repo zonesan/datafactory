@@ -80,18 +80,38 @@ type InstanceBinding struct {
 
 // ProjectStatus is information about the current status of a Project
 type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase
+	Phase  BackingServiceInstancePhase
+	Action BackingServiceInstanceAction
+	Error  string
+	
+	LastOperation *LastOperation
 }
 
-type BackingServiceInstancePhase string
+type LastOperation struct {
+	State                    string
+	Description              string
+	AsyncPollIntervalSeconds int
+}
+
+type BackingServiceInstancePhase  string
+type BackingServiceInstanceAction string
 
 const (
-	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" 
-	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
+	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	
+	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
+	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
+	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
+	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
+	
+	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
+	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
+	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
@@ -112,9 +132,9 @@ type BindingRequestOptions struct {
 	unversioned.TypeMeta
 	kapi.ObjectMeta
 	
-	BindKind            string `json:"bindKind, omitempty"`
-	BindResourceVersion string `json:"bindResourceVersion, omitempty"`
-	ResourceName        string `json:"resourceName, omitempty"`
+	BindKind            string
+	BindResourceVersion string
+	ResourceName        string
 }
 
 func NewBindingRequestOptions (kind, version, name string) *BindingRequestOptions {

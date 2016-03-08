@@ -76,18 +76,38 @@ type InstanceBinding struct {
 }
 
 type BackingServiceInstanceStatus struct {
-	Phase BackingServiceInstancePhase `json:"phase, omitempty"`
+	Phase  BackingServiceInstancePhase  `json:"phase, omitempty"`
+	Action BackingServiceInstanceAction `json:"action, omitempty"`
+	Error  string                       `json:"error, omitempty"`
+	
+	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }
 
-type BackingServiceInstancePhase string
+type LastOperation struct {
+	State                    string `json:"state"`
+	Description              string `json:"description"`
+	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
+}
+
+type BackingServiceInstancePhase  string
+type BackingServiceInstanceAction string
 
 const (
-	BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created" // not inited
-	BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
-	BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
+	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
+	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
+	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
+	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
+	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
+	
+	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
+	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
+	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
+	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
+	
+	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
+	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
+	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
@@ -105,8 +125,8 @@ const BindKind_DeploymentConfig = "DeploymentConfig"
 //}
 
 type BindingRequestOptions struct {
-	unversioned.TypeMeta
-	kapi.ObjectMeta
+	unversioned.TypeMeta `json:",inline"`
+	kapi.ObjectMeta      `json:"metadata,omitempty"`
 
 	BindKind            string `json:"bindKind, omitempty"`
 	BindResourceVersion string `json:"bindResourceVersion, omitempty"`

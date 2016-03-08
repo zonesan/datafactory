@@ -1533,6 +1533,16 @@ func autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceSt
 		defaulting.(func(*backingserviceinstanceapi.BackingServiceInstanceStatus))(in)
 	}
 	out.Phase = backingserviceinstanceapiv1.BackingServiceInstancePhase(in.Phase)
+	out.Action = backingserviceinstanceapiv1.BackingServiceInstanceAction(in.Action)
+	out.Error = in.Error
+	if in.LastOperation != nil {
+		out.LastOperation = new(backingserviceinstanceapiv1.LastOperation)
+		if err := convert_api_LastOperation_To_v1_LastOperation(in.LastOperation, out.LastOperation, s); err != nil {
+			return err
+		}
+	} else {
+		out.LastOperation = nil
+	}
 	return nil
 }
 
@@ -1609,6 +1619,20 @@ func autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in *backing
 
 func convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in *backingserviceinstanceapi.InstanceProvisioning, out *backingserviceinstanceapiv1.InstanceProvisioning, s conversion.Scope) error {
 	return autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in, out, s)
+}
+
+func autoconvert_api_LastOperation_To_v1_LastOperation(in *backingserviceinstanceapi.LastOperation, out *backingserviceinstanceapiv1.LastOperation, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapi.LastOperation))(in)
+	}
+	out.State = in.State
+	out.Description = in.Description
+	out.AsyncPollIntervalSeconds = in.AsyncPollIntervalSeconds
+	return nil
+}
+
+func convert_api_LastOperation_To_v1_LastOperation(in *backingserviceinstanceapi.LastOperation, out *backingserviceinstanceapiv1.LastOperation, s conversion.Scope) error {
+	return autoconvert_api_LastOperation_To_v1_LastOperation(in, out, s)
 }
 
 func autoconvert_v1_BackingServiceInstance_To_api_BackingServiceInstance(in *backingserviceinstanceapiv1.BackingServiceInstance, out *backingserviceinstanceapi.BackingServiceInstance, s conversion.Scope) error {
@@ -1693,6 +1717,16 @@ func autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceSt
 		defaulting.(func(*backingserviceinstanceapiv1.BackingServiceInstanceStatus))(in)
 	}
 	out.Phase = backingserviceinstanceapi.BackingServiceInstancePhase(in.Phase)
+	out.Action = backingserviceinstanceapi.BackingServiceInstanceAction(in.Action)
+	out.Error = in.Error
+	if in.LastOperation != nil {
+		out.LastOperation = new(backingserviceinstanceapi.LastOperation)
+		if err := convert_v1_LastOperation_To_api_LastOperation(in.LastOperation, out.LastOperation, s); err != nil {
+			return err
+		}
+	} else {
+		out.LastOperation = nil
+	}
 	return nil
 }
 
@@ -1769,6 +1803,20 @@ func autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in *backing
 
 func convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in *backingserviceinstanceapiv1.InstanceProvisioning, out *backingserviceinstanceapi.InstanceProvisioning, s conversion.Scope) error {
 	return autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in, out, s)
+}
+
+func autoconvert_v1_LastOperation_To_api_LastOperation(in *backingserviceinstanceapiv1.LastOperation, out *backingserviceinstanceapi.LastOperation, s conversion.Scope) error {
+	if defaulting, found := s.DefaultingInterface(reflect.TypeOf(*in)); found {
+		defaulting.(func(*backingserviceinstanceapiv1.LastOperation))(in)
+	}
+	out.State = in.State
+	out.Description = in.Description
+	out.AsyncPollIntervalSeconds = in.AsyncPollIntervalSeconds
+	return nil
+}
+
+func convert_v1_LastOperation_To_api_LastOperation(in *backingserviceinstanceapiv1.LastOperation, out *backingserviceinstanceapi.LastOperation, s conversion.Scope) error {
+	return autoconvert_v1_LastOperation_To_api_LastOperation(in, out, s)
 }
 
 func autoconvert_api_BinaryBuildRequestOptions_To_v1_BinaryBuildRequestOptions(in *buildapi.BinaryBuildRequestOptions, out *buildapiv1.BinaryBuildRequestOptions, s conversion.Scope) error {
@@ -8827,6 +8875,7 @@ func init() {
 		autoconvert_api_InstanceBinding_To_v1_InstanceBinding,
 		autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning,
 		autoconvert_api_IsPersonalSubjectAccessReview_To_v1_IsPersonalSubjectAccessReview,
+		autoconvert_api_LastOperation_To_v1_LastOperation,
 		autoconvert_api_LifecycleHook_To_v1_LifecycleHook,
 		autoconvert_api_Lifecycle_To_v1_Lifecycle,
 		autoconvert_api_LocalObjectReference_To_v1_LocalObjectReference,
@@ -9002,6 +9051,7 @@ func init() {
 		autoconvert_v1_InstanceBinding_To_api_InstanceBinding,
 		autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning,
 		autoconvert_v1_IsPersonalSubjectAccessReview_To_api_IsPersonalSubjectAccessReview,
+		autoconvert_v1_LastOperation_To_api_LastOperation,
 		autoconvert_v1_LifecycleHook_To_api_LifecycleHook,
 		autoconvert_v1_Lifecycle_To_api_Lifecycle,
 		autoconvert_v1_LocalObjectReference_To_api_LocalObjectReference,

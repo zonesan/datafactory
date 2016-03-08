@@ -903,6 +903,16 @@ func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.Backi
 
 func deepCopy_v1_BackingServiceInstanceStatus(in backingserviceinstanceapiv1.BackingServiceInstanceStatus, out *backingserviceinstanceapiv1.BackingServiceInstanceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
+	out.Action = in.Action
+	out.Error = in.Error
+	if in.LastOperation != nil {
+		out.LastOperation = new(backingserviceinstanceapiv1.LastOperation)
+		if err := deepCopy_v1_LastOperation(*in.LastOperation, out.LastOperation, c); err != nil {
+			return err
+		}
+	} else {
+		out.LastOperation = nil
+	}
 	return nil
 }
 
@@ -959,6 +969,13 @@ func deepCopy_v1_InstanceProvisioning(in backingserviceinstanceapiv1.InstancePro
 	} else {
 		out.Parameters = nil
 	}
+	return nil
+}
+
+func deepCopy_v1_LastOperation(in backingserviceinstanceapiv1.LastOperation, out *backingserviceinstanceapiv1.LastOperation, c *conversion.Cloner) error {
+	out.State = in.State
+	out.Description = in.Description
+	out.AsyncPollIntervalSeconds = in.AsyncPollIntervalSeconds
 	return nil
 }
 
@@ -3185,6 +3202,7 @@ func init() {
 		deepCopy_v1_BindingRequestOptions,
 		deepCopy_v1_InstanceBinding,
 		deepCopy_v1_InstanceProvisioning,
+		deepCopy_v1_LastOperation,
 		deepCopy_v1_BinaryBuildRequestOptions,
 		deepCopy_v1_BinaryBuildSource,
 		deepCopy_v1_Build,
