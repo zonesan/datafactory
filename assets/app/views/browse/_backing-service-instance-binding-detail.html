@@ -6,12 +6,12 @@
         未绑定
       </div>
       <dl ng-if="backingserviceinstance.spec.bound" class="dl-horizontal left">
-      	<dt>服务名称</dt>
+      	<dt>Web服务</dt>
         <dd>{{backingserviceinstance.spec.provisioning.backingservice_name}}</dd>
         <dt>运行时间</dt>
         <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>
-        <dt>绑定服务名称</dt>
-        <dd>{{backingserviceinstance.spec.bind_deploymentconfig}}</dd>
+        <dt>绑定的应用</dt>
+        <dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>
         <dt>证书</dt>
         <dd>
           <span ng-if="backingserviceinstance.spec.binding.credentials">
