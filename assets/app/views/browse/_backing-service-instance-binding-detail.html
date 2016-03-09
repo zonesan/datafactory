@@ -14,8 +14,8 @@
         <dd>{{backingserviceinstance.spec.bind_deploymentconfig}}</dd>
         <dt>证书</dt>
         <dd>
-          <span ng-if="backingserviceinstance.spec.binding">
-            <span ng-repeat="(k, v) in backingserviceinstance.spec.binding">
+          <span ng-if="backingserviceinstance.spec.binding.credentials">
+            <span ng-repeat="(k, v) in backingserviceinstance.spec.binding.credentials">
               <strong>{{k}}</strong>: {{v}}<br>
             </span>
           </span>
