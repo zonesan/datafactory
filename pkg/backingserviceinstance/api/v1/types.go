@@ -41,8 +41,8 @@ type BackingServiceInstanceSpec struct {
 }
 */
 type BackingServiceInstanceSpec struct {
-	InstanceProvisioning          `json:"provisioning, omitempty"`
-	InstanceBinding               `json:"binding, omitempty"`
+	InstanceProvisioning `json:"provisioning, omitempty"`
+	InstanceBinding      `json:"binding, omitempty"`
 	Bound                bool     `json:"bound, omitempty"`
 	InstanceID           string   `json:"instance_id, omitempty"`
 	Tags                 []string `json:"tags, omitempty"`
@@ -65,6 +65,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string            `json:"backingservice_name, omitempty"`
 	BackingServiceSpecID   string            `json:"backingservice_spec_id, omitempty"`
 	BackingServicePlanGuid string            `json:"backingservice_plan_guid, omitempty"`
+	BackingServicePlanName string            `json:"backingservice_plan_name, omitempty"`
 	Parameters             map[string]string `json:"parameters, omitempty"`
 }
 
@@ -79,7 +80,7 @@ type BackingServiceInstanceStatus struct {
 	Phase  BackingServiceInstancePhase  `json:"phase, omitempty"`
 	Action BackingServiceInstanceAction `json:"action, omitempty"`
 	Error  string                       `json:"error, omitempty"`
-	
+
 	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }
 
@@ -89,7 +90,7 @@ type LastOperation struct {
 	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
 }
 
-type BackingServiceInstancePhase  string
+type BackingServiceInstancePhase string
 type BackingServiceInstanceAction string
 
 const (
@@ -99,19 +100,19 @@ const (
 	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
 	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
 	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
-	
+
 	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
 	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
 	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
 	BackingServiceInstancePhaseDeleted      BackingServiceInstancePhase = "Deleted"
-	
+
 	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
 	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
 	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
 )
 
 //=====================================================
-// 
+//
 //=====================================================
 
 const BindKind_DeploymentConfig = "DeploymentConfig"

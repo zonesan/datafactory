@@ -65,6 +65,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string
 	BackingServiceSpecID   string
 	BackingServicePlanGuid string
+	BackingServicePlanName string
 	Parameters             map[string]string
 	// len(Parameters) == 0 means not inited
 }
