@@ -41,8 +41,8 @@ type BackingServiceInstanceSpec struct {
 
 type BackingServiceInstanceSpec struct {
 	InstanceProvisioning
-	InstanceBinding
-	Bound      bool
+	Binding    []InstanceBinding
+	Bound      int
 	Tags       []string
 	InstanceID string
 	// InstanceID is blank means to delete (when len(Parameters) > 0)

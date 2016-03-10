@@ -189,7 +189,7 @@ func (r *BindingREST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Obje
 
 	// update bsi
 
-	bsi.Spec.BindDeploymentConfig = bro.ResourceName // dc.Name
+	//need debug....bsi.Spec.BindDeploymentConfig = bro.ResourceName // dc.Name
 
 	if bsi.Annotations == nil {
 		bsi.Annotations = map[string]string{}

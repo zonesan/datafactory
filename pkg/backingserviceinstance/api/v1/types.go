@@ -42,10 +42,10 @@ type BackingServiceInstanceSpec struct {
 */
 type BackingServiceInstanceSpec struct {
 	InstanceProvisioning `json:"provisioning, omitempty"`
-	InstanceBinding      `json:"binding, omitempty"`
-	Bound                bool     `json:"bound, omitempty"`
-	InstanceID           string   `json:"instance_id, omitempty"`
-	Tags                 []string `json:"tags, omitempty"`
+	Binding              []InstanceBinding `json:"binding, omitempty"`
+	Bound                int               `json:"bound, omitempty"`
+	InstanceID           string            `json:"instance_id, omitempty"`
+	Tags                 []string          `json:"tags, omitempty"`
 }
 
 /*
