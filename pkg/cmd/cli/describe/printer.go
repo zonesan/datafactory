@@ -34,7 +34,7 @@ var (
 	applicationColumns            = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
 	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
 	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
-	backingServiceInstanceColumns = []string{"NAME", "LABELS", "BS", "PLAN", "BOUND", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "SERVICE", "PLAN", "BOUND", "STATUS"}
 	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
 	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
 	imageColumns                  = []string{"NAME", "DOCKER REF"}
@@ -211,7 +211,8 @@ func printBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceIn
 		}
 	*/
 
-	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bsi.Name, formatLabels(bsi.Labels), bsi.Spec.Bound, bsi.Status.Phase)
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%v\t%s\n", bsi.Name, bsi.Spec.BackingServiceName,
+		bsi.Spec.BackingServicePlanName, bsi.Spec.Bound, bsi.Status.Phase)
 	return err
 }
 

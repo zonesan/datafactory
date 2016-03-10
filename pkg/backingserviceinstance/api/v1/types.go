@@ -94,13 +94,6 @@ type BackingServiceInstancePhase string
 type BackingServiceInstanceAction string
 
 const (
-	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
-	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
-	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
-
 	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
 	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
 	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
@@ -109,6 +102,10 @@ const (
 	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
 	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
 	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
+
+	BindDeploymentConfigBinding   string = "binding"
+	BindDeploymentConfigUnbinding string = "unbinding"
+	BindDeploymentConfigBound     string = "bound"
 )
 
 //=====================================================

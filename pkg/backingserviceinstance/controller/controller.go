@@ -49,8 +49,6 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		return err
 	}
 
-AGAIN:
-
 	switch bsi.Status.Phase {
 	default:
 
@@ -64,7 +62,7 @@ AGAIN:
 
 	case "":
 
-		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDeleted
+		bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseProvisioning
 
 		changed = true
 
@@ -138,149 +136,39 @@ AGAIN:
 		glog.Infoln("bsi inited. ", bsi.Name)
 
 	case backingserviceinstanceapi.BackingServiceInstancePhaseUnbound:
-
-		glog.Infoln("bsi in unbound, ", bsi.Name)
-
-		if has_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToDelete) {
-			glog.Infoln("bsi to delete ", bsi.Name)
-
-			servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
-			if err != nil {
-				result = err
-				break
-			}
-
-			glog.Infoln("deleting ", bsi.Name)
-			if _, err = servicebroker_deprovisioning(bsi, servicebroker); err != nil {
-				result = err
-				break
-			}
-
-			glog.Infoln("bsi deleted ", bsi.Name)
-
-			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDeleted
-
-			bsi.Status.Action = remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToDelete)
-
-			changed = true
-
-		} else if has_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToBind) {
-			glog.Infoln("bsi to bind ", bsi.Name, " and ", bsi.Spec.BindDeploymentConfig)
-
-			servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
-			if err != nil {
-				result = err
-				break
-			}
-
-			bind_uuid := string(util.NewUUID())
-
-			servicebinding := &ServiceBinding{
-				ServiceId: bs.Spec.Id,
-				PlanId:    bsi.Spec.BackingServicePlanGuid,
-				AppGuid:   bsi.Namespace,
-				//BindResource: ,
-				//Parameters: ,
-				svc_instance_id: bsi.Spec.InstanceID,
-			}
-
-			glog.Infoln("bsi to bind 222, ", bsi.Name)
-
-			if len(bsi.Spec.Credentials) == 0 {
-				glog.Infoln("servicebroker_binding")
-
-				bindingresponse, err := servicebroker_binding(servicebinding, bind_uuid, servicebroker)
-				if err != nil {
-					result = err
-					break
-				}
-
-				bsi.Spec.BindUuid = bind_uuid
-
-				bsi.Spec.Credentials = make(map[string]string)
-				bsi.Spec.Credentials["Uri"] = bindingresponse.Credentials.Uri
-				bsi.Spec.Credentials["Name"] = bindingresponse.Credentials.Name
-				bsi.Spec.Credentials["Username"] = bindingresponse.Credentials.Username
-				bsi.Spec.Credentials["Password"] = bindingresponse.Credentials.Password
-				bsi.Spec.Credentials["Host"] = bindingresponse.Credentials.Host
-				bsi.Spec.Credentials["Port"] = bindingresponse.Credentials.Port
-				bsi.Spec.Credentials["Vhost"] = bindingresponse.Credentials.Vhost
-				// = bindingresponse.SyslogDrainUrl
-				// = bindingresponse.RouteServiceUrl
-
+		switch bsi.Status.Action {
+		case backingserviceinstanceapi.BackingServiceInstanceActionToDelete:
+			if result = c.deleteInstance(bs, bsi); result == nil {
 				changed = true
 			}
 
-			glog.Infoln("deploymentconfig_inject_envs")
-
-			err = c.deploymentconfig_inject_envs(bsi)
-			if err != nil {
-				result = err
-				break
+		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
+			if result = c.bindInstance(bs, bsi); result == nil {
+				bsi.Annotations[bsi.Spec.BindDeploymentConfig] = backingserviceinstanceapi.BindDeploymentConfigBound
+				changed = true
 			}
 
-			glog.Infoln("bsi bound. ", bsi.Name)
-
-			now := unversioned.Now()
-			bsi.Spec.BoundTime = &now //&unversioned.Now()
-			bsi.Spec.Bound = true
-
-			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseBound
-
-			bsi.Status.Action = remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToBind)
-
-			changed = true
+		default:
+			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
 		}
-
 	case backingserviceinstanceapi.BackingServiceInstancePhaseBound:
-
-		glog.Infoln("bsi in bound, ", bsi.Name)
-
-		if has_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToUnbind) ||
-			has_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToDelete) {
-
-			glog.Infoln("bsi to unbind ", bsi.Name)
-
-			servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
-			if err != nil {
-				result = err
-				break
+		switch bsi.Status.Action {
+		case backingserviceinstanceapi.BackingServiceInstanceActionToUnbind:
+			if result = c.unbindInstance(bs, bsi); result == nil {
+				delete(bsi.Annotations, bsi.Spec.BindDeploymentConfig)
+				changed = true
 			}
 
-			glog.Infoln("servicebroker_unbinding")
-
-			_, err = servicebroker_unbinding(bsi, servicebroker)
-			if err != nil {
-				result = err
-				break
+		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
+			if result = c.bindInstance(bs, bsi); result == nil {
+				bsi.Annotations[bsi.Spec.BindDeploymentConfig] = backingserviceinstanceapi.BindDeploymentConfigBound
+				changed = true
 			}
 
-			glog.Infoln("deploymentconfig_clear_envs")
-
-			err = c.deploymentconfig_clear_envs(bsi)
-			if err != nil {
-				result = err
-				break
-			}
-
-			glog.Infoln("bsi is unbound ", bsi.Name)
-
-			bsi.Spec.BindDeploymentConfig = ""
-			bsi.Spec.Credentials = nil
-			bsi.Spec.BoundTime = nil
-			bsi.Spec.BindUuid = ""
-			bsi.Spec.Bound = false
-
-			bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseUnbound
-
-			bsi.Status.Action = remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToUnbind)
-
-			changed = true
-
-			if has_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToDelete) {
-				goto AGAIN
-			}
+		default:
+			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
 		}
+
 	}
 
 	if result != nil {
@@ -719,4 +607,132 @@ func (c *BackingServiceInstanceController) deploymentconfig_print_envs(bsi *back
 			fmt.Println("     env[", env.Name, ",] = ", env.Value)
 		}
 	}
+}
+
+func (c *BackingServiceInstanceController) deleteInstance(bs *backingserviceapi.BackingService, bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
+	glog.Infoln("bsi to delete ", bsi.Name)
+
+	servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
+	if err != nil {
+		return err
+
+	}
+
+	glog.Infoln("deleting ", bsi.Name)
+	if _, err = servicebroker_deprovisioning(bsi, servicebroker); err != nil {
+		return err
+
+	}
+
+	glog.Infoln("bsi deleted ", bsi.Name)
+
+	bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseDeleted
+
+	bsi.Status.Action = remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToDelete)
+	return
+
+}
+
+func (c *BackingServiceInstanceController) bindInstance(bs *backingserviceapi.BackingService, bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
+	glog.Infoln("bsi to bind ", bsi.Name, " and ", bsi.Spec.BindDeploymentConfig)
+
+	servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
+	if err != nil {
+		return err
+	}
+
+	bind_uuid := string(util.NewUUID())
+
+	servicebinding := &ServiceBinding{
+		ServiceId: bs.Spec.Id,
+		PlanId:    bsi.Spec.BackingServicePlanGuid,
+		AppGuid:   bsi.Namespace,
+		//BindResource: ,
+		//Parameters: ,
+		svc_instance_id: bsi.Spec.InstanceID,
+	}
+
+	glog.Infoln("bsi to bind 222, ", bsi.Name)
+
+	if len(bsi.Spec.Credentials) == 0 {
+		glog.Infoln("servicebroker_binding")
+
+		bindingresponse, err := servicebroker_binding(servicebinding, bind_uuid, servicebroker)
+		if err != nil {
+			return err
+		}
+
+		bsi.Spec.BindUuid = bind_uuid
+
+		bsi.Spec.Credentials = make(map[string]string)
+		bsi.Spec.Credentials["Uri"] = bindingresponse.Credentials.Uri
+		bsi.Spec.Credentials["Name"] = bindingresponse.Credentials.Name
+		bsi.Spec.Credentials["Username"] = bindingresponse.Credentials.Username
+		bsi.Spec.Credentials["Password"] = bindingresponse.Credentials.Password
+		bsi.Spec.Credentials["Host"] = bindingresponse.Credentials.Host
+		bsi.Spec.Credentials["Port"] = bindingresponse.Credentials.Port
+		bsi.Spec.Credentials["Vhost"] = bindingresponse.Credentials.Vhost
+		// = bindingresponse.SyslogDrainUrl
+		// = bindingresponse.RouteServiceUrl
+
+	}
+
+	glog.Infoln("deploymentconfig_inject_envs")
+
+	err = c.deploymentconfig_inject_envs(bsi)
+	if err != nil {
+		return err
+	}
+
+	glog.Infoln("bsi bound. ", bsi.Name)
+
+	now := unversioned.Now()
+	bsi.Spec.BoundTime = &now //&unversioned.Now()
+	bsi.Spec.Bound = true
+
+	bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseBound
+
+	bsi.Status.Action = "" //remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToBind)
+	return
+
+}
+
+func (c *BackingServiceInstanceController) unbindInstance(bs *backingserviceapi.BackingService, bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
+
+	glog.Infoln("bsi to unbind ", bsi.Name)
+
+	servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
+	if err != nil {
+		return err
+	}
+
+	glog.Infoln("servicebroker_unbinding")
+
+	_, err = servicebroker_unbinding(bsi, servicebroker)
+	if err != nil {
+		return err
+	}
+
+	glog.Infoln("deploymentconfig_clear_envs")
+
+	err = c.deploymentconfig_clear_envs(bsi)
+	if err != nil {
+		return err
+	}
+
+	glog.Infoln("bsi is unbound ", bsi.Name)
+
+	delete(bsi.Annotations,bsi.Spec.BindDeploymentConfig)
+	bsi.Spec.BindDeploymentConfig = ""
+	bsi.Spec.Credentials = nil
+	bsi.Spec.BoundTime = nil
+	bsi.Spec.BindUuid = ""
+	bsi.Spec.Bound = false
+
+	bsi.Status.Phase = backingserviceinstanceapi.BackingServiceInstancePhaseUnbound
+
+	bsi.Status.Action = "" //remove_action_word(bsi.Status.Action, backingserviceinstanceapi.BackingServiceInstanceActionToUnbind)
+
+	return
+
 }
