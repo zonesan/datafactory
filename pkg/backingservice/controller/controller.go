@@ -29,7 +29,7 @@ func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) 
 	if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
 		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
 
-		c.Client.BackingServices().Update(bs)
+		c.Client.BackingServices(bs.Namespace).Update(bs)
 	}
 
 	return nil

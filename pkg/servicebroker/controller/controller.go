@@ -58,7 +58,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 			servicebrokerapi.ServiceBrokerLabel: sb.Name,
 		}
 		glog.Info("create backingservice")
-		if _, err := c.Client.BackingServices().Create(backingService); err == nil {
+		if _, err := c.Client.BackingServices("openshift").Create(backingService); err == nil {
 			glog.Info("create backingservice successfuly!", backingService)
 			finish = true
 		} else {

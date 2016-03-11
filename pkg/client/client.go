@@ -69,8 +69,8 @@ func (c *Client) ServiceBrokers() ServiceBrokerInterface {
 }
 
 // BackingService provides a REST client for backingservice
-func (c *Client) BackingServices() BackingServiceInterface {
-	return newBackingServices(c)
+func (c *Client) BackingServices(namespace string) BackingServiceInterface {
+	return newBackingServices(c, namespace)
 }
 
 // BackingServiceInstance provides a REST client for backingserviceinstance
