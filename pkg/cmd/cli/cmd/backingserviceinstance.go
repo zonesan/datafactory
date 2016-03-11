@@ -406,8 +406,16 @@ func (o *UnbindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientc
 	}
 	*/
 	//<<
+
+	bro := backingserviceinstanceapi.NewBindingRequestOptions(
+		backingserviceinstanceapi.BindKind_DeploymentConfig,
+		latestapi.Version,
+		o.DeploymentConfigName)
+	bro.Name = o.Name
+	bro.Namespace = namespace
 	
-	err = client.BackingServiceInstances(namespace).DeleteBinding(o.Name)
+	//err = client.BackingServiceInstances(namespace).DeleteBinding(o.Name)
+	err = client.BackingServiceInstances(namespace).UpdateBinding(o.Name,bro)
 	if err != nil {
 		return err
 	}
