@@ -121,6 +121,7 @@ __custom_func() {
    * replicationcontrollers (aka 'rc')
    * events (aka 'ev')
    * projects
+   * applications
    * secrets
    * imagestreams (aka 'is')
    * imagestreamtags (aka 'istag')
@@ -135,6 +136,9 @@ __custom_func() {
    * namespaces (aka 'ns')
    * users
    * groups
+   * servicebrokers (aka 'sb')
+   * backingservices (aka 'bs')
+   * backingserviceinstances (aka 'bsi')
 `
 )
 
