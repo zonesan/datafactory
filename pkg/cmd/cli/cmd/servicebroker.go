@@ -54,7 +54,9 @@ func NewCmdServiceBroker(fullName string, f *clientcmd.Factory, out io.Writer) *
 			}
 
 			if err := options.Run(); err != nil {
-				fmt.Println("run err %s", err.Error())
+				fmt.Printf("run err %s\n", err.Error())
+			} else {
+				fmt.Printf("create servicebroker %s success.\n", options.Name)
 			}
 		},
 	}
@@ -93,6 +95,12 @@ func (o *NewServiceBrokerOptions) complete(cmd *cobra.Command, f *clientcmd.Fact
 }
 
 func (o *NewServiceBrokerOptions) Run() error {
+
+	_, err := o.Client.ServiceBrokers().Get(o.Name)
+	if err == nil {
+		return errors.New(fmt.Sprintf("servicebroker %s already exists", o.Name))
+	}
+
 	serviceBroker := &servicebrokerapi.ServiceBroker{}
 	serviceBroker.Spec.Name = o.Name
 	serviceBroker.Spec.Url = o.Url
@@ -103,7 +111,7 @@ func (o *NewServiceBrokerOptions) Run() error {
 	serviceBroker.GenerateName = o.Name
 	serviceBroker.Status.Phase = servicebrokerapi.ServiceBrokerNew
 
-	_, err := o.Client.ServiceBrokers().Create(serviceBroker)
+	_, err = o.Client.ServiceBrokers().Create(serviceBroker)
 	if err != nil {
 		return err
 	}
