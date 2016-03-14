@@ -49,6 +49,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 
 				services, err := c.ServiceBrokerClient.Catalog(sb.Spec.Url, sb.Spec.UserName, sb.Spec.Password)
 				if err != nil {
+					c.Client.ServiceBrokers().Update(sb)
 					return err
 				}
 
