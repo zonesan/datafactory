@@ -106,6 +106,8 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 			if err != nil {
 				sb.Status.Phase = servicebrokerapi.ServiceBrokerFailed
 				c.Client.ServiceBrokers().Update(sb)
+
+				c.inActiveBackingService(sb.Name)
 				return err
 			}
 
@@ -122,6 +124,8 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 
 			sb.Status.Phase = servicebrokerapi.ServiceBrokerActive
 			c.Client.ServiceBrokers().Update(sb)
+
+			c.ActiveBackingService(sb.Name)
 			return nil
 		}
 
@@ -136,8 +140,24 @@ func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName strin
 	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
-			bsvc.Status.Phase = backingserviceapi.BackingServicePhaseInactive
-			c.Client.BackingServices().Update(&bsvc)
+			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseInactive {
+				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseInactive
+				c.Client.BackingServices().Update(&bsvc)
+			}
+		}
+	}
+}
+
+func (c *ServiceBrokerController) ActiveBackingService(serviceBrokerName string) {
+	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
+
+	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	if err == nil {
+		for _, bsvc := range bsList.Items {
+			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseActive {
+				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseActive
+				c.Client.BackingServices().Update(&bsvc)
+			}
 		}
 	}
 }
