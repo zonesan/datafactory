@@ -327,6 +327,7 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 		formatString(out, "Bound", bsi.Spec.Bound)
 		if bsi.Spec.Bound > 0 {
 			for _, bind := range bsi.Spec.Binding {
+				fmt.Fprintln(out, "────────────────────")
 				formatString(out, "BindUuid", bind.BindUuid)
 				formatString(out, "BindDeploymentConfig", bind.BindDeploymentConfig)
 				formatString(out, "Credentials", " ")
