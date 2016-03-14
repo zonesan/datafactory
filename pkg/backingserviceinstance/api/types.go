@@ -41,8 +41,8 @@ type BackingServiceInstanceSpec struct {
 
 type BackingServiceInstanceSpec struct {
 	InstanceProvisioning
-	InstanceBinding
-	Bound      bool
+	Binding    []InstanceBinding
+	Bound      int
 	Tags       []string
 	InstanceID string
 	// InstanceID is blank means to delete (when len(Parameters) > 0)
@@ -65,6 +65,7 @@ type InstanceProvisioning struct {
 	BackingServiceName     string
 	BackingServiceSpecID   string
 	BackingServicePlanGuid string
+	BackingServicePlanName string
 	Parameters             map[string]string
 	// len(Parameters) == 0 means not inited
 }
@@ -97,13 +98,6 @@ type BackingServiceInstancePhase string
 type BackingServiceInstanceAction string
 
 const (
-	//BackingServiceInstancePhaseCreated   BackingServiceInstancePhase = "Created"
-	//BackingServiceInstancePhaseActive    BackingServiceInstancePhase = "Active"
-	//BackingServiceInstancePhaseInactive  BackingServiceInstancePhase = "Inactive"
-	//BackingServiceInstancePhaseModified  BackingServiceInstancePhase = "Modified"
-	//BackingServiceInstancePhaseReady     BackingServiceInstancePhase = "Ready"
-	//BackingServiceInstancePhaseError     BackingServiceInstancePhase = "Error"
-
 	BackingServiceInstancePhaseProvisioning BackingServiceInstancePhase = "Provisioning"
 	BackingServiceInstancePhaseUnbound      BackingServiceInstancePhase = "Unbound"
 	BackingServiceInstancePhaseBound        BackingServiceInstancePhase = "Bound"
@@ -112,6 +106,10 @@ const (
 	BackingServiceInstanceActionToBind   BackingServiceInstanceAction = "_ToBind"
 	BackingServiceInstanceActionToUnbind BackingServiceInstanceAction = "_ToUnbind"
 	BackingServiceInstanceActionToDelete BackingServiceInstanceAction = "_ToDelete"
+
+	BindDeploymentConfigBinding   string = "binding"
+	BindDeploymentConfigUnbinding string = "unbinding"
+	BindDeploymentConfigBound     string = "bound"
 )
 
 //=====================================================

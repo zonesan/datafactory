@@ -942,8 +942,15 @@ func deepCopy_api_BackingServiceInstanceSpec(in backingserviceinstanceapi.Backin
 	if err := deepCopy_api_InstanceProvisioning(in.InstanceProvisioning, &out.InstanceProvisioning, c); err != nil {
 		return err
 	}
-	if err := deepCopy_api_InstanceBinding(in.InstanceBinding, &out.InstanceBinding, c); err != nil {
-		return err
+	if in.Binding != nil {
+		out.Binding = make([]backingserviceinstanceapi.InstanceBinding, len(in.Binding))
+		for i := range in.Binding {
+			if err := deepCopy_api_InstanceBinding(in.Binding[i], &out.Binding[i], c); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Binding = nil
 	}
 	out.Bound = in.Bound
 	if in.Tags != nil {
@@ -1018,6 +1025,7 @@ func deepCopy_api_InstanceProvisioning(in backingserviceinstanceapi.InstanceProv
 	out.BackingServiceName = in.BackingServiceName
 	out.BackingServiceSpecID = in.BackingServiceSpecID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {

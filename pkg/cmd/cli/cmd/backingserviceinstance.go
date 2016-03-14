@@ -251,7 +251,7 @@ func NewCmdBindBackingServiceInstance(fullName string, f *clientcmd.Factory, out
 	options := &BindBackingServiceInstanceOptions{}
 
 	cmd := &cobra.Command{
-		Use:     "bind-backingserviceinstance BackingServiceInstanceName DeployConfigName",
+		Use:     "bind BackingServiceInstanceName DeployConfigName",
 		Short:   "bind a BackingServiceInstance and a DeployConfig",
 		Long:    bindBackingServiceInstanceLong,
 		Example: fmt.Sprintf(bindBackingServiceInstanceExample, fullName),
@@ -349,7 +349,7 @@ func NewCmdUnbindBackingServiceInstance(fullName string, f *clientcmd.Factory, o
 	options := &UnbindBackingServiceInstanceOptions{}
 
 	cmd := &cobra.Command{
-		Use:     "unbind-backingserviceinstance BackingServiceInstanceName DeployConfigName",
+		Use:     "unbind BackingServiceInstanceName DeployConfigName",
 		Short:   "unbind a BackingServiceInstance and a DeployConfig",
 		Long:    unbindBackingServiceInstanceLong,
 		Example: fmt.Sprintf(unbindBackingServiceInstanceExample, fullName),
@@ -406,8 +406,16 @@ func (o *UnbindBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientc
 	}
 	*/
 	//<<
+
+	bro := backingserviceinstanceapi.NewBindingRequestOptions(
+		backingserviceinstanceapi.BindKind_DeploymentConfig,
+		latestapi.Version,
+		o.DeploymentConfigName)
+	bro.Name = o.Name
+	bro.Namespace = namespace
 	
-	err = client.BackingServiceInstances(namespace).DeleteBinding(o.Name)
+	//err = client.BackingServiceInstances(namespace).DeleteBinding(o.Name)
+	err = client.BackingServiceInstances(namespace).UpdateBinding(o.Name,bro)
 	if err != nil {
 		return err
 	}

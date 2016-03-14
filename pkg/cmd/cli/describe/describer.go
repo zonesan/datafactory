@@ -318,20 +318,24 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 		formatString(out, "Status", bsi.Status.Phase)
 		formatString(out, "DashboardUrl", bsi.Spec.DashboardUrl)
 		formatString(out, "BackingServiceName", bsi.Spec.BackingServiceName)
-		//formatString(out, "BackingServicePlanName", bsi.Spec.BackingServicePlanName)
+		formatString(out, "BackingServicePlanName", bsi.Spec.BackingServicePlanName)
 		formatString(out, "BackingServicePlanGuid", bsi.Spec.BackingServicePlanGuid)
 		fmt.Fprintf(out, "Parameters:\n")
 		for k, v := range bsi.Spec.Parameters {
 			formatString(out, k, v)
 		}
 		formatString(out, "Bound", bsi.Spec.Bound)
-		if bsi.Spec.Bound {
-			formatString(out, "BindUuid", bsi.Spec.BindUuid)
-			formatString(out, "BindDeploymentConfig", bsi.Spec.BindDeploymentConfig)
-			formatString(out, "Credentials", " ")
-			for k, v := range bsi.Spec.Credentials {
-				formatString(out, k, v)
+		if bsi.Spec.Bound > 0 {
+			for _, bind := range bsi.Spec.Binding {
+				fmt.Fprintln(out, "────────────────────")
+				formatString(out, "BindUuid", bind.BindUuid)
+				formatString(out, "BindDeploymentConfig", bind.BindDeploymentConfig)
+				formatString(out, "Credentials", " ")
+				for k, v := range bind.Credentials {
+					formatString(out, k, v)
+				}
 			}
+
 		}
 		return nil
 	})

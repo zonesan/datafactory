@@ -24,6 +24,7 @@ type BackingServiceInstanceInterface interface {
 	Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error)
 
 	CreateBinding(name string, request *backingserviceinstanceapi.BindingRequestOptions) (err error)
+	UpdateBinding(name string, request *backingserviceinstanceapi.BindingRequestOptions) (err error)
 	DeleteBinding(name string) (err error)
 }
 
@@ -136,5 +137,16 @@ func (c *backingserviceinstances) DeleteBinding(name string) (err error) {
 		SubResource("binding").
 		Do().
 		Error()
+	return
+}
+
+func (c *backingserviceinstances) UpdateBinding(name string, bro *backingserviceinstanceapi.BindingRequestOptions) (err error) {
+	result := &backingserviceinstanceapi.BackingServiceInstance{}
+	err = c.r.Put().
+	Namespace(c.ns).
+	Resource("backingserviceinstances").
+	Name(name).
+	SubResource("binding").
+	Body(bro).Do().Into(result)
 	return
 }

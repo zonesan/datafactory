@@ -1724,8 +1724,15 @@ func autoconvert_api_BackingServiceInstanceSpec_To_v1_BackingServiceInstanceSpec
 	if err := convert_api_InstanceProvisioning_To_v1_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
-		return err
+	if in.Binding != nil {
+		out.Binding = make([]backingserviceinstanceapiv1.InstanceBinding, len(in.Binding))
+		for i := range in.Binding {
+			if err := convert_api_InstanceBinding_To_v1_InstanceBinding(&in.Binding[i], &out.Binding[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Binding = nil
 	}
 	out.Bound = in.Bound
 	if in.Tags != nil {
@@ -1822,6 +1829,7 @@ func autoconvert_api_InstanceProvisioning_To_v1_InstanceProvisioning(in *backing
 	out.BackingServiceName = in.BackingServiceName
 	out.BackingServiceSpecID = in.BackingServiceSpecID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {
@@ -1908,8 +1916,15 @@ func autoconvert_v1_BackingServiceInstanceSpec_To_api_BackingServiceInstanceSpec
 	if err := convert_v1_InstanceProvisioning_To_api_InstanceProvisioning(&in.InstanceProvisioning, &out.InstanceProvisioning, s); err != nil {
 		return err
 	}
-	if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.InstanceBinding, &out.InstanceBinding, s); err != nil {
-		return err
+	if in.Binding != nil {
+		out.Binding = make([]backingserviceinstanceapi.InstanceBinding, len(in.Binding))
+		for i := range in.Binding {
+			if err := convert_v1_InstanceBinding_To_api_InstanceBinding(&in.Binding[i], &out.Binding[i], s); err != nil {
+				return err
+			}
+		}
+	} else {
+		out.Binding = nil
 	}
 	out.Bound = in.Bound
 	out.InstanceID = in.InstanceID
@@ -2006,6 +2021,7 @@ func autoconvert_v1_InstanceProvisioning_To_api_InstanceProvisioning(in *backing
 	out.BackingServiceName = in.BackingServiceName
 	out.BackingServiceSpecID = in.BackingServiceSpecID
 	out.BackingServicePlanGuid = in.BackingServicePlanGuid
+	out.BackingServicePlanName = in.BackingServicePlanName
 	if in.Parameters != nil {
 		out.Parameters = make(map[string]string)
 		for key, val := range in.Parameters {
