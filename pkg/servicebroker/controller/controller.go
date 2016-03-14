@@ -142,6 +142,10 @@ func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName strin
 }
 
 func Ping(sb *servicebrokerapi.ServiceBroker, pingSecond int64) bool {
+	if sb.Annotations == nil {
+		sb.Annotations = map[string]string{}
+	}
+
 	lastTimeStr := sb.Annotations[servicebrokerapi.ServiceBrokerLastPingTime]
 	if len(lastTimeStr) == 0 {
 		sb.Annotations[servicebrokerapi.ServiceBrokerLastPingTime] = fmt.Sprintf("%d", time.Now().UnixNano())
