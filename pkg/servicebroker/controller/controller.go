@@ -183,8 +183,7 @@ func getRetryTime(sb *servicebrokerapi.ServiceBroker) int {
 func setRetryTime(sb *servicebrokerapi.ServiceBroker) {
 	retries := sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes]
 	if len(retries) == 0 {
-		sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", 1)
-		return
+		sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", 0)
 	}
 
 	i, err := strconv.Atoi(retries)
