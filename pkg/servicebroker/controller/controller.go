@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
 	osclient "github.com/openshift/origin/pkg/client"
@@ -10,7 +9,6 @@ import (
 	"github.com/golang/glog"
 	backingservice "github.com/openshift/origin/pkg/backingservice/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"time"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
