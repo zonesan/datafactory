@@ -154,7 +154,7 @@ func Ping(sb *servicebrokerapi.ServiceBroker, pingSecond int64) bool {
 		return false
 	}
 
-	if time.Now().UnixNano() - int64(lastPing) < pingSecond {
+	if (time.Now().UnixNano() - int64(lastPing)) / 1e9 < pingSecond {
 		return false
 	}
 
