@@ -49,9 +49,9 @@ func ValidateBackingServiceInstanceUpdate(bsi *backingserviceinstanceapi.Backing
 //	return allErrs
 //}
 
-func ValidateBackingServiceInstanceBindingRequestOptions(o *BindingRequestOptions) fielderrors.ValidationErrorList {
+func ValidateBackingServiceInstanceBindingRequestOptions(o *backingserviceinstanceapi.BindingRequestOptions) fielderrors.ValidationErrorList {
 	allErrs := fielderrors.ValidationErrorList{}
-	// todo
+	allErrs = append(allErrs, validation.ValidateObjectMeta(&o.ObjectMeta, true, oapi.MinimalNameRequirements).Prefix("metadata")...)
 	return allErrs
 }
 
