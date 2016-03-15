@@ -24,7 +24,7 @@ func (e fatalError) Error() string {
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) (err error) {
-	glog.Info("bs handle called.")
+
 
 	if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
 		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive

@@ -1,8 +1,12 @@
 package controller
 
 import (
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
+	osclient "github.com/openshift/origin/pkg/client"
+	controller "github.com/openshift/origin/pkg/controller"
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/client/cache"
+	"k8s.io/kubernetes/pkg/client/record"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
@@ -10,11 +14,6 @@ import (
 	kutil "k8s.io/kubernetes/pkg/util"
 	"k8s.io/kubernetes/pkg/watch"
 	"time"
-
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
-	osclient "github.com/openshift/origin/pkg/client"
-	controller "github.com/openshift/origin/pkg/controller"
-
 )
 
 type BackingServiceInstanceControllerFactory struct {
@@ -41,9 +40,13 @@ func (factory *BackingServiceInstanceControllerFactory) Create() controller.Runn
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
 	cache.NewReflector(backingserviceinstanceLW, &backingserviceinstanceapi.BackingServiceInstance{}, queue, 1*time.Minute).Run()
 
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartRecordingToSink(factory.KubeClient.Events(""))
+
 	backingserviceInstanceController := &BackingServiceInstanceController{
 		Client:     factory.Client,
 		KubeClient: factory.KubeClient,
+		recorder:   eventBroadcaster.NewRecorder(kapi.EventSource{Component: "bsi"}),
 	}
 
 	return &controller.RetryController{

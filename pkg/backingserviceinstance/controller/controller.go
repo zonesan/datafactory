@@ -3,18 +3,18 @@ package controller
 import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
-	osclient "github.com/openshift/origin/pkg/client"
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
+	osclient "github.com/openshift/origin/pkg/client"
 	"io/ioutil"
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"
+	"k8s.io/kubernetes/pkg/client/record"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util"
@@ -30,6 +30,7 @@ type BackingServiceInstanceController struct {
 	Client osclient.Interface
 	// KubeClient is a Kubernetes client.
 	KubeClient kclient.Interface
+	recorder   record.EventRecorder
 }
 
 type fatalError string
@@ -41,6 +42,7 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
 	glog.Infoln("bsi handler called.", bsi.Name)
+	c.recorder.Eventf(bsi, "Debug", "bsi handler called.%s", bsi.Name)
 
 	changed := false
 
