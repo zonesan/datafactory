@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"github.com/golang/glog"
+
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
