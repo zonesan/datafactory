@@ -9,9 +9,10 @@ import (
 	"k8s.io/kubernetes/pkg/storage"
 	"k8s.io/kubernetes/pkg/watch"
 
-	"github.com/openshift/origin/pkg/servicebroker/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	servicebroker "github.com/openshift/origin/pkg/servicebroker/registry/servicebroker"
 	"k8s.io/kubernetes/pkg/runtime"
+	"k8s.io/kubernetes/pkg/api/unversioned"
 )
 
 type REST struct {
@@ -22,8 +23,12 @@ type REST struct {
 func NewREST(s storage.Interface) *REST {
 	prefix := "/servicebrokers"
 	store := &etcdgeneric.Etcd{
-		NewFunc:     func() runtime.Object { return &api.ServiceBroker{} },
-		NewListFunc: func() runtime.Object { return &api.ServiceBrokerList{} },
+		NewFunc:     func() runtime.Object {
+			return &servicebrokerapi.ServiceBroker{}
+		},
+		NewListFunc: func() runtime.Object {
+			return &servicebrokerapi.ServiceBrokerList{}
+		},
 		KeyRootFunc: func(ctx kapi.Context) string {
 			return prefix
 		},
@@ -31,7 +36,7 @@ func NewREST(s storage.Interface) *REST {
 			return etcdgeneric.NoNamespaceKeyFunc(ctx, prefix, name)
 		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) {
-			return obj.(*api.ServiceBroker).Name, nil
+			return obj.(*servicebrokerapi.ServiceBroker).Name, nil
 		},
 		PredicateFunc: func(label labels.Selector, field fields.Selector) generic.Matcher {
 			return servicebroker.Matcher(label, field)
@@ -69,6 +74,10 @@ func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Select
 
 // Create creates an image based on a specification.
 func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
+
+	servicebroker := obj.(*servicebrokerapi.ServiceBroker)
+	servicebroker.Status.Phase = servicebrokerapi.ServiceBrokerNew
+
 	return r.store.Create(ctx, obj)
 }
 
@@ -79,6 +88,22 @@ func (r *REST) Update(ctx kapi.Context, obj runtime.Object) (runtime.Object, boo
 
 // Delete deletes an existing image specified by its ID.
 func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions) (runtime.Object, error) {
+
+	sbObj, err := r.Get(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+
+	servicebroker := sbObj.(*servicebrokerapi.ServiceBroker)
+
+	if servicebroker.DeletionTimestamp.IsZero() {
+		now := unversioned.Now()
+		servicebroker.DeletionTimestamp = &now
+		servicebroker.Status.Phase = servicebrokerapi.ServiceBrokerDeleting
+		result, _, err := r.store.Update(ctx, servicebroker)
+		return result, err
+	}
+
 	return r.store.Delete(ctx, name, options)
 }
 

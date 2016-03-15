@@ -53,7 +53,9 @@ func NewCmdApplication(fullName string, f *clientcmd.Factory, out io.Writer) *co
 			}
 
 			if err := options.Run(f); err != nil {
-				fmt.Println("run err %s", err.Error())
+				fmt.Printf("run err %s\n", err.Error())
+			} else {
+				fmt.Printf("create application %s success.\n", options.Name)
 			}
 		},
 	}
@@ -93,6 +95,12 @@ func (o *NewApplicationOptions) Run(f *clientcmd.Factory) error {
 	if err != nil {
 		return err
 	}
+
+	_, err = o.Client.Applications(namespace).Get(o.Name)
+	if err == nil {
+		return errors.New(fmt.Sprintf("application %s already exists", o.Name))
+	}
+
 	application.Spec.Items = o.Items
 	application.Annotations = make(map[string]string)
 	application.Labels = map[string]string{}

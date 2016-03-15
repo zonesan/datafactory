@@ -39,7 +39,7 @@ func (factory *ServiceBrokerControllerFactory) Create() controller.RunnableContr
 		},
 	}
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
-	cache.NewReflector(servicebrokerLW, &servicebrokerapi.ServiceBroker{}, queue, 1*time.Minute).Run()
+	cache.NewReflector(servicebrokerLW, &servicebrokerapi.ServiceBroker{}, queue, 10 * time.Second).Run()
 
 	servicebrokerController := &ServiceBrokerController{
 		Client:              factory.Client,
