@@ -338,9 +338,31 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 				formatString(out, "BindUuid", bind.BindUuid)
 				formatString(out, "BindDeploymentConfig", bind.BindDeploymentConfig)
 				formatString(out, "Credentials", " ")
-				for k, v := range bind.Credentials {
-					formatString(out, k, v)
+
+				var keys []string
+				for k := range bind.Credentials {
+					keys = append(keys, k)
 				}
+				sort.Strings(keys)
+
+				for _, key := range keys {
+					formatString(out, key, bind.Credentials[key])
+				}
+
+				/*
+					formatString(out, "Uri", bind.Credentials["Uri"])
+					formatString(out, "Host", bind.Credentials["Host"])
+					formatString(out, "Port", bind.Credentials["Port"])
+					formatString(out, "Name", bind.Credentials["Name"])
+					formatString(out, "Vhost", bind.Credentials["Vhost"])
+					formatString(out, "Username", bind.Credentials["Username"])
+					formatString(out, "Password", bind.Credentials["Password"])
+				*/
+				/*
+					for k, v := range bind.Credentials {
+						formatString(out, k, v)
+					}
+				*/
 			}
 
 		}
