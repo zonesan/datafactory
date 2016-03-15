@@ -42,7 +42,7 @@ func describerMap(c *client.Client, kclient kclient.Interface, host string) map[
 	m := map[string]kctl.Describer{
 		"Application":            &ApplicationDescriber{c, kclient},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
-		"BackingService":         &BackingServiceDescriber{c},
+		"BackingService":         &BackingServiceDescriber{c, kclient},
 		"BackingServiceInstance": &BackingServiceInstanceDescriber{c, kclient},
 		"Build":                  &BuildDescriber{c, kclient},
 		"BuildConfig":            &BuildConfigDescriber{c, host},
@@ -120,21 +120,28 @@ func describeServiceBroker(sb *servicebrokerapi.ServiceBroker) (string, error) {
 
 // BackingServiceDescriber generates information about a Image
 type BackingServiceDescriber struct {
-	client.Interface
+	osClient   client.Interface
+	kubeClient kclient.Interface
 }
 
 // Describe returns the description of an backingService
 func (d *BackingServiceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServices()
+	c := d.osClient.BackingServices()
 	bs, err := c.Get(name)
 	if err != nil {
 		return "", err
 	}
 
-	return describeBackingService(bs)
+	events, err := d.kubeClient.Events(namespace).Search(bs)
+
+	if events == nil {
+		events = &kapi.EventList{}
+	}
+
+	return describeBackingService(bs, events)
 }
 
-func describeBackingService(bs *backingserviceapi.BackingService) (string, error) {
+func describeBackingService(bs *backingserviceapi.BackingService, events *kapi.EventList) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bs.ObjectMeta)
 		formatString(out, "Description", bs.Spec.Description)
@@ -173,6 +180,7 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			}
 
 		}
+		kctl.DescribeEvents(events, out)
 		return nil
 	})
 }

@@ -9,10 +9,11 @@ import (
 	kutil "k8s.io/kubernetes/pkg/util"
 	"k8s.io/kubernetes/pkg/watch"
 	"time"
-
+	kapi "k8s.io/kubernetes/pkg/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	controller "github.com/openshift/origin/pkg/controller"
+	"k8s.io/kubernetes/pkg/client/record"
 )
 
 type BackingServiceControllerFactory struct {
@@ -40,9 +41,13 @@ func (factory *BackingServiceControllerFactory) Create() controller.RunnableCont
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
 	cache.NewReflector(backingserviceLW, &backingserviceapi.BackingService{}, queue, 1*time.Minute).Run()
 
+	eventBroadcaster := record.NewBroadcaster()
+	eventBroadcaster.StartRecordingToSink(factory.KubeClient.Events("default"))
+
 	backingserviceController := &BackingServiceController{
 		Client:     factory.Client,
 		KubeClient: factory.KubeClient,
+		recorder:   eventBroadcaster.NewRecorder(kapi.EventSource{Component: "BackingService"}),
 	}
 
 	return &controller.RetryController{
