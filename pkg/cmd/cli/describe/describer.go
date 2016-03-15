@@ -14,6 +14,7 @@ import (
 
 	"github.com/docker/docker/pkg/parsers"
 	kapi "k8s.io/kubernetes/pkg/api"
+
 	kerrs "k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/meta"
 	"k8s.io/kubernetes/pkg/api/unversioned"
@@ -42,7 +43,7 @@ func describerMap(c *client.Client, kclient kclient.Interface, host string) map[
 		"Application":            &ApplicationDescriber{c, kclient},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
 		"BackingService":         &BackingServiceDescriber{c},
-		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
+		"BackingServiceInstance": &BackingServiceInstanceDescriber{c, kclient},
 		"Build":                  &BuildDescriber{c, kclient},
 		"BuildConfig":            &BuildConfigDescriber{c, host},
 		"DeploymentConfig":       NewDeploymentConfigDescriber(c, kclient),
@@ -298,21 +299,27 @@ func describeApplication(app *applicationapi.Application, itemStr string) (strin
 
 // BackingServiceInstanceDescriber generates information about a Image
 type BackingServiceInstanceDescriber struct {
-	client.Interface
+	osClient   client.Interface
+	kubeClient kclient.Interface
 }
 
 // Describe returns the description of an backingServiceinstance
 func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServiceInstances(namespace)
+	c := d.osClient.BackingServiceInstances(namespace)
 	bsi, err := c.Get(name)
 	if err != nil {
 		return "", err
 	}
 
-	return describeBackingServiceInstance(bsi, "")
+	events, err := d.kubeClient.Events(namespace).Search(bsi)
+	if events == nil {
+		events = &kapi.EventList{}
+	}
+
+	return describeBackingServiceInstance(bsi, events)
 }
 
-func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, imageName string) (string, error) {
+func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, events *kapi.EventList) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bsi.ObjectMeta)
 		formatString(out, "Status", bsi.Status.Phase)
@@ -337,6 +344,7 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 			}
 
 		}
+		kctl.DescribeEvents(events, out)
 		return nil
 	})
 }
