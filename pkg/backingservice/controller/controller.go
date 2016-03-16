@@ -32,8 +32,6 @@ func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) 
 	case backingserviceapi.BackingServicePhaseActive:
 	default:
 		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
-		glog.Infof("'%s' is now %s", bs.Name, bs.Status.Phase)
-		glog.Infof("%#v",bs)
 		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
 		c.Client.BackingServices().Update(bs)
 	}
