@@ -41,7 +41,7 @@ func (e fatalError) Error() string {
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
-	glog.Infoln("bsi handler called.", bsi.Name)
+	//glog.Infoln("bsi handler called.", bsi.Name)
 	//c.recorder.Eventf(bsi, "Debug", "bsi handler called.%s", bsi.Name)
 
 	changed := false
@@ -154,8 +154,6 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			}
 			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 
-		default:
-			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
 		}
 	case backingserviceinstanceapi.BackingServiceInstancePhaseBound:
 		switch bsi.Status.Action {
@@ -171,9 +169,10 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 				changed = true
 			}
 			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
-
-		default:
-			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
+			/*
+				default:
+					return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
+			*/
 		}
 
 	}
