@@ -498,12 +498,12 @@ func (c *BackingServiceInstanceController) deploymentconfig_clear_envs(dc string
 
 // return exists or not
 func env_get(envs []kapi.EnvVar, envName string) (bool, string) {
-	for i := len(envs) - 1; i >= 0; i -- {
+	for i := len(envs) - 1; i >= 0; i-- {
 		if envs[i].Name == envName {
 			return true, envs[i].Value
 		}
 	}
-	
+
 	return false, ""
 }
 
@@ -573,18 +573,18 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 		var vsp *VcapServiceParameters = nil
 		if plan != nil {
 			vsp = &VcapServiceParameters{
-				Name: bsi.Name,
-				Label: "",
-				Plan: plan.Name,
+				Name:        bsi.Name,
+				Label:       "",
+				Plan:        plan.Name,
 				Credentials: binding.Credentials,
 			}
 		}
-		
+
 		for i := range containers {
 			for k, v := range binding.Credentials {
 				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
 			}
-			
+
 			if vsp != nil {
 				_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, vsp, "")
 			}
@@ -594,7 +594,7 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 			for k := range binding.Credentials {
 				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
 			}
-			
+
 			_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, nil, bsi.Name)
 		}
 	}
@@ -610,32 +610,35 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 
 func modifyVcapServicesEnvNameEnv(env []kapi.EnvVar, bsName string, vsp *VcapServiceParameters, bsiName string) (bool, []kapi.EnvVar) {
 	_, json_env := env_get(env, VcapServicesEnvName)
-	
+
 	vs := VcapServices{}
-	if len(strings.TrimSpace(json_env)) > 0 { 
+	if len(strings.TrimSpace(json_env)) > 0 {
 		err := json.Unmarshal([]byte(json_env), &vs)
 		if err != nil {
 			glog.Warningln("unmarshalVcapServices error: ", err.Error())
 		}
 	}
-	
+
 	if vsp != nil {
 		vs = addVcapServiceParameters(vs, bsName, vsp)
 	}
 	if bsiName != "" {
 		vs = removeVcapServiceParameters(vs, bsName, bsiName)
 	}
-	
+
+	if len(vs)==0{
+		return env_unset(env, VcapServicesEnvName)
+	}
 	json_data, err := json.Marshal(vs)
 	if err != nil {
 		glog.Warningln("marshalVcapServices error: ", err.Error())
 		return false, env
 	}
-	
+
 	json_env = string(json_data)
-	
+
 	glog.Infof("new ", VcapServicesEnvName, " = ", json_env)
-	
+
 	return env_set(env, VcapServicesEnvName, json_env)
 }
 
@@ -654,20 +657,20 @@ func addVcapServiceParameters(vs VcapServices, serviceName string, vsParameters 
 	if vs == nil {
 		vs = VcapServices{}
 	}
-	
+
 	if vsParameters == nil {
 		return vs
 	}
-	
+
 	removeVcapServiceParameters(vs, serviceName, vsParameters.Name)
-	
+
 	vsp_list := vs[serviceName]
 	if vsp_list == nil {
 		vsp_list = []*VcapServiceParameters{}
 	}
 	vsp_list = append(vsp_list, vsParameters)
 	vs[serviceName] = vsp_list
-	
+
 	return vs
 }
 
@@ -675,21 +678,25 @@ func removeVcapServiceParameters(vs VcapServices, serviceName, instanceName stri
 	if vs == nil {
 		vs = VcapServices{}
 	}
-	
+
 	vsp_list := vs[serviceName]
 	if len(vsp_list) == 0 {
 		return vs
 	}
 	num := len(vsp_list)
 	vsp_list2 := make([]*VcapServiceParameters, 0, num)
-	for i := 0; i < num; i ++ {
+	for i := 0; i < num; i++ {
 		vsp := vsp_list[i]
 		if vsp != nil && vsp.Name != instanceName {
 			vsp_list2 = append(vsp_list2, vsp)
 		}
 	}
-	vs[serviceName] = vsp_list2
-	
+	if len(vsp_list2) == 0 {
+		delete(vs, serviceName)
+	} else {
+		vs[serviceName] = vsp_list2
+	}
+
 	return vs
 }
 
