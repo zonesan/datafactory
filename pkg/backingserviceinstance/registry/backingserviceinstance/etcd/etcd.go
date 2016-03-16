@@ -103,6 +103,7 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 	}
 	bsi := bsiObj.(*backingserviceinstanceapi.BackingServiceInstance)
 
+
 	if len(bsi.Annotations) > 0 {
 		for dc, bound := range bsi.Annotations {
 			if bound == backingserviceinstanceapi.BindDeploymentConfigBound {
@@ -115,7 +116,7 @@ func (r *REST) Delete(ctx kapi.Context, name string, options *kapi.DeleteOptions
 		now := unversioned.Now()
 		bsi.DeletionTimestamp = &now
 
-		bsi.Status.Action = bsi.Status.Action + backingserviceinstanceapi.BackingServiceInstanceActionToDelete
+		bsi.Status.Action = backingserviceinstanceapi.BackingServiceInstanceActionToDelete
 
 		result, _, err := r.store.Update(ctx, bsi)
 		return result, err

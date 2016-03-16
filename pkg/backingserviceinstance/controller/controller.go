@@ -71,6 +71,9 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		fallthrough
 
 	case backingserviceinstanceapi.BackingServiceInstancePhaseProvisioning:
+		if bsi.Status.Action == backingserviceinstanceapi.BackingServiceInstanceActionToDelete {
+			return c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
+		}
 
 		glog.Infoln("bsi provisioning ", bsi.Name)
 		//c.recorder.Eventf(bsi, "Provisioning", "bsi:%s, service:%s", bsi.Name, bsi.Spec.BackingServiceName)
@@ -122,14 +125,6 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		}
 
 		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
-		//bsi.Status.LastOperation = &backingserviceinstanceapi.LastOperation{
-		//	State: svcinstance.LastOperation.State,
-		//	Description: svcinstance.LastOperation.Description,
-		//	AsyncPollIntervalSeconds: svcinstance.LastOperation.AsyncPollIntervalSeconds,
-		//}
-
-		// ...
-
 		bsi.Spec.InstanceID = bsInstanceID
 		bsi.Spec.BackingServiceSpecID = bs.Spec.Id
 		if bsi.Spec.Parameters == nil {
