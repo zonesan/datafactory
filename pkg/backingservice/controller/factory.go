@@ -42,7 +42,7 @@ func (factory *BackingServiceControllerFactory) Create() controller.RunnableCont
 	cache.NewReflector(backingserviceLW, &backingserviceapi.BackingService{}, queue, 1*time.Minute).Run()
 
 	eventBroadcaster := record.NewBroadcaster()
-	eventBroadcaster.StartRecordingToSink(factory.KubeClient.Events("default"))
+	eventBroadcaster.StartRecordingToSink(factory.KubeClient.Events(""))
 
 	backingserviceController := &BackingServiceController{
 		Client:     factory.Client,

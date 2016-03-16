@@ -83,7 +83,6 @@ type InstanceBinding struct {
 type BackingServiceInstanceStatus struct {
 	Phase  BackingServiceInstancePhase
 	Action BackingServiceInstanceAction
-	Error  string
 
 	LastOperation *LastOperation
 }

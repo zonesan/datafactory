@@ -180,6 +180,7 @@ func describeBackingService(bs *backingserviceapi.BackingService, events *kapi.E
 			}
 
 		}
+
 		kctl.DescribeEvents(events, out)
 		return nil
 	})
@@ -374,6 +375,7 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 			}
 
 		}
+
 		kctl.DescribeEvents(events, out)
 		return nil
 	})

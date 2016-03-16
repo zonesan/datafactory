@@ -1757,7 +1757,6 @@ func autoconvert_api_BackingServiceInstanceStatus_To_v1_BackingServiceInstanceSt
 	}
 	out.Phase = backingserviceinstanceapiv1.BackingServiceInstancePhase(in.Phase)
 	out.Action = backingserviceinstanceapiv1.BackingServiceInstanceAction(in.Action)
-	out.Error = in.Error
 	if in.LastOperation != nil {
 		out.LastOperation = new(backingserviceinstanceapiv1.LastOperation)
 		if err := convert_api_LastOperation_To_v1_LastOperation(in.LastOperation, out.LastOperation, s); err != nil {
@@ -1949,7 +1948,6 @@ func autoconvert_v1_BackingServiceInstanceStatus_To_api_BackingServiceInstanceSt
 	}
 	out.Phase = backingserviceinstanceapi.BackingServiceInstancePhase(in.Phase)
 	out.Action = backingserviceinstanceapi.BackingServiceInstanceAction(in.Action)
-	out.Error = in.Error
 	if in.LastOperation != nil {
 		out.LastOperation = new(backingserviceinstanceapi.LastOperation)
 		if err := convert_v1_LastOperation_To_api_LastOperation(in.LastOperation, out.LastOperation, s); err != nil {
