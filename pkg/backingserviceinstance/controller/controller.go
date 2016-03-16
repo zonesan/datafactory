@@ -42,7 +42,7 @@ func (e fatalError) Error() string {
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
 	glog.Infoln("bsi handler called.", bsi.Name)
-	c.recorder.Eventf(bsi, "Debug", "bsi handler called.%s", bsi.Name)
+	//c.recorder.Eventf(bsi, "Debug", "bsi handler called.%s", bsi.Name)
 
 	changed := false
 
@@ -73,6 +73,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	case backingserviceinstanceapi.BackingServiceInstancePhaseProvisioning:
 
 		glog.Infoln("bsi provisioning ", bsi.Name)
+		//c.recorder.Eventf(bsi, "Provisioning", "bsi:%s, service:%s", bsi.Name, bsi.Spec.BackingServiceName)
 
 		plan_found := false
 		for _, plan := range bs.Spec.Plans {
@@ -84,14 +85,17 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		}
 
 		if !plan_found {
-			result = fmt.Errorf("plan (%s) in bs(%s) for bsi (%s) not found", bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
+			c.recorder.Eventf(bsi, "Provisioning", "plan (%s) in bs(%s) for bsi (%s) not found",
+				bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
+			result = fmt.Errorf("plan (%s) in bs(%s) for bsi (%s) not found",
+				bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
 			break
 		}
 
 		// ...
 
 		glog.Infoln("bsi provisioning servicebroker_load, ", bsi.Name)
-
+		//c.recorder.Eventf(bsi, "Provisioning", "bsi %s provisioning servicebroker_load", bsi.Name)
 		bsInstanceID := string(util.NewUUID())
 
 		servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
@@ -110,10 +114,12 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		svcinstance, err := servicebroker_create_instance(serviceinstance, bsInstanceID, servicebroker)
 		if err != nil {
 			result = err
+			c.recorder.Eventf(bsi, "Provisioning", err.Error())
 			break
+		} else {
+			c.recorder.Eventf(bsi, "Provisioning", "bsi provisioning done, instanceid: %s", bsInstanceID)
+			glog.Infoln("bsi provisioning servicebroker_create_instance done, ", bsi.Name)
 		}
-
-		glog.Infoln("bsi provisioning servicebroker_create_instance done, ", bsi.Name)
 
 		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
 		//bsi.Status.LastOperation = &backingserviceinstanceapi.LastOperation{
@@ -140,15 +146,18 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	case backingserviceinstanceapi.BackingServiceInstancePhaseUnbound:
 		switch bsi.Status.Action {
 		case backingserviceinstanceapi.BackingServiceInstanceActionToDelete:
+
 			if result = c.deleteInstance(bs, bsi); result == nil {
 				changed = true
 			}
-
+			c.recorder.Eventf(bsi, "Deleting", "instance:%s [%v]", bsi.Name, changed)
 		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
+
 			dcname := c.get_deploymentconfig_name(bsi, backingserviceinstanceapi.BindDeploymentConfigBinding)
 			if result = c.bindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
+			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 
 		default:
 			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
@@ -160,12 +169,13 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			if result = c.unbindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
-
+			c.recorder.Eventf(bsi, "Unbinding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
 			dcname := c.get_deploymentconfig_name(bsi, backingserviceinstanceapi.BindDeploymentConfigBinding)
 			if result = c.bindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
+			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 
 		default:
 			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
@@ -174,13 +184,18 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	}
 
 	if result != nil {
-		err_msg := result.Error()
-		if err_msg != bsi.Status.Error {
-			changed = true
-			bsi.Status.Error = err_msg
-		}
 
-		glog.Infoln("bsi controoler error. ", err_msg)
+		err_msg := result.Error()
+		/*
+			if err_msg != bsi.Status.Error {
+				glog.Info("#:", err_msg, "#:", bsi.Status.Error)
+				changed = true
+				bsi.Status.Error = err_msg
+			}
+		*/
+
+		glog.Infoln("bsi controller error. ", err_msg)
+		c.recorder.Eventf(bsi, "Error", err_msg)
 	}
 
 	if changed {

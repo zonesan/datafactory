@@ -17144,10 +17144,14 @@
       "$ref": "v1.InstanceProvisioning"
      },
      "binding": {
-      "$ref": "v1.InstanceBinding"
+      "type": "array",
+      "items": {
+       "$ref": "v1.InstanceBinding"
+      }
      },
      "bound": {
-      "type": "boolean"
+      "type": "integer",
+      "format": "int32"
      },
      "instance_id": {
       "type": "string"

@@ -4,6 +4,7 @@ import (
 
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
+	"k8s.io/kubernetes/pkg/client/record"
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
@@ -14,6 +15,7 @@ type BackingServiceController struct {
 	Client osclient.Interface
 	// KubeClient is a Kubernetes client.
 	KubeClient kclient.Interface
+	recorder   record.EventRecorder
 }
 
 type fatalError string
@@ -24,13 +26,24 @@ func (e fatalError) Error() string {
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) (err error) {
-
-
-	if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
+	switch bs.Status.Phase {
+	case backingserviceapi.BackingServicePhaseInactive:
+		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
+	case backingserviceapi.BackingServicePhaseActive:
+	default:
 		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
-
+		glog.Infof("'%s' is now %s", bs.Name, bs.Status.Phase)
+		glog.Infof("%#v",bs)
+		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
 		c.Client.BackingServices().Update(bs)
 	}
+	/*
+		if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
+			bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
+			c.recorder.Eventf(bs, "New", " '%s' is now %s!", bs.Name, bs.Status.Phase)
 
+			c.Client.BackingServices().Update(bs)
+		}
+	*/
 	return nil
 }
