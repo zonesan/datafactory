@@ -38,6 +38,7 @@ func TestSyncNamespaceThatIsTerminating(t *testing.T) {
 
 	// TODO: we will expect a finalize namespace call after rebase
 	expectedActionSet := []ktestclient.Action{
+		ktestclient.NewListAction("backingservices", "", nil, nil),
 		ktestclient.NewListAction("buildconfigs", "", nil, nil),
 		ktestclient.NewListAction("policies", "", nil, nil),
 		ktestclient.NewListAction("imagestreams", "", nil, nil),
