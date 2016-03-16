@@ -496,6 +496,17 @@ func (c *BackingServiceInstanceController) deploymentconfig_clear_envs(dc string
 	return c.deploymentconfig_modify_envs(dc, bsi, b, false)
 }
 
+// return exists or not
+func env_get(envs []kapi.EnvVar, envName string) (bool, string) {
+	for i := len(envs) - 1; i >= 0; i -- {
+		if envs[i].Name == envName {
+			return true, envs[i].Value
+		}
+	}
+	
+	return false, ""
+}
+
 // return overritten or not
 func env_set(envs []kapi.EnvVar, envName, envValue string) (bool, []kapi.EnvVar) {
 	if envs == nil {
@@ -542,43 +553,52 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 	if dc.Spec.Template == nil {
 		return nil
 	}
-	//pod_tempalte, err := c.KubeClient.PodTemplates(bsi.Namespace).Get(dc.Spec.Template.Name)
-	//if err != nil {
-	//	return err
-	//}
 
-	env_prefix := deploymentconfig_env_prefix(bsi.Name)
-	containers := dc.Spec.Template.Spec.Containers
-	num_containers := len(containers)
+	bs, err := c.Client.BackingServices().Get(bsi.Spec.BackingServiceName)
+	if err != nil {
+		return err
+	}
 
-	if toInject {
-		//for _, c := range containers {
-		//	for k, v := range bsi.Spec.Credentials {
-		//		_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, k), v)
-		//	}
-		//}
-		for i := 0; i < num_containers; i++ {
-			for k, v := range binding.Credentials {
-				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
-			}
-		}
-	} else {
-		//for _, c := range containers {
-		//	for k, _ := range bsi.Spec.Credentials {
-		//		_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, k))
-		//	}
-		//}
-		for i := 0; i < num_containers; i++ {
-			for k := range binding.Credentials {
-				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
-			}
-			//if containers[i].Env.VCAP_SERVICES
+	var plan = (*backingserviceapi.ServicePlan)(nil)
+	for k := range bs.Spec.Plans {
+		if bsi.Spec.BackingServicePlanGuid == bs.Spec.Plans[k].Id {
+			plan = &(bs.Spec.Plans[k])
 		}
 	}
 
-	//if _, err := c.KubeClient.PodTemplates(bsi.Namespace).Update(pod_tempalte); err != nil {
-	//	return err
-	//}
+	env_prefix := deploymentconfig_env_prefix(bsi.Name)
+	containers := dc.Spec.Template.Spec.Containers
+
+	if toInject {
+		var vsp *VcapServiceParameters = nil
+		if plan != nil {
+			vsp = &VcapServiceParameters{
+				Name: bsi.Name,
+				Label: "",
+				Plan: plan.Name,
+				Credentials: binding.Credentials,
+			}
+		}
+		
+		for i := range containers {
+			for k, v := range binding.Credentials {
+				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
+			}
+			
+			if vsp != nil {
+				_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, vsp, "")
+			}
+		}
+	} else {
+		for i := range containers {
+			for k := range binding.Credentials {
+				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
+			}
+			
+			_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, nil, bsi.Name)
+		}
+	}
+
 	if _, err := c.Client.DeploymentConfigs(bsi.Namespace).Update(dc); err != nil {
 		return err
 	}
@@ -586,6 +606,91 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 	c.deploymentconfig_print_envs(bsi.Namespace, binding)
 
 	return nil
+}
+
+func modifyVcapServicesEnvNameEnv(env []kapi.EnvVar, bsName string, vsp *VcapServiceParameters, bsiName string) (bool, []kapi.EnvVar) {
+	_, json_env := env_get(env, VcapServicesEnvName)
+	
+	vs := VcapServices{}
+	if len(strings.TrimSpace(json_env)) > 0 { 
+		err := json.Unmarshal([]byte(json_env), &vs)
+		if err != nil {
+			glog.Warningln("unmarshalVcapServices error: ", err.Error())
+		}
+	}
+	
+	if vsp != nil {
+		vs = addVcapServiceParameters(vs, bsName, vsp)
+	}
+	if bsiName != "" {
+		vs = removeVcapServiceParameters(vs, bsName, bsiName)
+	}
+	
+	json_data, err := json.Marshal(vs)
+	if err != nil {
+		glog.Warningln("marshalVcapServices error: ", err.Error())
+		return false, env
+	}
+	
+	json_env = string(json_data)
+	
+	glog.Infof("new ", VcapServicesEnvName, " = ", json_env)
+	
+	return env_set(env, VcapServicesEnvName, json_env)
+}
+
+const VcapServicesEnvName = "VCAP_SERVICES"
+
+type VcapServices map[string][]*VcapServiceParameters
+
+type VcapServiceParameters struct {
+	Name        string            `json:"name, omitempty"`
+	Label       string            `json:"label, omitempty"`
+	Plan        string            `json:"plan, omitempty"`
+	Credentials map[string]string `json:"credentials, omitempty"`
+}
+
+func addVcapServiceParameters(vs VcapServices, serviceName string, vsParameters *VcapServiceParameters) VcapServices {
+	if vs == nil {
+		vs = VcapServices{}
+	}
+	
+	if vsParameters == nil {
+		return vs
+	}
+	
+	removeVcapServiceParameters(vs, serviceName, vsParameters.Name)
+	
+	vsp_list := vs[serviceName]
+	if vsp_list == nil {
+		vsp_list = []*VcapServiceParameters{}
+	}
+	vsp_list = append(vsp_list, vsParameters)
+	vs[serviceName] = vsp_list
+	
+	return vs
+}
+
+func removeVcapServiceParameters(vs VcapServices, serviceName, instanceName string) VcapServices {
+	if vs == nil {
+		vs = VcapServices{}
+	}
+	
+	vsp_list := vs[serviceName]
+	if len(vsp_list) == 0 {
+		return vs
+	}
+	num := len(vsp_list)
+	vsp_list2 := make([]*VcapServiceParameters, 0, num)
+	for i := 0; i < num; i ++ {
+		vsp := vsp_list[i]
+		if vsp != nil && vsp.Name != instanceName {
+			vsp_list2 = append(vsp_list2, vsp)
+		}
+	}
+	vs[serviceName] = vsp_list2
+	
+	return vs
 }
 
 func (c *BackingServiceInstanceController) deploymentconfig_print_envs(ns string, binding *backingserviceinstanceapi.InstanceBinding) {
