@@ -5,20 +5,23 @@
       <div ng-if="!backingserviceinstance.spec.bound">
         未绑定
       </div>
-      <dl ng-if="backingserviceinstance.spec.bound" class="dl-horizontal left">
-        <dt>应用名称</dt>
-        <dd>{{backingserviceinstance.spec.binding.bind_deploymentconfig}}</dd>
-        <dt>运行时间</dt>
-        <dd>{{backingserviceinstance.metadata.creationTimestamp}}</dd>
-        <dt>凭证</dt>
-        <dd>
-          <span ng-if="backingserviceinstance.spec.binding.credentials">
-            <span ng-repeat="(k, v) in backingserviceinstance.spec.binding.credentials">
+      <div ng-if="backingserviceinstance.spec.bound > 0">
+        <dl class="dl-horizontal left" ng-repeat="b in backingserviceinstance.spec.binding">
+          <dt>应用名称</dt>
+          <dd>{{b.bind_deploymentconfig}}</dd>
+          <dt>运行时间</dt>
+          <dd>{{b.bound_time}}</dd>
+          <dt>凭证</dt>
+          <dd>
+          <span ng-if="b.credentials">
+            <span ng-repeat="(k, v) in b.credentials">
               <strong>{{k}}</strong>: {{v}}<br>
             </span>
           </span>
-        </dd>
-      </dl>
+          </dd>
+          <hr>
+        </dl>
+      </div>
     </div>
   </div>
 </div>
