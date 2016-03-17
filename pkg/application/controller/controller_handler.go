@@ -14,8 +14,8 @@ func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, i
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil {
 		if kerrors.IsNotFound(err) {
-			//user quickly delete resource and application
-			app.Spec.Items = append(app.Spec.Items[:itemIndex], app.Spec.Items[itemIndex + 1:]...)
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
 		}
 		return err
 	}
@@ -77,7 +77,11 @@ func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, 
 	client := c.Client.BackingServices()
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -138,7 +142,11 @@ func (c *ApplicationController) handleBackingServiceInstanceLabel(app *api.Appli
 	client := c.Client.BackingServiceInstances(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -199,7 +207,11 @@ func (c *ApplicationController) handleBuildLabel(app *api.Application, itemIndex
 	client := c.Client.Builds(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -260,7 +272,11 @@ func (c *ApplicationController) handleBuildConfigLabel(app *api.Application, ite
 	client := c.Client.BuildConfigs(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -321,7 +337,11 @@ func (c *ApplicationController) handleDeploymentConfigLabel(app *api.Application
 	client := c.Client.DeploymentConfigs(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -382,7 +402,11 @@ func (c *ApplicationController) handleReplicationControllerLabel(app *api.Applic
 	client := c.KubeClient.ReplicationControllers(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -443,7 +467,11 @@ func (c *ApplicationController) handleNodeLabel(app *api.Application, itemIndex 
 	client := c.KubeClient.Nodes()
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -504,7 +532,11 @@ func (c *ApplicationController) handlePodLabel(app *api.Application, itemIndex i
 	client := c.KubeClient.Pods(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -565,7 +597,11 @@ func (c *ApplicationController) handleServiceLabel(app *api.Application, itemInd
 	client := c.KubeClient.Services(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			c.deleteApplicationItem(app, itemIndex)
+			return nil
+		}
 		return err
 	}
 
@@ -618,4 +654,9 @@ func (c *ApplicationController) handleServiceLabel(app *api.Application, itemInd
 	}
 
 	return nil
+}
+
+func (c *ApplicationController) deleteApplicationItem(app *api.Application, itemIndex int) {
+	app.Spec.Items = append(app.Spec.Items[:itemIndex], app.Spec.Items[itemIndex + 1:]...)
+	c.Client.Applications(app.Namespace).Delete(app.Name)
 }

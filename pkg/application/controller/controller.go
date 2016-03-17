@@ -162,6 +162,10 @@ func (c *ApplicationController) preHandleAllLabel(application *api.Application) 
 }
 
 func (c *ApplicationController) handleAllLabel(app *api.Application) error {
+	if c.destoryApplication(app) {
+		return nil
+	}
+
 	errs := []error{}
 	oldLength := len(app.Spec.Items)
 	for i, item := range app.Spec.Items {
@@ -216,4 +220,14 @@ func (c *ApplicationController) handleAllLabel(app *api.Application) error {
 	}
 
 	return errutil.NewAggregate(errs)
+}
+
+func (c *ApplicationController) destoryApplication(app *api.Application) bool {
+	if len(app.Spec.Items) == 0 {
+		if app.Status.Phase == api.ApplicationTerminatingLabel || app.Status.Phase == api.ApplicationTerminating {
+			c.Client.Applications(app.Namespace).Delete(app.Name)
+			return true
+		}
+	}
+	return false
 }
