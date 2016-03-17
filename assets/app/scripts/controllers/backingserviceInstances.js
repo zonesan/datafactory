@@ -8,14 +8,14 @@
  * Controller of the openshiftConsole
  */
 angular.module('openshiftConsole')
-  .controller('BackingServiceInstancesController', function ($scope, AuthService, DataService) {
+  .controller('BackingServiceInstancesController', function ($scope, AuthService, DataService, $routeParams) {
     $scope.emptyMessage = '现在没有数据...';
-    AuthService.withUser().then(function() {
-      loadBackingServiceInstances();
-    });
+    //AuthService.withUser().then(function() {
+
+    //});
 
     var loadBackingServiceInstances = function() {
-      DataService.list("backingserviceinstances", $scope, function(backingserviceinstances){
+      DataService.list("backingserviceinstances", {namespace: $routeParams.project}, function(backingserviceinstances){
         $scope.backingserviceinstances = backingserviceinstances.by("metadata.name");
         console.log("backingserviceinstances", $scope.backingserviceinstances);
 
@@ -24,7 +24,7 @@ angular.module('openshiftConsole')
         }
       });
     };
-
+    loadBackingServiceInstances();
     var matchBs = function(bss, guid){
       for(var key in bss){
         var plans = bss[key].spec.plans;
@@ -38,7 +38,7 @@ angular.module('openshiftConsole')
     };
 
     var loadBackingServices = function(bsis) {
-      DataService.list("backingservices", {}, function(bss){
+      DataService.list("backingservices", {namespace: 'openshift'}, function(bss){
         bss = bss.by("metadata.name");
         console.log("bss", bss, "bsis", bsis);
 
