@@ -12,7 +12,11 @@ func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, i
 	client := c.Client.ServiceBrokers()
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
-	if err != nil && !kerrors.IsNotFound(err) {
+	if err != nil {
+		if kerrors.IsNotFound(err) {
+			//user quickly delete resource and application
+			app.Spec.Items = append(app.Spec.Items[:itemIndex], app.Spec.Items[itemIndex + 1:]...)
+		}
 		return err
 	}
 
