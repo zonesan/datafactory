@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-lg-6">
       <h3>绑定应用</h3>
-      <div ng-if="!backingserviceinstance.spec.bound">
+      <div ng-if="!backingserviceinstance.spec.bound || backingserviceinstance.spec.bound <= 0">
         未绑定
       </div>
       <div ng-if="backingserviceinstance.spec.bound > 0">
