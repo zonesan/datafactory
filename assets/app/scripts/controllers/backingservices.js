@@ -16,6 +16,7 @@ angular.module('openshiftConsole')
       loadBackingServices();
     });
 
+    $scope.namespace = 'openshift';
     var loadBackingServices = function() {
       DataService.list("backingservices", $scope, function(backingservices){
         $scope.backingservices = backingservices.by("metadata.name");

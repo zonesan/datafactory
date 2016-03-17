@@ -35,6 +35,7 @@ const (
 	// ResourceGroupPrefix is the prefix for indicating that a resource entry is actually a group of resources.  The groups are defined in code and indicate resources that are commonly permissioned together
 	ResourceGroupPrefix = "resourcegroup:"
 
+	BackingServiceGroupName         = ResourceGroupPrefix + "backingservices"
 	BackingServiceInstanceGroupName = ResourceGroupPrefix + "backingserviceinstances"
 
 	BuildGroupName      = ResourceGroupPrefix + "builds"
@@ -77,6 +78,7 @@ const (
 
 var (
 	GroupsToResources = map[string][]string{
+		BackingServiceGroupName:         {"backingservices"},
 		BackingServiceInstanceGroupName: {"backingserviceinstances", "backingserviceinstances/binding"},
 
 		BuildGroupName:       {"builds", "buildconfigs", "buildlogs", "buildconfigs/instantiate", "buildconfigs/instantiatebinary", "builds/log", "builds/clone", "buildconfigs/webhooks"},
@@ -91,14 +93,11 @@ var (
 		// RAR and SAR are in this list to support backwards compatibility with clients that expect access to those resource in a namespace scope and a cluster scope.
 		// TODO remove once we have eliminated the namespace scoped resource.
 		PermissionGrantingGroupName: {"roles", "rolebindings", "resourceaccessreviews" /* cluster scoped*/, "subjectaccessreviews" /* cluster scoped*/, "localresourceaccessreviews", "localsubjectaccessreviews"},
-		OpenshiftExposedGroupName:   {BuildGroupName, ImageGroupName, DeploymentGroupName, TemplateGroupName, "routes"},
+		OpenshiftExposedGroupName:   {"applications", BackingServiceInstanceGroupName, BuildGroupName, ImageGroupName, DeploymentGroupName, TemplateGroupName, "routes"},
 		OpenshiftAllGroupName: {OpenshiftExposedGroupName, UserGroupName, OAuthGroupName, PolicyOwnerGroupName, SDNGroupName, PermissionGrantingGroupName, OpenshiftStatusGroupName, "projects",
 			"clusterroles", "clusterrolebindings", "clusterpolicies", "clusterpolicybindings", "images" /* cluster scoped*/, "projectrequests", "builds/details",
-			"servicebrokers", "backingservices",
-			BackingServiceInstanceGroupName,
-			"applications",
-		},
-		OpenshiftStatusGroupName: {"imagestreams/status", "routes/status"},
+			"servicebrokers"},
+		OpenshiftStatusGroupName: {"imagestreams/status", "routes/status",BackingServiceGroupName},
 
 		QuotaGroupName:         {"limitranges", "resourcequotas", "resourcequotausages"},
 		KubeExposedGroupName:   {"pods", "replicationcontrollers", "serviceaccounts", "services", "endpoints", "persistentvolumeclaims", "pods/log"},

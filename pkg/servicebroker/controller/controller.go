@@ -3,15 +3,15 @@ package controller
 import (
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
+	"fmt"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
-	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/fields"
-	"time"
-	"fmt"
+	"k8s.io/kubernetes/pkg/labels"
 	"strconv"
+	"time"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -24,6 +24,8 @@ type ServiceBrokerController struct {
 	//ServiceBrokerClient is a ServiceBroker client
 	ServiceBrokerClient servicebrokerclient.Interface
 }
+
+const BSNS = "openshift"
 
 type fatalError string
 
@@ -52,6 +54,7 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 
 				errs := []error{}
 				for _, v := range services.Services {
+
 					if err := backingServiceHandler(c.Client, newBackingService(sb.Name, v)); err != nil {
 						errs = append(errs, err)
 					}
@@ -113,12 +116,12 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices(BSNS).List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseInactive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseInactive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices(BSNS).Update(&bsvc)
 			}
 		}
 	}
@@ -127,12 +130,12 @@ func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName strin
 func (c *ServiceBrokerController) ActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices(BSNS).List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseActive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseActive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices(BSNS).Update(&bsvc)
 			}
 		}
 	}
@@ -155,7 +158,7 @@ func Ping(sb *servicebrokerapi.ServiceBroker, pingSecond int64) bool {
 		return false
 	}
 
-	if (time.Now().UnixNano() - int64(lastPing)) / 1e9 < pingSecond {
+	if (time.Now().UnixNano()-int64(lastPing))/1e9 < pingSecond {
 		return false
 	}
 
@@ -188,7 +191,7 @@ func setRetryTime(sb *servicebrokerapi.ServiceBroker) {
 		return
 	}
 
-	sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", i + 1)
+	sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", i+1)
 
 	return
 }

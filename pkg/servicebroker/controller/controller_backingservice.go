@@ -1,11 +1,11 @@
 package controller
 
 import (
-	osclient "github.com/openshift/origin/pkg/client"
+	"github.com/golang/glog"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	osclient "github.com/openshift/origin/pkg/client"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	"k8s.io/kubernetes/pkg/api/errors"
-	"github.com/golang/glog"
 )
 
 func newBackingService(name string, spec backingserviceapi.BackingServiceSpec) *backingserviceapi.BackingService {
@@ -22,16 +22,16 @@ func newBackingService(name string, spec backingserviceapi.BackingServiceSpec) *
 }
 
 func backingServiceHandler(client osclient.Interface, backingService *backingserviceapi.BackingService) error {
-	_, err := client.BackingServices().Get(backingService.Name)
+	_, err := client.BackingServices(BSNS).Get(backingService.Name)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			if _, err := client.BackingServices().Create(backingService); err != nil {
+			if _, err := client.BackingServices(BSNS).Create(backingService); err != nil {
 				glog.Errorln("servicebroker create backingservice err ", err)
 				return err
 			}
 		}
 	} else {
-		if _, err := client.BackingServices().Update(backingService); err != nil {
+		if _, err := client.BackingServices(BSNS).Update(backingService); err != nil {
 			glog.Errorln("servicebroker update backingservice err ", err)
 			return err
 		}

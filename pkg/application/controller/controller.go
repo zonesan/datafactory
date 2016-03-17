@@ -67,7 +67,7 @@ func (c *ApplicationController) unifyDaemon(application *api.Application) {
 			errHandle(err, application, i, resource.Labels)
 
 		case "BackingService":
-			resource, err := c.Client.BackingServices().Get(application.Spec.Items[i].Name)
+			resource, err := c.Client.BackingServices(application.Namespace).Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
 
 		case "BackingServiceInstance":

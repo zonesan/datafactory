@@ -79,7 +79,7 @@ func (c *MasterConfig) RunBackingServiceController() {
 	controller.Run()
 }
 
-// RunBackingServiceController starts the project authorization cache
+// RunBackingServiceInstanceController starts the project authorization cache
 func (c *MasterConfig) RunBackingServiceInstanceController() {
 	osclient, kclient := c.OriginNamespaceControllerClients()
 	factory := backingserviceinstancecontroller.BackingServiceInstanceControllerFactory{

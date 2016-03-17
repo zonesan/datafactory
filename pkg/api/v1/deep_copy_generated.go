@@ -992,7 +992,6 @@ func deepCopy_v1_BackingServiceInstanceSpec(in backingserviceinstanceapiv1.Backi
 func deepCopy_v1_BackingServiceInstanceStatus(in backingserviceinstanceapiv1.BackingServiceInstanceStatus, out *backingserviceinstanceapiv1.BackingServiceInstanceStatus, c *conversion.Cloner) error {
 	out.Phase = in.Phase
 	out.Action = in.Action
-	out.Error = in.Error
 	if in.LastOperation != nil {
 		out.LastOperation = new(backingserviceinstanceapiv1.LastOperation)
 		if err := deepCopy_v1_LastOperation(*in.LastOperation, out.LastOperation, c); err != nil {

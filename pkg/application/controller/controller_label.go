@@ -28,12 +28,12 @@ func unloadServiceBrokerLabel(client osclient.Interface, application *api.Applic
 
 func unloadBackingServiceLabel(client osclient.Interface, application *api.Application, labelSelector labels.Selector) error {
 
-	resourceList, _ := client.BackingServices().List(labelSelector, fields.Everything())
+	resourceList, _ := client.BackingServices(application.Namespace).List(labelSelector, fields.Everything())
 	errs := []error{}
 	for _, resource := range resourceList.Items {
 		if !hasItem(application.Spec.Items, api.Item{Kind: "BackingService", Name: resource.Name}) {
 			delete(resource.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
-			if _, err := client.BackingServices().Update(&resource); err != nil {
+			if _, err := client.BackingServices(application.Namespace).Update(&resource); err != nil {
 				errs = append(errs, err)
 			}
 		}

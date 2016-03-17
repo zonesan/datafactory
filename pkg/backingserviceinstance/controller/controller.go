@@ -3,18 +3,18 @@ package controller
 import (
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 
-	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
-	osclient "github.com/openshift/origin/pkg/client"
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
-
 	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/golang/glog"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
+	osclient "github.com/openshift/origin/pkg/client"
 	"io/ioutil"
 	kapi "k8s.io/kubernetes/pkg/api"
 	"k8s.io/kubernetes/pkg/api/unversioned"
+	"k8s.io/kubernetes/pkg/client/record"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util"
@@ -30,6 +30,7 @@ type BackingServiceInstanceController struct {
 	Client osclient.Interface
 	// KubeClient is a Kubernetes client.
 	KubeClient kclient.Interface
+	recorder   record.EventRecorder
 }
 
 type fatalError string
@@ -40,11 +41,12 @@ func (e fatalError) Error() string {
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi.BackingServiceInstance) (result error) {
-	glog.Infoln("bsi handler called.", bsi.Name)
+	//glog.Infoln("bsi handler called.", bsi.Name)
+	//c.recorder.Eventf(bsi, "Debug", "bsi handler called.%s", bsi.Name)
 
 	changed := false
 
-	bs, err := c.Client.BackingServices().Get(bsi.Spec.BackingServiceName)
+	bs, err := c.Client.BackingServices("openshift").Get(bsi.Spec.BackingServiceName)
 	if err != nil {
 		return err
 	}
@@ -69,8 +71,12 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		fallthrough
 
 	case backingserviceinstanceapi.BackingServiceInstancePhaseProvisioning:
+		if bsi.Status.Action == backingserviceinstanceapi.BackingServiceInstanceActionToDelete {
+			return c.Client.BackingServiceInstances(bsi.Namespace).Delete(bsi.Name)
+		}
 
 		glog.Infoln("bsi provisioning ", bsi.Name)
+		//c.recorder.Eventf(bsi, "Provisioning", "bsi:%s, service:%s", bsi.Name, bsi.Spec.BackingServiceName)
 
 		plan_found := false
 		for _, plan := range bs.Spec.Plans {
@@ -82,14 +88,17 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		}
 
 		if !plan_found {
-			result = fmt.Errorf("plan (%s) in bs(%s) for bsi (%s) not found", bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
+			c.recorder.Eventf(bsi, "Provisioning", "plan (%s) in bs(%s) for bsi (%s) not found",
+				bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
+			result = fmt.Errorf("plan (%s) in bs(%s) for bsi (%s) not found",
+				bsi.Spec.BackingServicePlanGuid, bsi.Spec.BackingServiceName, bsi.Name)
 			break
 		}
 
 		// ...
 
 		glog.Infoln("bsi provisioning servicebroker_load, ", bsi.Name)
-
+		//c.recorder.Eventf(bsi, "Provisioning", "bsi %s provisioning servicebroker_load", bsi.Name)
 		bsInstanceID := string(util.NewUUID())
 
 		servicebroker, err := servicebroker_load(c.Client, bs.GenerateName)
@@ -108,20 +117,14 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 		svcinstance, err := servicebroker_create_instance(serviceinstance, bsInstanceID, servicebroker)
 		if err != nil {
 			result = err
+			c.recorder.Eventf(bsi, "Provisioning", err.Error())
 			break
+		} else {
+			c.recorder.Eventf(bsi, "Provisioning", "bsi provisioning done, instanceid: %s", bsInstanceID)
+			glog.Infoln("bsi provisioning servicebroker_create_instance done, ", bsi.Name)
 		}
 
-		glog.Infoln("bsi provisioning servicebroker_create_instance done, ", bsi.Name)
-
 		bsi.Spec.DashboardUrl = svcinstance.DashboardUrl
-		//bsi.Status.LastOperation = &backingserviceinstanceapi.LastOperation{
-		//	State: svcinstance.LastOperation.State,
-		//	Description: svcinstance.LastOperation.Description,
-		//	AsyncPollIntervalSeconds: svcinstance.LastOperation.AsyncPollIntervalSeconds,
-		//}
-
-		// ...
-
 		bsi.Spec.InstanceID = bsInstanceID
 		bsi.Spec.BackingServiceSpecID = bs.Spec.Id
 		if bsi.Spec.Parameters == nil {
@@ -138,18 +141,19 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 	case backingserviceinstanceapi.BackingServiceInstancePhaseUnbound:
 		switch bsi.Status.Action {
 		case backingserviceinstanceapi.BackingServiceInstanceActionToDelete:
+
 			if result = c.deleteInstance(bs, bsi); result == nil {
 				changed = true
 			}
-
+			c.recorder.Eventf(bsi, "Deleting", "instance:%s [%v]", bsi.Name, changed)
 		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
+
 			dcname := c.get_deploymentconfig_name(bsi, backingserviceinstanceapi.BindDeploymentConfigBinding)
 			if result = c.bindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
+			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 
-		default:
-			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
 		}
 	case backingserviceinstanceapi.BackingServiceInstancePhaseBound:
 		switch bsi.Status.Action {
@@ -158,27 +162,34 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 			if result = c.unbindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
-
+			c.recorder.Eventf(bsi, "Unbinding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
 		case backingserviceinstanceapi.BackingServiceInstanceActionToBind:
 			dcname := c.get_deploymentconfig_name(bsi, backingserviceinstanceapi.BindDeploymentConfigBinding)
 			if result = c.bindInstance(dcname, bs, bsi); result == nil {
 				changed = true
 			}
-
-		default:
-			return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
+			c.recorder.Eventf(bsi, "Binding", "instance: %s, dc: %s [%v]", bsi.Name, dcname, changed)
+			/*
+				default:
+					return fmt.Errorf("action '%s' should never happen under status '%s'", bsi.Status.Action, bsi.Status.Phase)
+			*/
 		}
 
 	}
 
 	if result != nil {
-		err_msg := result.Error()
-		if err_msg != bsi.Status.Error {
-			changed = true
-			bsi.Status.Error = err_msg
-		}
 
-		glog.Infoln("bsi controoler error. ", err_msg)
+		err_msg := result.Error()
+		/*
+			if err_msg != bsi.Status.Error {
+				glog.Info("#:", err_msg, "#:", bsi.Status.Error)
+				changed = true
+				bsi.Status.Error = err_msg
+			}
+		*/
+
+		glog.Infoln("bsi controller error. ", err_msg)
+		c.recorder.Eventf(bsi, "Error", err_msg)
 	}
 
 	if changed {
@@ -221,7 +232,7 @@ func servicebroker_load(c osclient.Interface, name string) (*ServiceBroker, erro
 
 func checkIfPlanidExist(client osclient.Interface, planId string) (bool, *backingserviceapi.BackingService, error) {
 
-	items, err := client.BackingServices().List(labels.Everything(), fields.Everything())
+	items, err := client.BackingServices("openshift").List(labels.Everything(), fields.Everything())
 
 	if err != nil {
 		return false, nil, err
@@ -494,6 +505,17 @@ func (c *BackingServiceInstanceController) deploymentconfig_clear_envs(dc string
 	return c.deploymentconfig_modify_envs(dc, bsi, b, false)
 }
 
+// return exists or not
+func env_get(envs []kapi.EnvVar, envName string) (bool, string) {
+	for i := len(envs) - 1; i >= 0; i-- {
+		if envs[i].Name == envName {
+			return true, envs[i].Value
+		}
+	}
+
+	return false, ""
+}
+
 // return overritten or not
 func env_set(envs []kapi.EnvVar, envName, envValue string) (bool, []kapi.EnvVar) {
 	if envs == nil {
@@ -540,43 +562,52 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 	if dc.Spec.Template == nil {
 		return nil
 	}
-	//pod_tempalte, err := c.KubeClient.PodTemplates(bsi.Namespace).Get(dc.Spec.Template.Name)
-	//if err != nil {
-	//	return err
-	//}
 
-	env_prefix := deploymentconfig_env_prefix(bsi.Name)
-	containers := dc.Spec.Template.Spec.Containers
-	num_containers := len(containers)
+	bs, err := c.Client.BackingServices("openshift").Get(bsi.Spec.BackingServiceName)
+	if err != nil {
+		return err
+	}
 
-	if toInject {
-		//for _, c := range containers {
-		//	for k, v := range bsi.Spec.Credentials {
-		//		_, c.Env = env_set(c.Env, deploymentconfig_env_name(env_prefix, k), v)
-		//	}
-		//}
-		for i := 0; i < num_containers; i++ {
-			for k, v := range binding.Credentials {
-				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
-			}
-		}
-	} else {
-		//for _, c := range containers {
-		//	for k, _ := range bsi.Spec.Credentials {
-		//		_, c.Env = env_unset(c.Env, deploymentconfig_env_name(env_prefix, k))
-		//	}
-		//}
-		for i := 0; i < num_containers; i++ {
-			for k := range binding.Credentials {
-				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
-			}
-			//if containers[i].Env.VCAP_SERVICES
+	var plan = (*backingserviceapi.ServicePlan)(nil)
+	for k := range bs.Spec.Plans {
+		if bsi.Spec.BackingServicePlanGuid == bs.Spec.Plans[k].Id {
+			plan = &(bs.Spec.Plans[k])
 		}
 	}
 
-	//if _, err := c.KubeClient.PodTemplates(bsi.Namespace).Update(pod_tempalte); err != nil {
-	//	return err
-	//}
+	env_prefix := deploymentconfig_env_prefix(bsi.Name)
+	containers := dc.Spec.Template.Spec.Containers
+
+	if toInject {
+		var vsp *VcapServiceParameters = nil
+		if plan != nil {
+			vsp = &VcapServiceParameters{
+				Name:        bsi.Name,
+				Label:       "",
+				Plan:        plan.Name,
+				Credentials: binding.Credentials,
+			}
+		}
+
+		for i := range containers {
+			for k, v := range binding.Credentials {
+				_, containers[i].Env = env_set(containers[i].Env, deploymentconfig_env_name(env_prefix, k), v)
+			}
+
+			if vsp != nil {
+				_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, vsp, "")
+			}
+		}
+	} else {
+		for i := range containers {
+			for k := range binding.Credentials {
+				_, containers[i].Env = env_unset(containers[i].Env, deploymentconfig_env_name(env_prefix, k))
+			}
+
+			_, containers[i].Env = modifyVcapServicesEnvNameEnv(containers[i].Env, bs.Name, nil, bsi.Name)
+		}
+	}
+
 	if _, err := c.Client.DeploymentConfigs(bsi.Namespace).Update(dc); err != nil {
 		return err
 	}
@@ -584,6 +615,98 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 	c.deploymentconfig_print_envs(bsi.Namespace, binding)
 
 	return nil
+}
+
+func modifyVcapServicesEnvNameEnv(env []kapi.EnvVar, bsName string, vsp *VcapServiceParameters, bsiName string) (bool, []kapi.EnvVar) {
+	_, json_env := env_get(env, VcapServicesEnvName)
+
+	vs := VcapServices{}
+	if len(strings.TrimSpace(json_env)) > 0 {
+		err := json.Unmarshal([]byte(json_env), &vs)
+		if err != nil {
+			glog.Warningln("unmarshalVcapServices error: ", err.Error())
+		}
+	}
+
+	if vsp != nil {
+		vs = addVcapServiceParameters(vs, bsName, vsp)
+	}
+	if bsiName != "" {
+		vs = removeVcapServiceParameters(vs, bsName, bsiName)
+	}
+
+	if len(vs) == 0 {
+		return env_unset(env, VcapServicesEnvName)
+	}
+	json_data, err := json.Marshal(vs)
+	if err != nil {
+		glog.Warningln("marshalVcapServices error: ", err.Error())
+		return false, env
+	}
+
+	json_env = string(json_data)
+
+	glog.Infof("new ", VcapServicesEnvName, " = ", json_env)
+
+	return env_set(env, VcapServicesEnvName, json_env)
+}
+
+const VcapServicesEnvName = "VCAP_SERVICES"
+
+type VcapServices map[string][]*VcapServiceParameters
+
+type VcapServiceParameters struct {
+	Name        string            `json:"name, omitempty"`
+	Label       string            `json:"label, omitempty"`
+	Plan        string            `json:"plan, omitempty"`
+	Credentials map[string]string `json:"credentials, omitempty"`
+}
+
+func addVcapServiceParameters(vs VcapServices, serviceName string, vsParameters *VcapServiceParameters) VcapServices {
+	if vs == nil {
+		vs = VcapServices{}
+	}
+
+	if vsParameters == nil {
+		return vs
+	}
+
+	removeVcapServiceParameters(vs, serviceName, vsParameters.Name)
+
+	vsp_list := vs[serviceName]
+	if vsp_list == nil {
+		vsp_list = []*VcapServiceParameters{}
+	}
+	vsp_list = append(vsp_list, vsParameters)
+	vs[serviceName] = vsp_list
+
+	return vs
+}
+
+func removeVcapServiceParameters(vs VcapServices, serviceName, instanceName string) VcapServices {
+	if vs == nil {
+		vs = VcapServices{}
+	}
+
+	vsp_list := vs[serviceName]
+	if len(vsp_list) == 0 {
+		return vs
+	}
+	num := len(vsp_list)
+	vsp_list2 := make([]*VcapServiceParameters, 0, num)
+	for i := 0; i < num; i++ {
+		vsp := vsp_list[i]
+		if vsp != nil && vsp.Name != instanceName {
+			vsp_list2 = append(vsp_list2, vsp)
+		}
+	}
+	if len(vsp_list2) == 0 {
+		delete(vs, serviceName)
+	} else {
+		vs[serviceName] = vsp_list2
+	}
+
+	return vs
 }
 
 func (c *BackingServiceInstanceController) deploymentconfig_print_envs(ns string, binding *backingserviceinstanceapi.InstanceBinding) {

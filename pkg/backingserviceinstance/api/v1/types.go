@@ -79,7 +79,6 @@ type InstanceBinding struct {
 type BackingServiceInstanceStatus struct {
 	Phase  BackingServiceInstancePhase  `json:"phase, omitempty"`
 	Action BackingServiceInstanceAction `json:"action, omitempty"`
-	Error  string                       `json:"error, omitempty"`
 
 	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }

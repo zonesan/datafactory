@@ -62,3 +62,7 @@ type ServiceBrokerSpec struct {
 type ServiceBrokerStatus struct {
 	Phase ServiceBrokerPhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
 }
+
+const (
+	ServiceBrokerLabel = "asiainfo.io/servicebroker"
+)

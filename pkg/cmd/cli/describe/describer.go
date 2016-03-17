@@ -14,6 +14,7 @@ import (
 
 	"github.com/docker/docker/pkg/parsers"
 	kapi "k8s.io/kubernetes/pkg/api"
+
 	kerrs "k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/api/meta"
 	"k8s.io/kubernetes/pkg/api/unversioned"
@@ -41,8 +42,8 @@ func describerMap(c *client.Client, kclient kclient.Interface, host string) map[
 	m := map[string]kctl.Describer{
 		"Application":            &ApplicationDescriber{c, kclient},
 		"ServiceBroker":          &ServiceBrokerDescriber{c},
-		"BackingService":         &BackingServiceDescriber{c},
-		"BackingServiceInstance": &BackingServiceInstanceDescriber{c},
+		"BackingService":         &BackingServiceDescriber{c, kclient},
+		"BackingServiceInstance": &BackingServiceInstanceDescriber{c, kclient},
 		"Build":                  &BuildDescriber{c, kclient},
 		"BuildConfig":            &BuildConfigDescriber{c, host},
 		"DeploymentConfig":       NewDeploymentConfigDescriber(c, kclient),
@@ -119,21 +120,28 @@ func describeServiceBroker(sb *servicebrokerapi.ServiceBroker) (string, error) {
 
 // BackingServiceDescriber generates information about a Image
 type BackingServiceDescriber struct {
-	client.Interface
+	osClient   client.Interface
+	kubeClient kclient.Interface
 }
 
 // Describe returns the description of an backingService
 func (d *BackingServiceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServices()
+	c := d.osClient.BackingServices(namespace)
 	bs, err := c.Get(name)
 	if err != nil {
 		return "", err
 	}
 
-	return describeBackingService(bs)
+	events, err := d.kubeClient.Events(namespace).Search(bs)
+
+	if events == nil {
+		events = &kapi.EventList{}
+	}
+
+	return describeBackingService(bs, events)
 }
 
-func describeBackingService(bs *backingserviceapi.BackingService) (string, error) {
+func describeBackingService(bs *backingserviceapi.BackingService, events *kapi.EventList) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bs.ObjectMeta)
 		formatString(out, "Description", bs.Spec.Description)
@@ -172,6 +180,8 @@ func describeBackingService(bs *backingserviceapi.BackingService) (string, error
 			}
 
 		}
+
+		kctl.DescribeEvents(events, out)
 		return nil
 	})
 }
@@ -265,7 +275,7 @@ func (appDescriber *ApplicationDescriber) Describe(namespace, name string) (stri
 			itemCreateTime = sb.CreationTimestamp.String()
 
 		case "BackingService":
-			bs, _ := appDescriber.osClient.BackingServices().Get(item.Name)
+			bs, _ := appDescriber.osClient.BackingServices(namespace).Get(item.Name)
 			itemCreateTime = bs.CreationTimestamp.String()
 
 		case "BackingServiceInstance":
@@ -298,21 +308,27 @@ func describeApplication(app *applicationapi.Application, itemStr string) (strin
 
 // BackingServiceInstanceDescriber generates information about a Image
 type BackingServiceInstanceDescriber struct {
-	client.Interface
+	osClient   client.Interface
+	kubeClient kclient.Interface
 }
 
 // Describe returns the description of an backingServiceinstance
 func (d *BackingServiceInstanceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.BackingServiceInstances(namespace)
+	c := d.osClient.BackingServiceInstances(namespace)
 	bsi, err := c.Get(name)
 	if err != nil {
 		return "", err
 	}
 
-	return describeBackingServiceInstance(bsi, "")
+	events, err := d.kubeClient.Events(namespace).Search(bsi)
+	if events == nil {
+		events = &kapi.EventList{}
+	}
+
+	return describeBackingServiceInstance(bsi, events)
 }
 
-func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, imageName string) (string, error) {
+func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, events *kapi.EventList) (string, error) {
 	return tabbedString(func(out *tabwriter.Writer) error {
 		formatMeta(out, bsi.ObjectMeta)
 		formatString(out, "Status", bsi.Status.Phase)
@@ -331,12 +347,36 @@ func describeBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServic
 				formatString(out, "BindUuid", bind.BindUuid)
 				formatString(out, "BindDeploymentConfig", bind.BindDeploymentConfig)
 				formatString(out, "Credentials", " ")
-				for k, v := range bind.Credentials {
-					formatString(out, k, v)
+
+				var keys []string
+				for k := range bind.Credentials {
+					keys = append(keys, k)
 				}
+				sort.Strings(keys)
+
+				for _, key := range keys {
+					formatString(out, key, bind.Credentials[key])
+				}
+
+				/*
+					formatString(out, "Uri", bind.Credentials["Uri"])
+					formatString(out, "Host", bind.Credentials["Host"])
+					formatString(out, "Port", bind.Credentials["Port"])
+					formatString(out, "Name", bind.Credentials["Name"])
+					formatString(out, "Vhost", bind.Credentials["Vhost"])
+					formatString(out, "Username", bind.Credentials["Username"])
+					formatString(out, "Password", bind.Credentials["Password"])
+				*/
+				/*
+					for k, v := range bind.Credentials {
+						formatString(out, k, v)
+					}
+				*/
 			}
 
 		}
+
+		kctl.DescribeEvents(events, out)
 		return nil
 	})
 }

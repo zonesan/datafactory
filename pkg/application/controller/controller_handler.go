@@ -74,7 +74,7 @@ func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, i
 func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
-	client := c.Client.BackingServices()
+	client := c.Client.BackingServices(app.Namespace)
 
 	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil {

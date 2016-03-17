@@ -24,7 +24,7 @@ func (Strategy) PrepareForUpdate(obj, old runtime.Object) {}
 
 // NamespaceScoped is false for sdns
 func (Strategy) NamespaceScoped() bool {
-	return false
+	return true
 }
 
 func (Strategy) GenerateName(base string) string {

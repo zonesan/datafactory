@@ -62,5 +62,5 @@ type ServiceBrokerStatus struct {
 }
 
 const (
-	ServiceBrokerLabel = "openshift.io/servicebroker"
+	ServiceBrokerLabel = "asiainfo.io/servicebroker"
 )
