@@ -67,9 +67,9 @@
                   </tr>
                   </thead>
                   <tbody>
-                  <tr ng-repeat="item in app.spec.items" ng-if="item.kind == 'BackingService'">
+                  <tr ng-repeat="item in app.spec.items" ng-if="item.kind == 'DeploymentConfig'">
                     <td>
-                      <a href="project/openshift/backingservices/{{item.name}}">{{item.name}}</a>
+                      <a href="project/{{projectName}}/browse/deployments/{{item.name}}">{{item.name}}</a>
                     </td>
                     <td>
                       {{item.kind}}

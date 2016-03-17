@@ -32,10 +32,10 @@
             </div>
           </td>
           <td data-title="BackingserviceNum">
-            <a data-toggle="collapse" href="#service-{{app.metadata.name}}">{{app.spec.items | serviceLenFilter: 'BackingService'}}</a>
+            <a data-toggle="collapse" href="#service-{{app.metadata.name}}">{{app.spec.items | serviceLenFilter: 'DeploymentConfig'}}</a>
             <div class="collapse" id="service-{{app.metadata.name}}">
-              <span ng-repeat="item in app.spec.items" ng-if="item.kind == 'BackingService'">
-                <a href="project/openshift/backingservices/{{item.name}}">{{item.name}}</a><br>
+              <span ng-repeat="item in app.spec.items" ng-if="item.kind == 'DeploymentConfig'">
+                <a ng-href="project/{{projectName}}/browse/deployments/{{item.name}}">{{item.name}}</a><br>
               </span>
             </div>
           </td>
