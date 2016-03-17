@@ -26,6 +26,7 @@ angular.module('openshiftConsole')
     });
 
     var loadBackingService = function() {
+      $scope.namespace = 'openshift';
       DataService.get("backingservices", $routeParams.backingservice, $scope).then(
         // success
         function(backingservice) {
