@@ -6,12 +6,12 @@ import (
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
 )
 
-func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.ServiceBrokers()
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -35,7 +35,7 @@ func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, i
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -67,12 +67,12 @@ func (c *ApplicationController) handleServiceBrokerLabel(app *api.Application, i
 	return nil
 }
 
-func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.BackingServices()
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -96,7 +96,7 @@ func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, 
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -128,12 +128,12 @@ func (c *ApplicationController) handleBackingServiceLabel(app *api.Application, 
 	return nil
 }
 
-func (c *ApplicationController) handleBackingServiceInstanceLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleBackingServiceInstanceLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.BackingServiceInstances(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -157,7 +157,7 @@ func (c *ApplicationController) handleBackingServiceInstanceLabel(app *api.Appli
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -189,12 +189,12 @@ func (c *ApplicationController) handleBackingServiceInstanceLabel(app *api.Appli
 	return nil
 }
 
-func (c *ApplicationController) handleBuildLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleBuildLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.Builds(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -218,7 +218,7 @@ func (c *ApplicationController) handleBuildLabel(app *api.Application, itemIndex
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -250,12 +250,12 @@ func (c *ApplicationController) handleBuildLabel(app *api.Application, itemIndex
 	return nil
 }
 
-func (c *ApplicationController) handleBuildConfigLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleBuildConfigLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.BuildConfigs(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -279,7 +279,7 @@ func (c *ApplicationController) handleBuildConfigLabel(app *api.Application, ite
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -311,12 +311,12 @@ func (c *ApplicationController) handleBuildConfigLabel(app *api.Application, ite
 	return nil
 }
 
-func (c *ApplicationController) handleDeploymentConfigLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleDeploymentConfigLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.Client.DeploymentConfigs(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -340,7 +340,7 @@ func (c *ApplicationController) handleDeploymentConfigLabel(app *api.Application
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -372,12 +372,12 @@ func (c *ApplicationController) handleDeploymentConfigLabel(app *api.Application
 	return nil
 }
 
-func (c *ApplicationController) handleReplicationControllerLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleReplicationControllerLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.KubeClient.ReplicationControllers(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -401,7 +401,7 @@ func (c *ApplicationController) handleReplicationControllerLabel(app *api.Applic
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -433,12 +433,12 @@ func (c *ApplicationController) handleReplicationControllerLabel(app *api.Applic
 	return nil
 }
 
-func (c *ApplicationController) handleNodeLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleNodeLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.KubeClient.Nodes()
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -462,7 +462,7 @@ func (c *ApplicationController) handleNodeLabel(app *api.Application, itemIndex 
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
@@ -494,12 +494,12 @@ func (c *ApplicationController) handleNodeLabel(app *api.Application, itemIndex 
 	return nil
 }
 
-func (c *ApplicationController) handlePodLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handlePodLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.KubeClient.Pods(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -523,7 +523,7 @@ func (c *ApplicationController) handlePodLabel(app *api.Application, itemIndex i
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName, nil); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name, nil); err != nil {
 				return err
 			}
 		} else {
@@ -555,12 +555,12 @@ func (c *ApplicationController) handlePodLabel(app *api.Application, itemIndex i
 	return nil
 }
 
-func (c *ApplicationController) handleServiceLabel(app *api.Application, itemIndex int, itemName string) error {
+func (c *ApplicationController) handleServiceLabel(app *api.Application, itemIndex int) error {
 	labelSelectorStr := fmt.Sprintf("%s.application.%s", app.Namespace, app.Name)
 
 	client := c.KubeClient.Services(app.Namespace)
 
-	resource, err := client.Get(itemName)
+	resource, err := client.Get(app.Spec.Items[itemIndex].Name)
 	if err != nil && !kerrors.IsNotFound(err) {
 		return err
 	}
@@ -584,7 +584,7 @@ func (c *ApplicationController) handleServiceLabel(app *api.Application, itemInd
 
 	case api.ApplicationTerminating:
 		if !labelExistsOtherApplicationKey(resource.Labels, labelSelectorStr) {
-			if err := client.Delete(itemName); err != nil {
+			if err := client.Delete(app.Spec.Items[itemIndex].Name); err != nil {
 				return err
 			}
 		} else {
