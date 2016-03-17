@@ -8,23 +8,26 @@
  * Controller of the openshiftConsole
  */
 angular.module('openshiftConsole')
-  .controller('BackingServiceInstancesController', function ($scope, AuthService, DataService, $routeParams) {
+  .controller('BackingServiceInstancesController', function ($scope, AuthService, ProjectsService, DataService, $routeParams) {
     $scope.emptyMessage = '现在没有数据...';
     //AuthService.withUser().then(function() {
 
     //});
 
-    var loadBackingServiceInstances = function() {
-      DataService.list("backingserviceinstances", {namespace: $routeParams.project}, function(backingserviceinstances){
-        $scope.backingserviceinstances = backingserviceinstances.by("metadata.name");
-        console.log("backingserviceinstances", $scope.backingserviceinstances);
+    ProjectsService
+      .get($routeParams.project)
+      .then(_.spread(function(project, context) {
+        $scope.project = project;
+        DataService.list("backingserviceinstances", context, function(backingserviceinstances){
+          $scope.backingserviceinstances = backingserviceinstances.by("metadata.name");
+          console.log("backingserviceinstances", $scope.backingserviceinstances);
 
-        if ($scope.backingserviceinstances) {
-          loadBackingServices($scope.backingserviceinstances);
-        }
-      });
-    };
-    loadBackingServiceInstances();
+          if ($scope.backingserviceinstances) {
+            loadBackingServices($scope.backingserviceinstances);
+          }
+        });
+      }));
+
     var matchBs = function(bss, guid){
       for(var key in bss){
         var plans = bss[key].spec.plans;
