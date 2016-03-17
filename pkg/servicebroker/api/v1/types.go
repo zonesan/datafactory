@@ -17,6 +17,15 @@ const (
 
 	// ServiceBrokerFailed indicates that servicebroker stopped.
 	ServiceBrokerFailed ServiceBrokerPhase = "Failed"
+
+// ServiceBrokerDeleting indicates that servicebroker is going to be deleted.
+	ServiceBrokerDeleting ServiceBrokerPhase = "Deleting"
+
+// ServiceBrokerLastPingTime indicates that servicebroker last ping time.
+	ServiceBrokerLastPingTime string = "ServiceBroker/LastPing"
+
+// ServiceBrokerNewRetryTimes indicates that new servicebroker retry times.
+	ServiceBrokerNewRetryTimes string = "ServiceBroker/NewRetryTimes"
 )
 
 type ServiceBrokerPhase string
@@ -53,3 +62,7 @@ type ServiceBrokerSpec struct {
 type ServiceBrokerStatus struct {
 	Phase ServiceBrokerPhase `json:"phase,omitempty" description:"phase is the current lifecycle phase of the servicebroker"`
 }
+
+const (
+	ServiceBrokerLabel = "asiainfoLDP/servicebroker"
+)

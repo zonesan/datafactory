@@ -7,8 +7,8 @@
     <table class="table table-bordered table-hover table-mobile">
       <thead>
       <tr>
-        <th>服务名称</th>
         <th>实例名称</th>
+        <th>服务名称</th>
         <th>创建时间</th>
       </tr>
       </thead>
@@ -17,10 +17,10 @@
       </tbody>
       <tbody ng-repeat="bsi in backingserviceinstances | orderObjectsByDate : true">
       <tr>
-        <td data-title="Backing Service Name">
-        <a ng-href="backingservices/{{bsi.bsName}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
         <td data-title="Instance Name">
         <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
+        <td data-title="Backing Service Name">
+        <a ng-href="backingservices/{{bsi.bsName}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
         <td data-title="Created Time">
         <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp>
         </td>

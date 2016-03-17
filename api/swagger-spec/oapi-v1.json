@@ -1388,6 +1388,59 @@
       ]
      },
      {
+      "type": "v1.BindingRequestOptions",
+      "method": "PUT",
+      "summary": "replace binding of the specified BindingRequestOptions",
+      "nickname": "replaceNamespacedBindingRequestOptionsBinding",
+      "parameters": [
+       {
+        "type": "string",
+        "paramType": "query",
+        "name": "pretty",
+        "description": "If 'true', then the output is pretty printed.",
+        "required": false,
+        "allowMultiple": false
+       },
+       {
+        "type": "v1.BindingRequestOptions",
+        "paramType": "body",
+        "name": "body",
+        "description": "",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "namespace",
+        "description": "object name and auth scope, such as for teams and projects",
+        "required": true,
+        "allowMultiple": false
+       },
+       {
+        "type": "string",
+        "paramType": "path",
+        "name": "name",
+        "description": "name of the BindingRequestOptions",
+        "required": true,
+        "allowMultiple": false
+       }
+      ],
+      "responseMessages": [
+       {
+        "code": 200,
+        "message": "OK",
+        "responseModel": "v1.BindingRequestOptions"
+       }
+      ],
+      "produces": [
+       "application/json"
+      ],
+      "consumes": [
+       "*/*"
+      ]
+     },
+     {
       "type": "unversioned.Status",
       "method": "DELETE",
       "summary": "delete binding of a BindingRequestOptions",
@@ -17326,10 +17379,14 @@
       "$ref": "v1.InstanceProvisioning"
      },
      "binding": {
-      "$ref": "v1.InstanceBinding"
+      "type": "array",
+      "items": {
+       "$ref": "v1.InstanceBinding"
+      }
      },
      "bound": {
-      "type": "boolean"
+      "type": "integer",
+      "format": "int32"
      },
      "instance_id": {
       "type": "string"
@@ -17349,6 +17406,7 @@
      "backingservice_name",
      "backingservice_spec_id",
      "backingservice_plan_guid",
+     "backingservice_plan_name",
      "parameters"
     ],
     "properties": {
@@ -17362,6 +17420,9 @@
       "type": "string"
      },
      "backingservice_plan_guid": {
+      "type": "string"
+     },
+     "backingservice_plan_name": {
       "type": "string"
      },
      "parameters": {
@@ -17396,7 +17457,6 @@
     "required": [
      "phase",
      "action",
-     "error",
      "last_operation"
     ],
     "properties": {
@@ -17404,9 +17464,6 @@
       "type": "string"
      },
      "action": {
-      "type": "string"
-     },
-     "error": {
       "type": "string"
      },
      "last_operation": {
