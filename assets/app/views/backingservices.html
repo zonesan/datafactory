@@ -17,7 +17,7 @@
       </tbody>
       <tbody ng-repeat="backingservice in backingservices | orderObjectsByDate : true">
       <tr>
-        <td data-title="Name"><a ng-href="backingservices/{{backingservice.metadata.name}}">{{backingservice.spec.name}}</a></td>
+        <td data-title="Name"><a ng-href="project/openshift/backingservices/{{backingservice.metadata.name}}">{{backingservice.spec.name}}</a></td>
         <td data-title="version">
           {{backingservice.apiVersion}}
         </td>

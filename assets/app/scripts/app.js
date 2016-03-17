@@ -104,11 +104,11 @@ angular
           return '/project/' + encodeURIComponent(params.project) + "/overview";
         }
       })
-      .when('/backingservices', {
+      .when('/project/:project/backingservices', {
         templateUrl: 'views/backingservices.html',
         controller: 'BackingservicesController'
       })
-      .when('/backingservices/:backingservice', {
+      .when('/project/:project/backingservices/:backingservice', {
         templateUrl: 'views/backingservice.html',
         controller: 'BackingserviceController'
 
