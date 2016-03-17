@@ -4,13 +4,10 @@ import (
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
 	"fmt"
-	"github.com/golang/glog"
-	backingservice "github.com/openshift/origin/pkg/backingservice/api"
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/fields"
 	"k8s.io/kubernetes/pkg/labels"
 	"strconv"
@@ -57,31 +54,11 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 
 				errs := []error{}
 				for _, v := range services.Services {
-					backingService := &backingservice.BackingService{}
-					backingService.Spec = backingservice.BackingServiceSpec(v)
-					backingService.Annotations = make(map[string]string)
-					backingService.Name = v.Name
-					backingService.GenerateName = sb.Name
-					backingService.Labels = map[string]string{
-						servicebrokerapi.ServiceBrokerLabel: sb.Name,
-					}
 
-					_, err := c.Client.BackingServices(BSNS).Get(backingService.Name)
-					if err != nil {
-						if errors.IsNotFound(err) {
-							if _, err := c.Client.BackingServices(BSNS).Create(backingService); err != nil {
-								glog.Errorln("servicebroker create backingservice err ", err)
-								errs = append(errs, err)
-							}
-						}
-					} else {
-						if _, err := c.Client.BackingServices(BSNS).Update(backingService); err != nil {
-							glog.Errorln("servicebroker update backingservice err ", err)
-							errs = append(errs, err)
-						}
+					if err := backingServiceHandler(c.Client, newBackingService(sb.Name, v)); err != nil {
+						errs = append(errs, err)
 					}
 				}
-
 				if len(errs) == 0 {
 					removeRetryTime(sb)
 					sb.Status.Phase = servicebrokerapi.ServiceBrokerActive

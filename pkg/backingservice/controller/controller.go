@@ -25,6 +25,7 @@ func (e fatalError) Error() string {
 
 // Handle processes a namespace and deletes content in origin if its terminating
 func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) (err error) {
+
 	switch bs.Status.Phase {
 	case backingserviceapi.BackingServicePhaseInactive:
 		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
@@ -35,13 +36,6 @@ func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) 
 		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
 		c.Client.BackingServices(bs.Namespace).Update(bs)
 	}
-	/*
-		if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {
-			bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
-			c.recorder.Eventf(bs, "New", " '%s' is now %s!", bs.Name, bs.Status.Phase)
 
-			c.Client.BackingServices().Update(bs)
-		}
-	*/
 	return nil
 }

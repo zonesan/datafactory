@@ -36,7 +36,7 @@ func (factory *ApplicationControllerFactory) Create() controller.RunnableControl
 		},
 	}
 	queue := cache.NewFIFO(cache.MetaNamespaceKeyFunc)
-	cache.NewReflector(applicationLW, &applicationapi.Application{}, queue, 1*time.Minute).Run()
+	cache.NewReflector(applicationLW, &applicationapi.Application{}, queue, 10 * time.Second).Run()
 
 	applicationController := &ApplicationController{
 		Client:     factory.Client,

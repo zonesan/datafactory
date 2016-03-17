@@ -17,9 +17,29 @@ const (
 	newApplicationLong = `
 Create a new application to partition resources for a comfortable knowledge of my services
 
+*  DeploymentConfig [dc]
+*  BuildConfig  [bc]
+*  ImageStream  [is]
+*  ImageStreamTag  [istag]
+*  ImageStreamImage  [isimage]
+*  PersistentVolume  [pv]
+*  PersistentVolumeClaim  [pvc]
+*  ReplicationController  [rc]
+*  Node  [no]
+*  Pod  [po]
+*  Service  [svc]
+*  Event  [ev]
+*  BackingService  [bs]
+*  ServiceBroker  [sb]
+*  BackingServiceInstance  [bsi]
+
 `
 	newApplicationExample = `# Create a new application with [name items]
-  $ %[1]s  mobile_app  --items="Pod=php,Pod=mysql,ServiceBrokerInstance=redis"`
+  $ %[1]s  mobile_app  --items="Pod=php,Pod=mysql,ServiceBroker=redis"
+
+  $ %[1]s  mobile_app  --items="po=php,no=mysql,sb=redis"
+  `
+
 )
 
 type NewApplicationOptions struct {
@@ -113,3 +133,4 @@ func (o *NewApplicationOptions) Run(f *clientcmd.Factory) error {
 
 	return nil
 }
+

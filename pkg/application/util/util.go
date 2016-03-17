@@ -27,10 +27,35 @@ func Parse(items string) (applicationapi.ItemList, error) {
 		}
 
 		list = append(list, applicationapi.Item{
-			Kind: item[0],
+			Kind: expandKindShortcut(item[0]),
 			Name: item[1],
 		})
 	}
 
 	return list, nil
+}
+
+//todo make elegant
+func expandKindShortcut(kind string) string {
+	shortForms := map[string]string{
+		"dc":      "DeploymentConfig",
+		"bc":      "BuildConfig",
+		"is":      "ImageStream",
+		"istag":   "ImageStreamTag",
+		"isimage": "ImageStreamImage",
+		"pv":      "PersistentVolume",
+		"pvc":     "PersistentVolumeClaim",
+		"rc":      "ReplicationController",
+		"no":      "Node",
+		"po":      "Pod",
+		"svc":     "Service",
+		"ev":      "Event",
+		"bs":      "BackingService",
+		"sb":      "ServiceBroker",
+		"bsi":     "BackingServiceInstance",
+	}
+	if expanded, ok := shortForms[kind]; ok {
+		return expanded
+	}
+	return kind
 }

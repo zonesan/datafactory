@@ -162,48 +162,56 @@ func (c *ApplicationController) preHandleAllLabel(application *api.Application) 
 }
 
 func (c *ApplicationController) handleAllLabel(app *api.Application) error {
-	errs := []error{}
+	if c.destoryApplication(app) {
+		return nil
+	}
 
+	errs := []error{}
+	oldLength := len(app.Spec.Items)
 	for i, item := range app.Spec.Items {
+		newLength := len(app.Spec.Items)
+		deleteNum := oldLength - newLength
+		i = i - deleteNum
+
 		switch item.Kind {
 		case "ServiceBroker":
-			if err := c.handleServiceBrokerLabel(app, i, item.Name); err != nil {
+			if err := c.handleServiceBrokerLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "BackingService":
-			if err := c.handleBackingServiceLabel(app, i, item.Name); err != nil {
+			if err := c.handleBackingServiceLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "BackingServiceInstance":
-			if err := c.handleBackingServiceInstanceLabel(app, i, item.Name); err != nil {
+			if err := c.handleBackingServiceInstanceLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "Build":
-			if err := c.handleBuildLabel(app, i, item.Name); err != nil {
+			if err := c.handleBuildLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "BuildConfig":
-			if err := c.handleBuildConfigLabel(app, i, item.Name); err != nil {
+			if err := c.handleBuildConfigLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "DeploymentConfig":
-			if err := c.handleDeploymentConfigLabel(app, i, item.Name); err != nil {
+			if err := c.handleDeploymentConfigLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "ReplicationController":
-			if err := c.handleReplicationControllerLabel(app, i, item.Name); err != nil {
+			if err := c.handleReplicationControllerLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "Node":
-			if err := c.handleNodeLabel(app, i, item.Name); err != nil {
+			if err := c.handleNodeLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "Pod":
-			if err := c.handlePodLabel(app, i, item.Name); err != nil {
+			if err := c.handlePodLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "Service":
-			if err := c.handleServiceLabel(app, i, item.Name); err != nil {
+			if err := c.handleServiceLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		default:
@@ -212,4 +220,14 @@ func (c *ApplicationController) handleAllLabel(app *api.Application) error {
 	}
 
 	return errutil.NewAggregate(errs)
+}
+
+func (c *ApplicationController) destoryApplication(app *api.Application) bool {
+	if len(app.Spec.Items) == 0 {
+		if app.Status.Phase == api.ApplicationTerminatingLabel || app.Status.Phase == api.ApplicationTerminating {
+			c.Client.Applications(app.Namespace).Delete(app.Name)
+			return true
+		}
+	}
+	return false
 }
