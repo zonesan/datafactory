@@ -93,7 +93,7 @@ func (o *NewBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd.
 	}
 	
 	//>> todo: maybe better do this is in Create
-	bs, err := client.BackingServices().Get(o.BackingServiceName)
+	bs, err := client.BackingServices("openshift").Get(o.BackingServiceName)
 	if err != nil {
 		return err
 	}
@@ -205,7 +205,7 @@ func (o *EditBackingServiceInstanceOptions) Run(cmd *cobra.Command, f *clientcmd
 	}
 	
 	//>> todo: maybe better do this is in Update
-	bs, err := client.BackingServices().Get(backingServiceInstance.Spec.BackingServiceName)
+	bs, err := client.BackingServices("openshift").Get(backingServiceInstance.Spec.BackingServiceName)
 	if err != nil {
 		return err
 	}

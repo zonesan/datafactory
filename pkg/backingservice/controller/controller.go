@@ -1,7 +1,6 @@
 package controller
 
 import (
-
 	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
 	osclient "github.com/openshift/origin/pkg/client"
 	"k8s.io/kubernetes/pkg/client/record"
@@ -32,8 +31,9 @@ func (c *BackingServiceController) Handle(bs *backingserviceapi.BackingService) 
 	case backingserviceapi.BackingServicePhaseActive:
 	default:
 		bs.Status.Phase = backingserviceapi.BackingServicePhaseActive
+
 		c.recorder.Eventf(bs, "New", "'%s' is now %s!", bs.Name, bs.Status.Phase)
-		c.Client.BackingServices().Update(bs)
+		c.Client.BackingServices(bs.Namespace).Update(bs)
 	}
 	/*
 		if bs.Status.Phase != backingserviceapi.BackingServicePhaseActive {

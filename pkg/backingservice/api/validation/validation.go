@@ -22,7 +22,7 @@ func BackingServicetName(name string, prefix bool) (bool, string) {
 // ValidateBackingService tests required fields for a BackingService.
 func ValidateBackingService(bs *backingserviceapi.BackingService) fielderrors.ValidationErrorList {
 	allErrs := fielderrors.ValidationErrorList{}
-	allErrs = append(allErrs, validation.ValidateObjectMeta(&bs.ObjectMeta, false, BackingServicetName).Prefix("metadata")...)
+	allErrs = append(allErrs, validation.ValidateObjectMeta(&bs.ObjectMeta, true, BackingServicetName).Prefix("metadata")...)
 	//allErrs = append(allErrs, validateBuildSpec(&build.Spec).Prefix("spec")...)
 	return allErrs
 }

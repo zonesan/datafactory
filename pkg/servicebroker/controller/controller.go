@@ -3,18 +3,18 @@ package controller
 import (
 	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 
-	osclient "github.com/openshift/origin/pkg/client"
-	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
-	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	"fmt"
 	"github.com/golang/glog"
 	backingservice "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	osclient "github.com/openshift/origin/pkg/client"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	servicebrokerclient "github.com/openshift/origin/pkg/servicebroker/client"
-	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/api/errors"
 	"k8s.io/kubernetes/pkg/fields"
-	"time"
-	"fmt"
+	"k8s.io/kubernetes/pkg/labels"
 	"strconv"
+	"time"
 )
 
 // NamespaceController is responsible for participating in Kubernetes Namespace termination
@@ -27,6 +27,8 @@ type ServiceBrokerController struct {
 	//ServiceBrokerClient is a ServiceBroker client
 	ServiceBrokerClient servicebrokerclient.Interface
 }
+
+const BSNS = "openshift"
 
 type fatalError string
 
@@ -64,16 +66,16 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 						servicebrokerapi.ServiceBrokerLabel: sb.Name,
 					}
 
-					_, err := c.Client.BackingServices().Get(backingService.Name)
+					_, err := c.Client.BackingServices(BSNS).Get(backingService.Name)
 					if err != nil {
 						if errors.IsNotFound(err) {
-							if _, err := c.Client.BackingServices().Create(backingService); err != nil {
+							if _, err := c.Client.BackingServices(BSNS).Create(backingService); err != nil {
 								glog.Errorln("servicebroker create backingservice err ", err)
 								errs = append(errs, err)
 							}
 						}
 					} else {
-						if _, err := c.Client.BackingServices().Update(backingService); err != nil {
+						if _, err := c.Client.BackingServices(BSNS).Update(backingService); err != nil {
 							glog.Errorln("servicebroker update backingservice err ", err)
 							errs = append(errs, err)
 						}
@@ -137,12 +139,12 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices(BSNS).List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseInactive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseInactive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices(BSNS).Update(&bsvc)
 			}
 		}
 	}
@@ -151,12 +153,12 @@ func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName strin
 func (c *ServiceBrokerController) ActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices(BSNS).List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseActive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseActive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices(BSNS).Update(&bsvc)
 			}
 		}
 	}
@@ -179,7 +181,7 @@ func Ping(sb *servicebrokerapi.ServiceBroker, pingSecond int64) bool {
 		return false
 	}
 
-	if (time.Now().UnixNano() - int64(lastPing)) / 1e9 < pingSecond {
+	if (time.Now().UnixNano()-int64(lastPing))/1e9 < pingSecond {
 		return false
 	}
 
@@ -212,7 +214,7 @@ func setRetryTime(sb *servicebrokerapi.ServiceBroker) {
 		return
 	}
 
-	sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", i + 1)
+	sb.Annotations[servicebrokerapi.ServiceBrokerNewRetryTimes] = fmt.Sprintf("%d", i+1)
 
 	return
 }

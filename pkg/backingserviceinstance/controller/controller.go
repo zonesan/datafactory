@@ -46,7 +46,7 @@ func (c *BackingServiceInstanceController) Handle(bsi *backingserviceinstanceapi
 
 	changed := false
 
-	bs, err := c.Client.BackingServices().Get(bsi.Spec.BackingServiceName)
+	bs, err := c.Client.BackingServices("openshift").Get(bsi.Spec.BackingServiceName)
 	if err != nil {
 		return err
 	}
@@ -232,7 +232,7 @@ func servicebroker_load(c osclient.Interface, name string) (*ServiceBroker, erro
 
 func checkIfPlanidExist(client osclient.Interface, planId string) (bool, *backingserviceapi.BackingService, error) {
 
-	items, err := client.BackingServices().List(labels.Everything(), fields.Everything())
+	items, err := client.BackingServices("openshift").List(labels.Everything(), fields.Everything())
 
 	if err != nil {
 		return false, nil, err
@@ -563,7 +563,7 @@ func (c *BackingServiceInstanceController) deploymentconfig_modify_envs(dcname s
 		return nil
 	}
 
-	bs, err := c.Client.BackingServices().Get(bsi.Spec.BackingServiceName)
+	bs, err := c.Client.BackingServices("openshift").Get(bsi.Spec.BackingServiceName)
 	if err != nil {
 		return err
 	}
@@ -635,7 +635,7 @@ func modifyVcapServicesEnvNameEnv(env []kapi.EnvVar, bsName string, vsp *VcapSer
 		vs = removeVcapServiceParameters(vs, bsName, bsiName)
 	}
 
-	if len(vs)==0{
+	if len(vs) == 0 {
 		return env_unset(env, VcapServicesEnvName)
 	}
 	json_data, err := json.Marshal(vs)
