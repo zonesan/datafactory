@@ -62,5 +62,5 @@ type ServiceBrokerStatus struct {
 }
 
 const (
-	ServiceBrokerLabel = "asiainfoLDP/servicebroker"
+	ServiceBrokerLabel = "asiainfo.io/servicebroker"
 )
