@@ -126,7 +126,7 @@ type BackingServiceDescriber struct {
 
 // Describe returns the description of an backingService
 func (d *BackingServiceDescriber) Describe(namespace, name string) (string, error) {
-	c := d.osClient.BackingServices()
+	c := d.osClient.BackingServices(namespace)
 	bs, err := c.Get(name)
 	if err != nil {
 		return "", err
@@ -275,7 +275,7 @@ func (appDescriber *ApplicationDescriber) Describe(namespace, name string) (stri
 			itemCreateTime = sb.CreationTimestamp.String()
 
 		case "BackingService":
-			bs, _ := appDescriber.osClient.BackingServices().Get(item.Name)
+			bs, _ := appDescriber.osClient.BackingServices(namespace).Get(item.Name)
 			itemCreateTime = bs.CreationTimestamp.String()
 
 		case "BackingServiceInstance":

@@ -10,7 +10,7 @@ import (
 
 // BackingServicesInterface has methods to work with BackingService resources in a namespace
 type BackingServicesInterface interface {
-	BackingServices() BackingServiceInterface
+	BackingServices(namespace string) BackingServiceInterface
 }
 
 // BackingServiceInterface exposes methods on project resources.
@@ -25,19 +25,21 @@ type BackingServiceInterface interface {
 
 type backingservices struct {
 	r *Client
+	ns string
 }
 
 // newUsers returns a project
-func newBackingServices(c *Client) *backingservices {
+func newBackingServices(c *Client, namespace string) *backingservices {
 	return &backingservices{
 		r: c,
+		ns: namespace,
 	}
 }
 
 // Get returns information about a particular project or an error
 func (c *backingservices) Get(name string) (result *backingserviceapi.BackingService, err error) {
 	result = &backingserviceapi.BackingService{}
-	err = c.r.Get().Resource("backingservices").Name(name).Do().Into(result)
+	err = c.r.Get().Namespace(c.ns).Resource("backingservices").Name(name).Do().Into(result)
 	return
 }
 
@@ -45,6 +47,7 @@ func (c *backingservices) Get(name string) (result *backingserviceapi.BackingSer
 func (c *backingservices) List(label labels.Selector, field fields.Selector) (result *backingserviceapi.BackingServiceList, err error) {
 	result = &backingserviceapi.BackingServiceList{}
 	err = c.r.Get().
+		Namespace(c.ns).
 		Resource("backingservices").
 		LabelsSelectorParam(label).
 		FieldsSelectorParam(field).
@@ -56,26 +59,27 @@ func (c *backingservices) List(label labels.Selector, field fields.Selector) (re
 // Create creates a new BackingService
 func (c *backingservices) Create(p *backingserviceapi.BackingService) (result *backingserviceapi.BackingService, err error) {
 	result = &backingserviceapi.BackingService{}
-	err = c.r.Post().Resource("backingservices").Body(p).Do().Into(result)
+	err = c.r.Post().Namespace(c.ns).Resource("backingservices").Body(p).Do().Into(result)
 	return
 }
 
 // Update updates the project on server
 func (c *backingservices) Update(p *backingserviceapi.BackingService) (result *backingserviceapi.BackingService, err error) {
 	result = &backingserviceapi.BackingService{}
-	err = c.r.Put().Resource("backingservices").Name(p.Name).Body(p).Do().Into(result)
+	err = c.r.Put().Namespace(c.ns).Resource("backingservices").Name(p.Name).Body(p).Do().Into(result)
 	return
 }
 
 // Delete removes the project on server
 func (c *backingservices) Delete(name string) (err error) {
-	err = c.r.Delete().Resource("backingservices").Name(name).Do().Error()
+	err = c.r.Delete().Namespace(c.ns).Resource("backingservices").Name(name).Do().Error()
 	return
 }
 
 // Watch returns a watch.Interface that watches the requested backingservices
 func (c *backingservices) Watch(label labels.Selector, field fields.Selector, resourceVersion string) (watch.Interface, error) {
 	return c.r.Get().
+		Namespace(c.ns).
 		Prefix("watch").
 		Resource("backingservices").
 		Param("resourceVersion", resourceVersion).

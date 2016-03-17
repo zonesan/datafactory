@@ -116,7 +116,7 @@ func init() {
 	// if a kind is not enumerated here, it is assumed to have a namespace scope
 	kindToRootScope := map[string]bool{
 		"ServiceBroker":  true,
-		"BackingService": true,
+		//"BackingService": true,
 		//"BackingServiceInstance": true,
 
 		"Status": true,

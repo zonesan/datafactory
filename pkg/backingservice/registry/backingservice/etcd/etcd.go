@@ -25,10 +25,10 @@ func NewREST(s storage.Interface) *REST {
 		NewFunc:     func() runtime.Object { return &api.BackingService{} },
 		NewListFunc: func() runtime.Object { return &api.BackingServiceList{} },
 		KeyRootFunc: func(ctx kapi.Context) string {
-			return prefix
+			return etcdgeneric.NamespaceKeyRootFunc(ctx, prefix)
 		},
 		KeyFunc: func(ctx kapi.Context, name string) (string, error) {
-			return etcdgeneric.NoNamespaceKeyFunc(ctx, prefix, name)
+			return etcdgeneric.NamespaceKeyFunc(ctx, prefix, name)
 		},
 		ObjectNameFunc: func(obj runtime.Object) (string, error) {
 			return obj.(*api.BackingService).Name, nil

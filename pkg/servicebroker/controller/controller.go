@@ -64,16 +64,16 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 						servicebrokerapi.ServiceBrokerLabel: sb.Name,
 					}
 
-					_, err := c.Client.BackingServices().Get(backingService.Name)
+					_, err := c.Client.BackingServices("openshift").Get(backingService.Name)
 					if err != nil {
 						if errors.IsNotFound(err) {
-							if _, err := c.Client.BackingServices().Create(backingService); err != nil {
+							if _, err := c.Client.BackingServices("openshift").Create(backingService); err != nil {
 								glog.Errorln("servicebroker create backingservice err ", err)
 								errs = append(errs, err)
 							}
 						}
 					} else {
-						if _, err := c.Client.BackingServices().Update(backingService); err != nil {
+						if _, err := c.Client.BackingServices("openshift").Update(backingService); err != nil {
 							glog.Errorln("servicebroker update backingservice err ", err)
 							errs = append(errs, err)
 						}
@@ -137,12 +137,12 @@ func (c *ServiceBrokerController) Handle(sb *servicebrokerapi.ServiceBroker) (er
 func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices("openshift").List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseInactive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseInactive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices("openshift").Update(&bsvc)
 			}
 		}
 	}
@@ -151,12 +151,12 @@ func (c *ServiceBrokerController) inActiveBackingService(serviceBrokerName strin
 func (c *ServiceBrokerController) ActiveBackingService(serviceBrokerName string) {
 	selector, _ := labels.Parse(servicebrokerapi.ServiceBrokerLabel + "=" + serviceBrokerName)
 
-	bsList, err := c.Client.BackingServices().List(selector, fields.Everything())
+	bsList, err := c.Client.BackingServices("openshift").List(selector, fields.Everything())
 	if err == nil {
 		for _, bsvc := range bsList.Items {
 			if bsvc.Status.Phase != backingserviceapi.BackingServicePhaseActive {
 				bsvc.Status.Phase = backingserviceapi.BackingServicePhaseActive
-				c.Client.BackingServices().Update(&bsvc)
+				c.Client.BackingServices("openshift").Update(&bsvc)
 			}
 		}
 	}
