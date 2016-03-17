@@ -20,7 +20,7 @@
         <td data-title="Instance Name">
         <a ng-href="{{bsi | navigateResourceURL}}">{{bsi.metadata.name}}</a></td>
         <td data-title="Backing Service Name">
-        <a ng-href="backingservices/{{bsi.bsName}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
+        <a ng-href="project/openshift/backingservices/{{bsi.bsName}}">{{bsi.spec.provisioning.backingservice_name}}</a></td>
         <td data-title="Created Time">
         <relative-timestamp timestamp="bsi.metadata.creationTimestamp"></relative-timestamp>
         </td>
