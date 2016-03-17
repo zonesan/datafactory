@@ -70,6 +70,9 @@ func (r *REST) List(ctx kapi.Context, label labels.Selector, field fields.Select
 
 // Create creates an image based on a specification.
 func (r *REST) Create(ctx kapi.Context, obj runtime.Object) (runtime.Object, error) {
+	if bs, ok := obj.(*api.BackingService); ok {
+		bs.Status.Phase = api.BackingServicePhaseActive
+	}
 	return r.store.Create(ctx, obj)
 }
 
