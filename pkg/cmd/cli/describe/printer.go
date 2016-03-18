@@ -14,7 +14,10 @@ import (
 	"k8s.io/kubernetes/pkg/labels"
 	"k8s.io/kubernetes/pkg/util/sets"
 
+	applicationapi "github.com/openshift/origin/pkg/application/api"
 	authorizationapi "github.com/openshift/origin/pkg/authorization/api"
+	backingserviceapi "github.com/openshift/origin/pkg/backingservice/api"
+	backingserviceinstanceapi "github.com/openshift/origin/pkg/backingserviceinstance/api"
 	buildapi "github.com/openshift/origin/pkg/build/api"
 	deployapi "github.com/openshift/origin/pkg/deploy/api"
 	imageapi "github.com/openshift/origin/pkg/image/api"
@@ -22,26 +25,31 @@ import (
 	projectapi "github.com/openshift/origin/pkg/project/api"
 	routeapi "github.com/openshift/origin/pkg/route/api"
 	sdnapi "github.com/openshift/origin/pkg/sdn/api"
+	servicebrokerapi "github.com/openshift/origin/pkg/servicebroker/api"
 	templateapi "github.com/openshift/origin/pkg/template/api"
 	userapi "github.com/openshift/origin/pkg/user/api"
 )
 
 var (
-	buildColumns            = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
-	buildConfigColumns      = []string{"NAME", "TYPE", "FROM", "LATEST"}
-	imageColumns            = []string{"NAME", "DOCKER REF"}
-	imageStreamTagColumns   = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
-	imageStreamImageColumns = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
-	imageStreamColumns      = []string{"NAME", "DOCKER REPO", "TAGS", "UPDATED"}
-	projectColumns          = []string{"NAME", "DISPLAY NAME", "STATUS"}
-	routeColumns            = []string{"NAME", "HOST/PORT", "PATH", "SERVICE", "LABELS", "INSECURE POLICY", "TLS TERMINATION"}
-	deploymentColumns       = []string{"NAME", "STATUS", "CAUSE"}
-	deploymentConfigColumns = []string{"NAME", "TRIGGERS", "LATEST"}
-	templateColumns         = []string{"NAME", "DESCRIPTION", "PARAMETERS", "OBJECTS"}
-	policyColumns           = []string{"NAME", "ROLES", "LAST MODIFIED"}
-	policyBindingColumns    = []string{"NAME", "ROLE BINDINGS", "LAST MODIFIED"}
-	roleBindingColumns      = []string{"NAME", "ROLE", "USERS", "GROUPS", "SERVICE ACCOUNTS", "SUBJECTS"}
-	roleColumns             = []string{"NAME"}
+	applicationColumns            = []string{"NAME", "NAMESPACE", "LABELS", "CREATE TIME", "STATUS"}
+	serviceBrokerColumns          = []string{"NAME", "LABELS", "CREATE TIME", "URL", "STATUS"}
+	backingServiceColumns         = []string{"NAME", "LABELS", "BINDABLE", "STATUS"}
+	backingServiceInstanceColumns = []string{"NAME", "SERVICE", "PLAN", "BOUND", "STATUS"}
+	buildColumns                  = []string{"NAME", "TYPE", "FROM", "STATUS", "STARTED", "DURATION"}
+	buildConfigColumns            = []string{"NAME", "TYPE", "FROM", "LATEST"}
+	imageColumns                  = []string{"NAME", "DOCKER REF"}
+	imageStreamTagColumns         = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
+	imageStreamImageColumns       = []string{"NAME", "DOCKER REF", "UPDATED", "IMAGENAME"}
+	imageStreamColumns            = []string{"NAME", "DOCKER REPO", "TAGS", "UPDATED"}
+	projectColumns                = []string{"NAME", "DISPLAY NAME", "STATUS"}
+	routeColumns                  = []string{"NAME", "HOST/PORT", "PATH", "SERVICE", "LABELS", "INSECURE POLICY", "TLS TERMINATION"}
+	deploymentColumns             = []string{"NAME", "STATUS", "CAUSE"}
+	deploymentConfigColumns       = []string{"NAME", "TRIGGERS", "LATEST"}
+	templateColumns               = []string{"NAME", "DESCRIPTION", "PARAMETERS", "OBJECTS"}
+	policyColumns                 = []string{"NAME", "ROLES", "LAST MODIFIED"}
+	policyBindingColumns          = []string{"NAME", "ROLE BINDINGS", "LAST MODIFIED"}
+	roleBindingColumns            = []string{"NAME", "ROLE", "USERS", "GROUPS", "SERVICE ACCOUNTS", "SUBJECTS"}
+	roleColumns                   = []string{"NAME"}
 
 	oauthClientColumns              = []string{"NAME", "SECRET", "WWW-CHALLENGE", "REDIRECT URIS"}
 	oauthClientAuthorizationColumns = []string{"NAME", "USER NAME", "CLIENT NAME", "SCOPES"}
@@ -65,6 +73,14 @@ var (
 func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, columnLabels []string) *kctl.HumanReadablePrinter {
 	// TODO: support cross namespace listing
 	p := kctl.NewHumanReadablePrinter(noHeaders, withNamespace, wide, showAll, columnLabels)
+	p.Handler(applicationColumns, printApplication)
+	p.Handler(applicationColumns, printApplicationList)
+	p.Handler(serviceBrokerColumns, printServiceBroker)
+	p.Handler(serviceBrokerColumns, printServiceBrokerList)
+	p.Handler(backingServiceColumns, printBackingService)
+	p.Handler(backingServiceColumns, printBackingServiceList)
+	p.Handler(backingServiceInstanceColumns, printBackingServiceInstance)
+	p.Handler(backingServiceInstanceColumns, printBackingServiceInstanceList)
 	p.Handler(buildColumns, printBuild)
 	p.Handler(buildColumns, printBuildList)
 	p.Handler(buildConfigColumns, printBuildConfig)
@@ -133,6 +149,82 @@ func NewHumanReadablePrinter(noHeaders, withNamespace, wide bool, showAll bool, 
 }
 
 const templateDescriptionLen = 80
+
+func printApplication(application *applicationapi.Application, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", application.Name, application.Namespace, labels.Set(application.Labels), formatRelativeTime(application.CreationTimestamp.Time), application.Status.Phase)
+	return err
+}
+
+type SortableApplications []applicationapi.Application
+
+func (list SortableApplications) Len() int {
+	return len(list)
+}
+
+func (list SortableApplications) Swap(i, j int) {
+	list[i], list[j] = list[j], list[i]
+}
+
+func (list SortableApplications) Less(i, j int) bool {
+	return list[i].ObjectMeta.Name < list[j].ObjectMeta.Name
+}
+
+func printApplicationList(applications *applicationapi.ApplicationList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	sort.Sort(SortableApplications(applications.Items))
+	for _, application := range applications.Items {
+		if err := printApplication(&application, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printBackingService(bs *backingserviceapi.BackingService, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	/*
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
+	*/
+
+	_, err := fmt.Fprintf(w, "%s\t%s\t%v\t%s\n", bs.Name, formatLabels(bs.Labels), bs.Spec.Bindable, bs.Status.Phase)
+	return err
+}
+
+func printBackingServiceList(bsList *backingserviceapi.BackingServiceList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+
+	for _, bs := range bsList.Items {
+		if err := printBackingService(&bs, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printBackingServiceInstance(bsi *backingserviceinstanceapi.BackingServiceInstance, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	/*
+		var labels []string
+		for k, v := range bs.Labels {
+			label := fmt.Sprintf("%s=%s", k, v)
+			labels = append(labels, label)
+		}
+	*/
+
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%v\t%s\n", bsi.Name, bsi.Spec.BackingServiceName,
+		bsi.Spec.BackingServicePlanName, bsi.Spec.Bound, bsi.Status.Phase)
+	return err
+}
+
+func printBackingServiceInstanceList(bsiList *backingserviceinstanceapi.BackingServiceInstanceList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+
+	for _, bsi := range bsiList.Items {
+		if err := printBackingServiceInstance(&bsi, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
 
 // PrintTemplateParameters the Template parameters with their default values
 func PrintTemplateParameters(params []templateapi.Parameter, output io.Writer) error {
@@ -419,6 +511,35 @@ func printProjectList(projects *projectapi.ProjectList, w io.Writer, withNamespa
 	sort.Sort(SortableProjects(projects.Items))
 	for _, project := range projects.Items {
 		if err := printProject(&project, w, withNamespace, wide, showAll, columnLabels); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func printServiceBroker(serviceBroker *servicebrokerapi.ServiceBroker, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	_, err := fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t\n", serviceBroker.Name, labels.Set(serviceBroker.Labels), formatRelativeTime(serviceBroker.CreationTimestamp.Time), serviceBroker.Spec.Url, serviceBroker.Status.Phase)
+	return err
+}
+
+type SortableServiceBrokers []servicebrokerapi.ServiceBroker
+
+func (list SortableServiceBrokers) Len() int {
+	return len(list)
+}
+
+func (list SortableServiceBrokers) Swap(i, j int) {
+	list[i], list[j] = list[j], list[i]
+}
+
+func (list SortableServiceBrokers) Less(i, j int) bool {
+	return list[i].ObjectMeta.Name < list[j].ObjectMeta.Name
+}
+
+func printServiceBrokerList(serviceBrokers *servicebrokerapi.ServiceBrokerList, w io.Writer, withNamespace, wide, showAll bool, columnLabels []string) error {
+	sort.Sort(SortableServiceBrokers(serviceBrokers.Items))
+	for _, serviceBroker := range serviceBrokers.Items {
+		if err := printServiceBroker(&serviceBroker, w, withNamespace, wide, showAll, columnLabels); err != nil {
 			return err
 		}
 	}

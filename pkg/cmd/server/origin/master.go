@@ -25,6 +25,11 @@ import (
 	"github.com/openshift/origin/pkg/api/latest"
 	"github.com/openshift/origin/pkg/api/v1"
 	"github.com/openshift/origin/pkg/api/v1beta3"
+
+	application "github.com/openshift/origin/pkg/application/registry/application/etcd"
+	backingservice "github.com/openshift/origin/pkg/backingservice/registry/backingservice/etcd"
+	backingserviceinstanceetcd "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance/etcd"
+	backingserviceinstanceregistry "github.com/openshift/origin/pkg/backingserviceinstance/registry/backingserviceinstance"
 	buildclient "github.com/openshift/origin/pkg/build/client"
 	buildgenerator "github.com/openshift/origin/pkg/build/generator"
 	buildregistry "github.com/openshift/origin/pkg/build/registry/build"
@@ -61,6 +66,7 @@ import (
 	hostsubnetetcd "github.com/openshift/origin/pkg/sdn/registry/hostsubnet/etcd"
 	netnamespaceetcd "github.com/openshift/origin/pkg/sdn/registry/netnamespace/etcd"
 	"github.com/openshift/origin/pkg/service"
+	servicebroker "github.com/openshift/origin/pkg/servicebroker/registry/servicebroker/etcd"
 	templateregistry "github.com/openshift/origin/pkg/template/registry"
 	templateetcd "github.com/openshift/origin/pkg/template/registry/etcd"
 	groupetcd "github.com/openshift/origin/pkg/user/registry/group/etcd"
@@ -330,7 +336,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	if err != nil {
 		glog.Fatalf("Unable to configure Kubelet client: %v", err)
 	}
-
+	applicationStorage := application.NewREST(c.EtcdHelper, c.PrivilegedLoopbackOpenShiftClient, c.PrivilegedLoopbackKubernetesClient)
+	serviceBrokerStorage := servicebroker.NewREST(c.EtcdHelper)
+	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
+	
 	buildStorage, buildDetailsStorage := buildetcd.NewStorage(c.EtcdHelper)
 	buildRegistry := buildregistry.NewRegistry(buildStorage)
 
@@ -384,6 +393,10 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	imageStreamTagRegistry := imagestreamtag.NewRegistry(imageStreamTagStorage)
 	imageStreamImageStorage := imagestreamimage.NewREST(imageRegistry, imageStreamRegistry)
 	imageStreamImageRegistry := imagestreamimage.NewRegistry(imageStreamImageStorage)
+	
+	backingServiceInstanceEtcd := backingserviceinstanceetcd.NewREST(c.EtcdHelper)
+	backingServiceInstanceRegistry := backingserviceinstanceregistry.NewRegistry(backingServiceInstanceEtcd)
+	backingServiceInstanceBindingEtcd := backingserviceinstanceetcd.NewBindingREST(backingServiceInstanceRegistry, deployConfigRegistry)
 
 	buildGenerator := &buildgenerator.BuildGenerator{
 		Client: buildgenerator.Client{
@@ -435,12 +448,19 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	)
 
 	storage := map[string]rest.Storage{
-		"images":              imageStorage,
-		"imageStreams":        imageStreamStorage,
-		"imageStreams/status": imageStreamStatusStorage,
-		"imageStreamImages":   imageStreamImageStorage,
-		"imageStreamMappings": imageStreamMappingStorage,
-		"imageStreamTags":     imageStreamTagStorage,
+		"applications":            applicationStorage,
+		"serviceBrokers":          serviceBrokerStorage,
+		"backingServices":         backingServiceStorage,
+		
+		"backingServiceInstances"        : backingServiceInstanceEtcd,
+		"backingServiceInstances/binding": backingServiceInstanceBindingEtcd,
+		
+		"images":                  imageStorage,
+		"imageStreams":            imageStreamStorage,
+		"imageStreams/status":     imageStreamStatusStorage,
+		"imageStreamImages":       imageStreamImageStorage,
+		"imageStreamMappings":     imageStreamMappingStorage,
+		"imageStreamTags":         imageStreamTagStorage,
 
 		"deploymentConfigs":         deployConfigStorage.DeploymentConfig,
 		"deploymentConfigs/scale":   deployConfigStorage.Scale,

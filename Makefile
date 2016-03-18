@@ -1,3 +1,4 @@
+
 # Old-skool build tools.
 #
 # Targets (see each target for more information):
@@ -15,14 +16,12 @@ export GOFLAGS
 export TESTFLAGS
 
 # Build code.
-#
 # Args:
 #   WHAT: Directory names to build.  If any of these directories has a 'main'
 #     package, the build will produce executable files under $(OUT_DIR)/go/bin.
 #     If not specified, "everything" will be built.
 #   GOFLAGS: Extra flags to pass to 'go' when building.
 #   TESTFLAGS: Extra flags that should only be passed to hack/test-go.sh
-#
 # Example:
 #   make
 #   make all
@@ -44,7 +43,7 @@ all build:
 #   make check
 #   make check WHAT=pkg/build GOFLAGS=-v
 check:
-	TEST_KUBE=1 hack/test-go.sh $(WHAT) $(TESTS) $(TESTFLAGS)
+	TEST_KUBE=0 hack/test-go.sh $(WHAT) $(TESTS) $(TESTFLAGS)
 .PHONY: check
 
 # Verify code is properly organized.
