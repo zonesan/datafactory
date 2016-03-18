@@ -106,6 +106,22 @@ func unloadReplicationControllerLabel(client kclient.Interface, application *api
 	return nil
 }
 
+func unloadImageStreamLabel(client osclient.Interface, application *api.Application, labelSelector labels.Selector) error {
+
+	resourceList, _ := client.ImageStreams(application.Namespace).List(labelSelector, fields.Everything())
+	errs := []error{}
+	for _, resource := range resourceList.Items {
+		if !hasItem(application.Spec.Items, api.Item{Kind: "ImageStream", Name: resource.Name}) {
+			delete(resource.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
+			if _, err := client.ImageStreams(application.Namespace).Update(&resource); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return nil
+}
+
 func unloadNodeLabel(client kclient.Interface, application *api.Application, labelSelector labels.Selector) error {
 
 	resourceList, _ := client.Nodes().List(labelSelector, fields.Everything())

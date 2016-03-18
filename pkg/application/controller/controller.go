@@ -86,6 +86,10 @@ func (c *ApplicationController) unifyDaemon(application *api.Application) {
 			resource, err := c.KubeClient.ReplicationControllers(application.Namespace).Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
 
+		case "ImageStream":
+			resource, err := c.Client.ImageStreams(application.Namespace).Get(application.Spec.Items[i].Name)
+			errHandle(err, application, i, resource.Labels)
+
 		case "Node":
 			resource, err := c.KubeClient.Nodes().Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
@@ -132,6 +136,10 @@ func (c *ApplicationController) preHandleAllLabel(application *api.Application) 
 	}
 
 	if err := unloadDeploymentConfigLabel(c.Client, application, selector); err != nil {
+		errs = append(errs, err)
+	}
+
+	if err := unloadImageStreamLabel(c.Client, application, selector); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -189,6 +197,10 @@ func (c *ApplicationController) handleAllLabel(app *api.Application) error {
 			}
 		case "ReplicationController":
 			if err := c.handleReplicationControllerLabel(app, i); err != nil {
+				errs = append(errs, err)
+			}
+		case "ImageStream":
+			if err := c.handleImageStreamLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "Node":

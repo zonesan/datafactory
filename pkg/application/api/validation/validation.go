@@ -10,9 +10,9 @@ import (
 	oapi "github.com/openshift/origin/pkg/api"
 	applicationapi "github.com/openshift/origin/pkg/application/api"
 	applicationutil "github.com/openshift/origin/pkg/application/util"
-	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 	oclient "github.com/openshift/origin/pkg/client"
 	kerrors "k8s.io/kubernetes/pkg/api/errors"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
 )
 
 func ValidateApplicationName(name string, prefix bool) (bool, string) {
@@ -76,6 +76,13 @@ func ValidationApplicationItemName(namespace string, items applicationapi.ItemLi
 
 		case "DeploymentConfig":
 			if _, err := oClient.DeploymentConfigs(namespace).Get(item.Name); err != nil {
+				if kerrors.IsNotFound(err) {
+					return false, fmt.Sprintf("resource %s=%s no found.", item.Kind, item.Name)
+				}
+			}
+
+		case "ImageStream":
+			if _, err := oClient.ImageStreams(namespace).Get(item.Name); err != nil {
 				if kerrors.IsNotFound(err) {
 					return false, fmt.Sprintf("resource %s=%s no found.", item.Kind, item.Name)
 				}
