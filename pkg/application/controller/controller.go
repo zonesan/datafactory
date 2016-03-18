@@ -66,10 +66,6 @@ func (c *ApplicationController) unifyDaemon(application *api.Application) {
 			resource, err := c.Client.ServiceBrokers().Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
 
-		case "BackingService":
-			resource, err := c.Client.BackingServices(application.Namespace).Get(application.Spec.Items[i].Name)
-			errHandle(err, application, i, resource.Labels)
-
 		case "BackingServiceInstance":
 			resource, err := c.Client.BackingServiceInstances(application.Namespace).Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
@@ -102,6 +98,7 @@ func (c *ApplicationController) unifyDaemon(application *api.Application) {
 			resource, err := c.KubeClient.Services(application.Namespace).Get(application.Spec.Items[i].Name)
 			errHandle(err, application, i, resource.Labels)
 		}
+
 	}
 
 	if application.Status.Phase == api.ApplicationChecking {
@@ -119,10 +116,6 @@ func (c *ApplicationController) preHandleAllLabel(application *api.Application) 
 	errs := []error{}
 
 	if err := unloadServiceBrokerLabel(c.Client, application, selector); err != nil {
-		errs = append(errs, err)
-	}
-
-	if err := unloadBackingServiceLabel(c.Client, application, selector); err != nil {
 		errs = append(errs, err)
 	}
 
@@ -176,10 +169,6 @@ func (c *ApplicationController) handleAllLabel(app *api.Application) error {
 		switch item.Kind {
 		case "ServiceBroker":
 			if err := c.handleServiceBrokerLabel(app, i); err != nil {
-				errs = append(errs, err)
-			}
-		case "BackingService":
-			if err := c.handleBackingServiceLabel(app, i); err != nil {
 				errs = append(errs, err)
 			}
 		case "BackingServiceInstance":
