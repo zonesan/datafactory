@@ -26,22 +26,6 @@ func unloadServiceBrokerLabel(client osclient.Interface, application *api.Applic
 	return nil
 }
 
-func unloadBackingServiceLabel(client osclient.Interface, application *api.Application, labelSelector labels.Selector) error {
-
-	resourceList, _ := client.BackingServices(application.Namespace).List(labelSelector, fields.Everything())
-	errs := []error{}
-	for _, resource := range resourceList.Items {
-		if !hasItem(application.Spec.Items, api.Item{Kind: "BackingService", Name: resource.Name}) {
-			delete(resource.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
-			if _, err := client.BackingServices(application.Namespace).Update(&resource); err != nil {
-				errs = append(errs, err)
-			}
-		}
-	}
-
-	return nil
-}
-
 func unloadBackingServiceInstanceLabel(client osclient.Interface, application *api.Application, labelSelector labels.Selector) error {
 
 	resourceList, _ := client.BackingServiceInstances(application.Namespace).List(labelSelector, fields.Everything())
@@ -114,6 +98,22 @@ func unloadReplicationControllerLabel(client kclient.Interface, application *api
 		if !hasItem(application.Spec.Items, api.Item{Kind: "ReplicationController", Name: resource.Name}) {
 			delete(resource.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
 			if _, err := client.ReplicationControllers(application.Namespace).Update(&resource); err != nil {
+				errs = append(errs, err)
+			}
+		}
+	}
+
+	return nil
+}
+
+func unloadImageStreamLabel(client osclient.Interface, application *api.Application, labelSelector labels.Selector) error {
+
+	resourceList, _ := client.ImageStreams(application.Namespace).List(labelSelector, fields.Everything())
+	errs := []error{}
+	for _, resource := range resourceList.Items {
+		if !hasItem(application.Spec.Items, api.Item{Kind: "ImageStream", Name: resource.Name}) {
+			delete(resource.Labels, fmt.Sprintf("%s.application.%s", application.Namespace, application.Name))
+			if _, err := client.ImageStreams(application.Namespace).Update(&resource); err != nil {
 				errs = append(errs, err)
 			}
 		}

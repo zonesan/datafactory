@@ -10,44 +10,51 @@ import (
 
 	api "github.com/openshift/origin/pkg/application/api"
 	applicationvalidation "github.com/openshift/origin/pkg/application/api/validation"
+
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	oclient "github.com/openshift/origin/pkg/client"
+
 )
 
 type Strategy struct {
 	runtime.ObjectTyper
+	KClient *kclient.Client
+	OClient *oclient.Client
 }
 
 // Strategy is the default logic that applies when creating and updating HostSubnet
 // objects via the REST API.
-var AppStrategy = Strategy{kapi.Scheme}
+var AppStrategy = Strategy{kapi.Scheme, nil, nil}
 
-func (Strategy) PrepareForUpdate(obj, old runtime.Object) {}
+func (s Strategy) PrepareForUpdate(obj, old runtime.Object) {}
 
-func (Strategy) NamespaceScoped() bool {
+func (s Strategy) NamespaceScoped() bool {
 	return true
 }
 
-func (Strategy) GenerateName(base string) string {
+func (s Strategy) GenerateName(base string) string {
 	return base
 }
 
-func (Strategy) PrepareForCreate(obj runtime.Object) {
+func (s Strategy) PrepareForCreate(obj runtime.Object) {
 }
 
-func (Strategy) Validate(ctx kapi.Context, obj runtime.Object) fielderrors.ValidationErrorList {
+func (s Strategy) Validate(ctx kapi.Context, obj runtime.Object) fielderrors.ValidationErrorList {
 	application := obj.(*api.Application)
-	return applicationvalidation.ValidateApplication(application)
+
+	return applicationvalidation.ValidateApplication(application, s.OClient, s.KClient)
 }
 
-func (Strategy) AllowCreateOnUpdate() bool {
+func (s Strategy) AllowCreateOnUpdate() bool {
 	return false
 }
 
-func (Strategy) AllowUnconditionalUpdate() bool {
+func (s Strategy) AllowUnconditionalUpdate() bool {
 	return false
 }
 
 // ValidateUpdate is the default update validation for a HostSubnet
-func (Strategy) ValidateUpdate(ctx kapi.Context, obj, old runtime.Object) fielderrors.ValidationErrorList {
+func (s Strategy) ValidateUpdate(ctx kapi.Context, obj, old runtime.Object) fielderrors.ValidationErrorList {
 	return fielderrors.ValidationErrorList{}
 }
 

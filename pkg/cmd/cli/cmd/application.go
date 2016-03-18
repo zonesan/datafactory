@@ -29,7 +29,6 @@ Create a new application to partition resources for a comfortable knowledge of m
 *  Pod  [po]
 *  Service  [svc]
 *  Event  [ev]
-*  BackingService  [bs]
 *  ServiceBroker  [sb]
 *  BackingServiceInstance  [bsi]
 

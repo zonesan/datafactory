@@ -13,6 +13,8 @@ import (
 	"github.com/openshift/origin/pkg/application/api"
 	application "github.com/openshift/origin/pkg/application/registry/application"
 	"k8s.io/kubernetes/pkg/runtime"
+	kclient "k8s.io/kubernetes/pkg/client/unversioned"
+	oclient "github.com/openshift/origin/pkg/client"
 )
 
 type REST struct {
@@ -20,8 +22,10 @@ type REST struct {
 }
 
 // NewREST returns a new REST.
-func NewREST(s storage.Interface) *REST {
+func NewREST(s storage.Interface, oClient *oclient.Client, kClient *kclient.Client) *REST {
 	prefix := "/applications"
+	application.AppStrategy.OClient = oClient
+	application.AppStrategy.KClient = kClient
 	store := &etcdgeneric.Etcd{
 		NewFunc:     func() runtime.Object { return &api.Application{} },
 		NewListFunc: func() runtime.Object { return &api.ApplicationList{} },

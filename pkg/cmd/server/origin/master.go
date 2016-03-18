@@ -336,8 +336,7 @@ func (c *MasterConfig) GetRestStorage() map[string]rest.Storage {
 	if err != nil {
 		glog.Fatalf("Unable to configure Kubelet client: %v", err)
 	}
-
-	applicationStorage := application.NewREST(c.EtcdHelper)
+	applicationStorage := application.NewREST(c.EtcdHelper, c.PrivilegedLoopbackOpenShiftClient, c.PrivilegedLoopbackKubernetesClient)
 	serviceBrokerStorage := servicebroker.NewREST(c.EtcdHelper)
 	backingServiceStorage := backingservice.NewREST(c.EtcdHelper)
 	

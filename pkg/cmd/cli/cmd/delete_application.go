@@ -55,6 +55,7 @@ func NewCmdDeleteApplication(fullName string, f *clientcmd.Factory, out io.Write
 			if err := options.Run(f); err != nil {
 				fmt.Println("run err %s", err.Error())
 			}
+
 		},
 	}
 
@@ -90,6 +91,8 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 		if err = o.Client.Applications(namespace).Delete(app.Name); err != nil {
 			return err
 		}
+
+		fmt.Printf("application %s deleted", app.Name)
 		return nil
 	}
 
@@ -98,5 +101,6 @@ func (o *DeleteApplicationOptions) Run(f *clientcmd.Factory) error {
 		return err
 	}
 
+	fmt.Printf("application %s deleted", app.Name)
 	return nil
 }

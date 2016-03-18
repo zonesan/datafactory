@@ -33,7 +33,7 @@ const (
 var ApplicationItemSupportKinds = []string{
 	"Build", "BuildConfig", "DeploymentConfig", "ImageStream", "ImageStreamTag", "ImageStreamImage", //openshift kind
 	"Event", "Node", "Job", "Pod", "ReplicationController", "Service", "PersistentVolume", "PersistentVolumeClaim", //k8s kind
-	"ServiceBroker", "BackingService", "BackingServiceInstance",
+	"ServiceBroker", "BackingServiceInstance",
 }
 
 type ApplicationPhase string
